@@ -6,6 +6,7 @@
 
 body {
   font-family: 'Be Vietnam Pro', sans-serif;
+  background-color: black;
 }
 :root {
   --primary-color: #605DC8;
