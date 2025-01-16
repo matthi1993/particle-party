@@ -108,7 +108,7 @@ export const computeShader = `
         let size = f32(300);
 
         var particle = me;
-        particle.velocity = (particle.velocity + force) * 0.25;
+        particle.velocity = (particle.velocity + force) * 0.1;
 
 
         particle.position += particle.velocity;
