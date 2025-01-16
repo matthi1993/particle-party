@@ -12,32 +12,32 @@ export function createDefaultSimulationModel() {
 
     data.forceByType = new Map()
     data.forceByType.set(RED, [
-      new Force(RED, RED, -10),
-      new Force(RED, GREEN, 10),
+      new Force(RED, RED, -1),
+      new Force(RED, GREEN, 1),
       new Force(RED, BLUE, 0),
-      new Force(RED, YELLOW, 10),
+      new Force(RED, YELLOW, 1),
     ]);
 
 
     data.forceByType.set(GREEN, [
-      new Force(GREEN, RED, 10),
-      new Force(GREEN, GREEN, 10),
-      new Force(GREEN, BLUE, 5),
-      new Force(GREEN, YELLOW, 2),
+      new Force(GREEN, RED, 1),
+      new Force(GREEN, GREEN, 1),
+      new Force(GREEN, BLUE, 0.5),
+      new Force(GREEN, YELLOW, 0.2),
     ]);
 
     data.forceByType.set(BLUE, [
       new Force(BLUE, RED, 0),
-      new Force(BLUE, GREEN, 5),
-      new Force(BLUE, BLUE, 10),
-      new Force(BLUE, YELLOW, -3),
+      new Force(BLUE, GREEN, 0.5),
+      new Force(BLUE, BLUE, 1),
+      new Force(BLUE, YELLOW, -0.3),
     ]);
 
     data.forceByType.set(YELLOW, [
-      new Force(YELLOW, RED, 10),
-      new Force(YELLOW, GREEN, 2),
-      new Force(YELLOW, BLUE, -3),
-      new Force(YELLOW, YELLOW, -10),
+      new Force(YELLOW, RED, 1),
+      new Force(YELLOW, GREEN, 0.2),
+      new Force(YELLOW, BLUE, -0.3),
+      new Force(YELLOW, YELLOW, -1),
     ]);
 
     data.points = create(3000, RED)
