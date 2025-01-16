@@ -50,7 +50,15 @@ export const computeShader = `
         let myType = particleTypes[i32(me.particleAttributes.x)];
 
         let numParticles = arrayLength(&particles);
-        let numForces = arrayLength(&forces);
+
+        var forceCounter = 0;
+        var myForces: array<f32, 4>;
+        for (var i: u32 = 0; i < arrayLength(&forces); i++) {
+            if(forces[i].idParticleA == me.particleAttributes.x) {
+                myForces[forceCounter] = forces[i].force;
+                forceCounter++;
+            }
+        }
 
         // Initialize force accumulator
         var force: vec4f = vec4f(0, 0,0,0);
@@ -81,15 +89,7 @@ export const computeShader = `
                 let distance = sqrt(distanceSquared);
 
                 if (distance > 0 && distance < myType.radius) {
-                    var gravity = f32(0);
-
-                    for (var i: u32 = 0; i < numForces; i++) {
-                        if(forces[i].idParticleA == me.particleAttributes.x && forces[i].idParticleB == other.particleAttributes.x) {
-                            gravity = forces[i].force;
-                            break;
-                        }
-                    }
-
+                    var gravity = myForces[i32(other.particleAttributes.x)];
                     let forceMagnitude = gravity / distance;
                     force += normalizeVector(direction) * forceMagnitude;
                 }
