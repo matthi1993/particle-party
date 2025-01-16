@@ -19,33 +19,24 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'default';
 
   private gpuContext: GpuContext = new GpuContext();
+  private simulationCompute?: Compute;
+  private simulationRenderer?: Render;
 
   private UPDATE_INTERVAL = 50;
   private step = 0;
 
-  private renderPipeline?: any;
-  private bindGroups?: any;
-  private squreVertex?: any;
-
-  private points?: any;
-
   private renderIntervalId: any;
-
-  private simulationCompute?: Compute;
-  private simulationRenderer?: Render;
 
   async ngOnInit() {
     await this.gpuContext.setup();
 
-    this.squreVertex = new Square(this.gpuContext.device);
-
-    this.points = create(1000, 0)
+    const points = create(1000, 0)
       .concat(create(3000, 1))
       .concat(create(2000, 2))
       .concat(create(3000, 3));
 
 
-    let positionArray = createArraysFromPoints(this.points);
+    let positionArray = createArraysFromPoints(points);
 
     const positionsStorage = [
       this.gpuContext.createStorageBuffer("Positions In", positionArray.byteLength),
@@ -73,7 +64,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     // Create a bind group to pass the grid uniforms into the pipeline
-    this.bindGroups = [
+    const bindGroups = [
       this.gpuContext.device.createBindGroup({
         label: "Cell renderer bind group A",
         layout: bindGroupLayout,
@@ -102,19 +93,19 @@ export class AppComponent implements OnInit, OnDestroy {
     this.simulationCompute = new Compute(
       this.gpuContext.device,
       pipelineLayout,
-      this.bindGroups,
-      this.points.length,
+      bindGroups,
+      points.length,
       computeShader
     )
 
     this.simulationRenderer = new Render(
       this.gpuContext,
       pipelineLayout,
-      this.bindGroups,
+      bindGroups,
         vertexShaderSource,
         fragmentShaderSource,
-        this.squreVertex,
-        this.points.length
+        new Square(this.gpuContext.device),
+        points.length
     )
 
     this.startRenderLoop();
@@ -127,13 +118,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Clear the interval to prevent memory leaks
     if (this.renderIntervalId) {
       clearInterval(this.renderIntervalId);
     }
   }
 
-  render() {
+  render() { // TODO seperate render and compute loop
     if (!this.gpuContext.device || !this.gpuContext.context) {
       return;
     }
@@ -141,7 +131,7 @@ export class AppComponent implements OnInit, OnDestroy {
     const encoder = this.gpuContext.device.createCommandEncoder();
 
     this.simulationCompute?.execute(encoder, this.step);
-    this.step++; //TODO rethink this stepper
+    this.step++; //TODO don't use this for render
     this.simulationRenderer?.execute(encoder, this.step, this.gpuContext.context.getCurrentTexture().createView());
     
     this.gpuContext.device.queue.submit([encoder.finish()]);
