@@ -1,7 +1,6 @@
-<div>
+<div class="wrapper">
     <div class="canvas-wrapper">
-        <canvas id="gpuCanvas" width="600" height="600"></canvas>
+        <canvas id="gpuCanvas" width="700" height="700"></canvas>
     </div>
-    <div class="controls-wrapper">
-    </div>
+    <app-controls [data]="simulationData" (onDataChange)="onDataChange($event)"></app-controls>
 </div>

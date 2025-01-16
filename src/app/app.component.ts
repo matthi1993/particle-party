@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { Square, create, createArraysFromPoints } from './utils';
+import { Square, createArraysFromPoints, createForcesArray, createTypesArray } from './utils';
 import { vertexShaderSource } from './shader/vertexShader';
 import { fragmentShaderSource } from './shader/fragmentShader';
 import { computeShader } from './shader/computeShader'
@@ -8,15 +8,21 @@ import { Compute } from './gpu.compute'
 import { Render } from './gpu.render'
 import { GpuContext } from './gpu.context'
 
+import { ControlsComponent, SimulationData } from './components/controls/controls.component';
+
 
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  imports: [
+    ControlsComponent
+  ]
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'default';
+
 
   private gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
@@ -27,16 +33,35 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private renderIntervalId: any;
 
+  public simulationData: SimulationData = new SimulationData();
+
   async ngOnInit() {
     await this.gpuContext.setup();
+    this.updateData();
+    this.startRenderLoop();
+  }
 
-    const points = create(1000, 0)
-      .concat(create(3000, 1))
-      .concat(create(2000, 2))
-      .concat(create(3000, 3));
+  startRenderLoop() {
+    this.renderIntervalId = setInterval(() => {
+      this.render();
+    }, this.UPDATE_INTERVAL);
+  }
 
+  ngOnDestroy() {
+    if (this.renderIntervalId) {
+      clearInterval(this.renderIntervalId);
+    }
+  }
 
-    let positionArray = createArraysFromPoints(points);
+  public onDataChange(data: SimulationData) {
+    this.simulationData = data;
+    this.updateData();
+  }
+
+  public updateData() {
+    this.step = 0;
+    console.log(this.simulationData);
+    let positionArray = createArraysFromPoints(this.simulationData.points);
 
     const positionsStorage = [
       this.gpuContext.createStorageBuffer("Positions In", positionArray.byteLength),
@@ -44,17 +69,34 @@ export class AppComponent implements OnInit, OnDestroy {
     ];
     this.gpuContext.device.queue.writeBuffer(positionsStorage[0], 0, positionArray);
 
-    // Create the bind group layout and pipeline layout.
+    let typesArray = createTypesArray(this.simulationData.types);
+    const typesStorage = this.gpuContext.createStorageBuffer("Types", typesArray.byteLength);
+    this.gpuContext.device.queue.writeBuffer(typesStorage, 0, typesArray);
+
+    let forcesArray = createForcesArray(this.simulationData.forces);
+    const forcesStorage = this.gpuContext.createStorageBuffer("Forces", forcesArray.byteLength);
+    this.gpuContext.device.queue.writeBuffer(forcesStorage, 0, forcesArray);
+    console.log(forcesArray);
+
+    // create the bind group layout and pipeline layout.
     const bindGroupLayout = this.gpuContext.device.createBindGroupLayout({
       label: "Cell Bind Group Layout",
       entries: [{
         binding: 0,
         visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
-        buffer: { type: "read-only-storage" } // Position in buffer
+        buffer: { type: "read-only-storage" } // position in buffer
       }, {
         binding: 1,
         visibility: GPUShaderStage.COMPUTE,
-        buffer: { type: "storage" } // Position out buffer
+        buffer: { type: "storage" } // position out buffer
+      }, {
+        binding: 2,
+        visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
+        buffer: { type: "read-only-storage" } // types buffer
+      }, {
+        binding: 3,
+        visibility: GPUShaderStage.COMPUTE,
+        buffer: { type: "read-only-storage" } // types buffer
       }]
     });
 
@@ -74,6 +116,12 @@ export class AppComponent implements OnInit, OnDestroy {
         }, {
           binding: 1,
           resource: { buffer: positionsStorage[1] }
+        }, {
+          binding: 2,
+          resource: { buffer: typesStorage }
+        }, {
+          binding: 3,
+          resource: { buffer: forcesStorage }
         }],
       }),
       this.gpuContext.device.createBindGroup({
@@ -85,6 +133,12 @@ export class AppComponent implements OnInit, OnDestroy {
         }, {
           binding: 1,
           resource: { buffer: positionsStorage[0] }
+        }, {
+          binding: 2,
+          resource: { buffer: typesStorage }
+        }, {
+          binding: 3,
+          resource: { buffer: forcesStorage }
         }],
       }),
     ];
@@ -94,7 +148,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.gpuContext.device,
       pipelineLayout,
       bindGroups,
-      points.length,
+      this.simulationData.points.length,
       computeShader
     )
 
@@ -102,25 +156,11 @@ export class AppComponent implements OnInit, OnDestroy {
       this.gpuContext,
       pipelineLayout,
       bindGroups,
-        vertexShaderSource,
-        fragmentShaderSource,
-        new Square(this.gpuContext.device),
-        points.length
+      vertexShaderSource,
+      fragmentShaderSource,
+      new Square(this.gpuContext.device),
+      this.simulationData.points.length
     )
-
-    this.startRenderLoop();
-  }
-
-  startRenderLoop() {
-    this.renderIntervalId = setInterval(() => {
-      this.render();
-    }, this.UPDATE_INTERVAL);
-  }
-
-  ngOnDestroy() {
-    if (this.renderIntervalId) {
-      clearInterval(this.renderIntervalId);
-    }
   }
 
   render() { // TODO seperate render and compute loop
@@ -133,7 +173,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.simulationCompute?.execute(encoder, this.step);
     this.step++; //TODO don't use this for render
     this.simulationRenderer?.execute(encoder, this.step, this.gpuContext.context.getCurrentTexture().createView());
-    
+
     this.gpuContext.device.queue.submit([encoder.finish()]);
   }
 }

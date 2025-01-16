@@ -8,8 +8,24 @@ export const computeShader = `
         particleAttributes: vec4f
     }
 
+    struct ParticleType {
+        color: vec4f,    // 16 bytes
+        id: f32,         // 4 bytes
+        radius: f32,     // 4 bytes
+        _padding: vec2f, // 8 bytes (to align the struct to 16 bytes)
+    }
+
+    struct Force {
+        idParticleA: f32,   // 4 bytes
+        idParticleB: f32,   // 4 bytes
+        force: f32,         // 4 bytes
+    }
+
     @group(0) @binding(0) var<storage> particles: array<Particle>;
     @group(0) @binding(1) var<storage, read_write> particlesOut: array<Particle>;
+
+    @group(0) @binding(2) var<storage> particleTypes: array<ParticleType>;
+    @group(0) @binding(3) var<storage> forces: array<Force>;
 
     var<workgroup> sharedParticles: array<Particle, ${WORKGROUP_SIZE}>; // Shared memory for particles in workgroup
 
@@ -27,14 +43,17 @@ export const computeShader = `
         @builtin(local_invocation_id) local_id: vec3<u32>, 
         @builtin(workgroup_id) workgroup_id: vec3<u32>
     ) {
-        let numParticles = arrayLength(&particles);
+
         let index = global_id.x;
 
         let me = particles[index];
+        let myType = particleTypes[i32(me.particleAttributes.x)];
+
+        let numParticles = arrayLength(&particles);
+        let numForces = arrayLength(&forces);
 
         // Initialize force accumulator
         var force: vec4f = vec4f(0, 0,0,0);
-        let forceRadius = f32(80); // TODO get from input, make different per particle
 
         // Loop over all particles in chunks
         for (var chunkStart = 0u; chunkStart < numParticles; chunkStart += ${WORKGROUP_SIZE}) {
@@ -50,7 +69,7 @@ export const computeShader = `
             // Calculate interactions with particles in shared memory
             for (var i = 0u; i < ${WORKGROUP_SIZE}; i++) {
                 
-            // stop loop if no more particles left
+                // stop loop if no more particles left
                 if (chunkStart + i >= numParticles) {
                     break;
                 }
@@ -61,75 +80,28 @@ export const computeShader = `
                 let distanceSquared = max(dot(direction, direction), 1e-6); // Avoid division by zero
                 let distance = sqrt(distanceSquared);
 
-                if (distance > 0 && distance < forceRadius) {
-                    var gravityByType = f32(0);
+                if (distance > 0 && distance < myType.radius) {
+                    var gravity = f32(0);
 
-                    if (me.particleAttributes.x == 0 && other.particleAttributes.x == 0) {
-                        gravityByType = -2;
-                    }
-                    if (me.particleAttributes.x == 0 && other.particleAttributes.x == 1) {
-                        gravityByType = 0.2;
-                    }
-                    if (me.particleAttributes.x == 0 && other.particleAttributes.x == 2) {
-                        gravityByType = 0.1;
-                    }
-                    if (me.particleAttributes.x == 0 && other.particleAttributes.x == 3) {
-                        gravityByType = 0.8;
+                    for (var i: u32 = 0; i < numForces; i++) {
+                        if(forces[i].idParticleA == me.particleAttributes.x && forces[i].idParticleB == other.particleAttributes.x) {
+                            gravity = forces[i].force;
+                            break;
+                        }
                     }
 
-
-
-                    if (me.particleAttributes.x == 1 && other.particleAttributes.x == 0) {
-                        gravityByType = 0.3;
-                    }   
-                    if (me.particleAttributes.x == 1 && other.particleAttributes.x == 1) {
-                        gravityByType = 0.2;
-                    }
-                    if (me.particleAttributes.x == 1 && other.particleAttributes.x == 2) {
-                        gravityByType = -0.3;
-                    }
-                    if (me.particleAttributes.x == 1 && other.particleAttributes.x == 3) {
-                        gravityByType = 0.1;
-                    }
-
-
-
-                    if (me.particleAttributes.x == 2 && other.particleAttributes.x == 0) {
-                        gravityByType = 0.3;
-                    }
-                    if (me.particleAttributes.x == 2 && other.particleAttributes.x == 1) {
-                       gravityByType = -0.3;
-                    }
-                    if (me.particleAttributes.x == 2 && other.particleAttributes.x == 2) {
-                        gravityByType = 0.9;
-                    }
-                    if (me.particleAttributes.x == 2 && other.particleAttributes.x == 3) {
-                        gravityByType = 0.3;
-                    }
-
-                    
-
-                    if (me.particleAttributes.x == 3 && other.particleAttributes.x == 0) {
-                        gravityByType = 0.3;
-                    }
-                    if (me.particleAttributes.x == 3 && other.particleAttributes.x == 1) {
-                       gravityByType = 0.4;
-                    }
-                    if (me.particleAttributes.x == 3 && other.particleAttributes.x == 2) {
-                        gravityByType = 0.1;
-                    }
-                    if (me.particleAttributes.x == 3 && other.particleAttributes.x == 3) {
-                        gravityByType = 0.2;
-                    }
-
-                    // Example: Gravitational force
-                    let forceMagnitude = gravityByType / distance;
+                    let forceMagnitude = gravity / distance;
                     force += normalizeVector(direction) * forceMagnitude;
                 }
             }
 
             workgroupBarrier(); // Synchronize before loading the next chunk
         }
+
+
+
+
+
 
         // Update the velocity and position of the particle
 

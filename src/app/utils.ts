@@ -1,3 +1,7 @@
+import { Force } from './components/controls/controls.component';
+import { ParticleType, Point } from './model/Point'
+
+
 const SQUARE = new Float32Array([
     -1, -1,
     1, -1,
@@ -35,52 +39,51 @@ export class Square {
     }
 }
 
-class Point {
-
-    public x: number;
-    public y: number;
-    public z: number;
-    public w: number;
-    public type: number;
-
-    constructor(x: number, y: number, type: number) {
-        this.x = x;
-        this.y = y;
-        this.z = 0;
-        this.w = 0;
-        this.type = type;
-    }
-}
-
-export function create(count: number, type: number) {
-    let list = [];
-    let size = 400;
-
-    for (let i = 0; i < count; i++) {
-        list.push(new Point(Math.random() * size - size / 2, Math.random() * size - size / 2, type));
-    }
-    return list;
-}
-
 export function createArraysFromPoints(points: Point[]) {
     let dimensions = 12;
-
     let positionArray = new Float32Array(points.length * dimensions);
 
-
     for (let i = 0; i < points.length; i++) {
-
         const element = points[i];
-
-        // set position
-        positionArray[i * dimensions] = element.x;
-        positionArray[i * dimensions + 1] = element.y;
-        positionArray[i * dimensions + 2] = element.z;
-        positionArray[i * dimensions + 3] = element.w;
-
-        // set velocity
-        // nothing to do as everything is 0
-        positionArray[i * dimensions + 8] = element.type;
+        
+        positionArray[i * dimensions] = element.position.x;
+        positionArray[i * dimensions + 1] = element.position.y;
+        positionArray[i * dimensions + 2] = element.position.z;
+        positionArray[i * dimensions + 3] = element.position.w;
+        
+        positionArray[i * dimensions + 8] = element.particleType.id;
     };
     return positionArray;
+}
+
+export function createTypesArray(types: ParticleType[]) {
+    let dimensions = 8;
+    let typesArray = new Float32Array(types.length * dimensions);
+
+    for (let i = 0; i < types.length; i++) {
+        const element = types[i];
+
+        typesArray[i * dimensions + 0] = element.color.x;
+        typesArray[i * dimensions + 1] = element.color.y;
+        typesArray[i * dimensions + 2] = element.color.z;
+        typesArray[i * dimensions + 3] = element.color.w;
+
+        typesArray[i * dimensions + 4] = element.id;
+        typesArray[i * dimensions + 5] = element.radius;
+    };
+    return typesArray;
+}
+
+export function createForcesArray(forces: Force[]) {
+    let dimensions = 3;
+    let forceArray = new Float32Array(forces.length * dimensions);
+
+    for (let i = 0; i < forces.length; i++) {
+        const element = forces[i];
+
+        forceArray[i * dimensions + 0] = element.particleA.id;
+        forceArray[i * dimensions + 1] = element.particleB.id;
+        forceArray[i * dimensions + 2] = element.force;
+    };
+    return forceArray;
 }
