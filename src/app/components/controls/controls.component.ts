@@ -61,9 +61,9 @@ export class ControlsComponent implements OnInit {
 
   updateData() {
     this.data.points = create(this.points, RED)
-      .concat(create(this.points, GREEN))
       .concat(create(this.points, BLUE))
-      .concat(create(this.points, YELLOW));
+      .concat(create(this.points, YELLOW))
+      .concat(create(this.points, GREEN));
 
     this.onDataChange.emit();
   }
