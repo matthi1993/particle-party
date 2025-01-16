@@ -52,7 +52,7 @@ export const computeShader = `
         let numParticles = arrayLength(&particles);
 
         var forceCounter = 0;
-        var myForces: array<f32, 4>;
+        var myForces: array<f32, 16>; // TODO 16 is the max number of types currently
         for (var i: u32 = 0; i < arrayLength(&forces); i++) {
             if(forces[i].idParticleA == me.particleAttributes.x) {
                 myForces[forceCounter] = forces[i].force;

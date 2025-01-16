@@ -8,7 +8,9 @@ import { Compute } from './gpu.compute'
 import { Render } from './gpu.render'
 import { GpuContext } from './gpu.context'
 
-import { ControlsComponent, SimulationData } from './components/controls/controls.component';
+import { ControlsComponent } from './components/controls/controls.component';
+import { SimulationData } from './model/Simulation';
+import { createDefaultSimulationModel } from './model/DefaultSimulationData';
 
 
 
@@ -28,12 +30,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private simulationCompute?: Compute;
   private simulationRenderer?: Render;
 
+  private forcesStorage?: any;
+  private typesStorage?: any;
+
   private UPDATE_INTERVAL = 50;
   private step = 0;
 
   private renderIntervalId: any;
 
-  public simulationData: SimulationData = new SimulationData();
+  public simulationData: SimulationData = createDefaultSimulationModel();
 
   async ngOnInit() {
     await this.gpuContext.setup();
@@ -53,14 +58,20 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onDataChange(data: SimulationData) {
-    this.simulationData = data;
+  public onDataChange() {
     this.updateData();
+  }
+
+  public onForcesChange() {
+    let forcesArray = createForcesArray(this.simulationData.forceByType);
+    this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
+
+    let typesArray = createTypesArray(this.simulationData.forceByType);
+    this.gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
   }
 
   public updateData() {
     this.step = 0;
-    console.log(this.simulationData);
     let positionArray = createArraysFromPoints(this.simulationData.points);
 
     const positionsStorage = [
@@ -69,14 +80,13 @@ export class AppComponent implements OnInit, OnDestroy {
     ];
     this.gpuContext.device.queue.writeBuffer(positionsStorage[0], 0, positionArray);
 
-    let typesArray = createTypesArray(this.simulationData.types);
-    const typesStorage = this.gpuContext.createStorageBuffer("Types", typesArray.byteLength);
-    this.gpuContext.device.queue.writeBuffer(typesStorage, 0, typesArray);
+    let typesArray = createTypesArray(this.simulationData.forceByType);
+    this.typesStorage = this.gpuContext.createStorageBuffer("Types", typesArray.byteLength);
+    this.gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
 
-    let forcesArray = createForcesArray(this.simulationData.forces);
-    const forcesStorage = this.gpuContext.createStorageBuffer("Forces", forcesArray.byteLength);
-    this.gpuContext.device.queue.writeBuffer(forcesStorage, 0, forcesArray);
-    console.log(forcesArray);
+    let forcesArray = createForcesArray(this.simulationData.forceByType);
+    this.forcesStorage = this.gpuContext.createStorageBuffer("Forces", forcesArray.byteLength);
+    this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
 
     // create the bind group layout and pipeline layout.
     const bindGroupLayout = this.gpuContext.device.createBindGroupLayout({
@@ -118,10 +128,10 @@ export class AppComponent implements OnInit, OnDestroy {
           resource: { buffer: positionsStorage[1] }
         }, {
           binding: 2,
-          resource: { buffer: typesStorage }
+          resource: { buffer: this.typesStorage }
         }, {
           binding: 3,
-          resource: { buffer: forcesStorage }
+          resource: { buffer: this.forcesStorage }
         }],
       }),
       this.gpuContext.device.createBindGroup({
@@ -135,10 +145,10 @@ export class AppComponent implements OnInit, OnDestroy {
           resource: { buffer: positionsStorage[0] }
         }, {
           binding: 2,
-          resource: { buffer: typesStorage }
+          resource: { buffer: this.typesStorage }
         }, {
           binding: 3,
-          resource: { buffer: forcesStorage }
+          resource: { buffer: this.forcesStorage }
         }],
       }),
     ];

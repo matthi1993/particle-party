@@ -13,11 +13,13 @@ export class Vec4 {
 }
 
 export class ParticleType {
+    public name;
     public id;
     public color;
     public radius;
 
-    constructor(id: number, color: Vec4, radius: number) {
+    constructor(name: string, id: number, color: Vec4, radius: number) {
+        this.name = name;
         this.id = id;
         this.color = color;
         this.radius = radius;

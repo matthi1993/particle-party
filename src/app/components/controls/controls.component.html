@@ -4,4 +4,27 @@
     <input [(ngModel)]="points" matInput placeholder="number of points ..." />
     <button mat-flat-button (click)="updateData()">Recreate Points</button>
 
+    <div class="force-matrix">
+
+        @for (entry of types; track entry) {
+        <mat-card appearance="outlined">
+            <mat-card-content>
+                <div>{{ entry.name }}</div>
+                <label>
+                    Radius:
+                    <input (change)="updateRadius(entry, $event)" matInput placeholder="radius ..." />
+                </label>
+                @for (entryForce of types; track entryForce) {
+                <div class="entry-force">
+                    <label>
+                        {{ entry.name }} {{ entry.id }} / {{ entryForce.name }} {{ entryForce.id }}: 
+                        <input (change)="updateForce(entry, entryForce, $event)" matInput placeholder="force ..." />
+                    </label>
+                </div>
+                }
+            </mat-card-content>
+        </mat-card>
+        }
+
+    </div>
 </div>

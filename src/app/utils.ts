@@ -1,5 +1,5 @@
-import { Force } from './components/controls/controls.component';
 import { ParticleType, Point } from './model/Point'
+import { Force } from './model/Simulation';
 
 
 const SQUARE = new Float32Array([
@@ -45,45 +45,51 @@ export function createArraysFromPoints(points: Point[]) {
 
     for (let i = 0; i < points.length; i++) {
         const element = points[i];
-        
+
         positionArray[i * dimensions] = element.position.x;
         positionArray[i * dimensions + 1] = element.position.y;
         positionArray[i * dimensions + 2] = element.position.z;
         positionArray[i * dimensions + 3] = element.position.w;
-        
+
         positionArray[i * dimensions + 8] = element.particleType.id;
     };
     return positionArray;
 }
 
-export function createTypesArray(types: ParticleType[]) {
+export function createTypesArray(types: Map<ParticleType, Force[]>) {
     let dimensions = 8;
-    let typesArray = new Float32Array(types.length * dimensions);
+    let typesArray = new Float32Array(types.size * dimensions);
 
-    for (let i = 0; i < types.length; i++) {
-        const element = types[i];
+    let index = 0;
+    types.forEach((value, key) => {
+        typesArray[index * dimensions + 0] = key.color.x;
+        typesArray[index * dimensions + 1] = key.color.y;
+        typesArray[index * dimensions + 2] = key.color.z;
+        typesArray[index * dimensions + 3] = key.color.w;
 
-        typesArray[i * dimensions + 0] = element.color.x;
-        typesArray[i * dimensions + 1] = element.color.y;
-        typesArray[i * dimensions + 2] = element.color.z;
-        typesArray[i * dimensions + 3] = element.color.w;
+        typesArray[index * dimensions + 4] = key.id;
+        typesArray[index * dimensions + 5] = key.radius;
 
-        typesArray[i * dimensions + 4] = element.id;
-        typesArray[i * dimensions + 5] = element.radius;
-    };
+        index++;
+    });
     return typesArray;
 }
 
-export function createForcesArray(forces: Force[]) {
+export function createForcesArray(types: Map<ParticleType, Force[]>) {
     let dimensions = 3;
-    let forceArray = new Float32Array(forces.length * dimensions);
+    const flattenedValues = Array.from(types.values()).flat();
+    let forceArray = new Float32Array(flattenedValues.length * dimensions);
 
-    for (let i = 0; i < forces.length; i++) {
-        const element = forces[i];
+    let index = 0;
+    types.forEach((value, key) => {
+        value.forEach(force => {
+            forceArray[index * dimensions + 0] = force.particleA.id;
+            forceArray[index * dimensions + 1] = force.particleB.id;
+            forceArray[index * dimensions + 2] = force.force;
+            
+            index++;
+        })
+    });
 
-        forceArray[i * dimensions + 0] = element.particleA.id;
-        forceArray[i * dimensions + 1] = element.particleB.id;
-        forceArray[i * dimensions + 2] = element.force;
-    };
     return forceArray;
 }
