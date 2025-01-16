@@ -65,55 +65,61 @@ export const computeShader = `
                     var gravityByType = f32(0);
 
                     if (me.particleAttributes.x == 0 && other.particleAttributes.x == 0) {
-                        gravityByType = -0.732;
+                        gravityByType = -2;
                     }
                     if (me.particleAttributes.x == 0 && other.particleAttributes.x == 1) {
-                        gravityByType = 0.317;
+                        gravityByType = 0.2;
                     }
                     if (me.particleAttributes.x == 0 && other.particleAttributes.x == 2) {
-                        gravityByType = -0.34;
+                        gravityByType = 0.1;
                     }
                     if (me.particleAttributes.x == 0 && other.particleAttributes.x == 3) {
-                        gravityByType = -0.14;
+                        gravityByType = 0.8;
                     }
+
+
 
                     if (me.particleAttributes.x == 1 && other.particleAttributes.x == 0) {
-                        gravityByType = 0.34;
+                        gravityByType = 0.3;
                     }   
                     if (me.particleAttributes.x == 1 && other.particleAttributes.x == 1) {
-                        gravityByType = -0.1;
+                        gravityByType = 0.2;
                     }
                     if (me.particleAttributes.x == 1 && other.particleAttributes.x == 2) {
-                        gravityByType = -0.2;
+                        gravityByType = -0.3;
                     }
                     if (me.particleAttributes.x == 1 && other.particleAttributes.x == 3) {
-                        gravityByType = 0.12;
+                        gravityByType = 0.1;
                     }
+
+
 
                     if (me.particleAttributes.x == 2 && other.particleAttributes.x == 0) {
-                        gravityByType = 0.92;
+                        gravityByType = 0.3;
                     }
                     if (me.particleAttributes.x == 2 && other.particleAttributes.x == 1) {
-                       gravityByType = 0.4;
+                       gravityByType = -0.3;
                     }
                     if (me.particleAttributes.x == 2 && other.particleAttributes.x == 2) {
-                        gravityByType = -0.2;
+                        gravityByType = 0.9;
                     }
                     if (me.particleAttributes.x == 2 && other.particleAttributes.x == 3) {
-                        gravityByType = -0.12;
+                        gravityByType = 0.3;
                     }
 
+                    
+
                     if (me.particleAttributes.x == 3 && other.particleAttributes.x == 0) {
-                        gravityByType = -0.32;
+                        gravityByType = 0.3;
                     }
                     if (me.particleAttributes.x == 3 && other.particleAttributes.x == 1) {
-                       gravityByType = -0.12;
+                       gravityByType = 0.4;
                     }
                     if (me.particleAttributes.x == 3 && other.particleAttributes.x == 2) {
-                        gravityByType = -0.92;
+                        gravityByType = 0.1;
                     }
                     if (me.particleAttributes.x == 3 && other.particleAttributes.x == 3) {
-                        gravityByType = 0.95;
+                        gravityByType = 0.2;
                     }
 
                     // Example: Gravitational force
@@ -127,24 +133,27 @@ export const computeShader = `
 
         // Update the velocity and position of the particle
 
-        let size = f32(3000);
+        let size = f32(300);
 
         var particle = me;
         particle.velocity = (particle.velocity + force) * 0.5;
 
 
+        particle.position += particle.velocity;
+
+
         if(particle.position.x > size || particle.position.x < -1 * size) {
             particle.velocity.x = particle.velocity.x * -1;
+            particle.position.x += particle.velocity.x;
         }
         if(particle.position.y > size || particle.position.y < -1 * size) {
             particle.velocity.y = particle.velocity.y * -1;
+            particle.position.y += particle.velocity.y;
         }
         if(particle.position.z > size || particle.position.z < -1 * size) {
             particle.velocity.z = particle.velocity.z * -1;
+            particle.position.z += particle.velocity.z;
         }
-
-
-        particle.position += particle.velocity;
 
         particlesOut[index] = particle;
         

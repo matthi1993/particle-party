@@ -54,7 +54,7 @@ class Point {
 
 export function create(count: number, type: number) {
     let list = [];
-    let size = 500;
+    let size = 400;
 
     for (let i = 0; i < count; i++) {
         list.push(new Point(Math.random() * size - size / 2, Math.random() * size - size / 2, type));

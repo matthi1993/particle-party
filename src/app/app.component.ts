@@ -39,10 +39,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.squreVertex = new Square(this.gpuContext.device);
 
-    this.points = create(2000, 0)
-      .concat(create(2000, 1))
+    this.points = create(1000, 0)
+      .concat(create(3000, 1))
       .concat(create(2000, 2))
-      .concat(create(2000, 3));
+      .concat(create(3000, 3));
 
 
     let positionArray = createArraysFromPoints(this.points);
