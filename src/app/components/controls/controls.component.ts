@@ -57,10 +57,10 @@ export class SimulationData {
       new Force(YELLOW, BLUE, -3),
     ];
 
-    this.points = create(200, RED)
-      .concat(create(200, GREEN))
-      .concat(create(200, BLUE))
-      .concat(create(200, YELLOW));
+    this.points = create(3000, RED)
+      .concat(create(3000, GREEN))
+      .concat(create(3000, BLUE))
+      .concat(create(3000, YELLOW));
   }
 }
 
