@@ -1,7 +1,4 @@
 <div class="controls-wrapper">
-    Components:
-
-    <input [(ngModel)]="points" matInput placeholder="number of points ..." />
     <button mat-flat-button (click)="updateData()">Recreate Points</button>
 
     <div class="force-matrix">
@@ -10,10 +7,18 @@
         <mat-card appearance="outlined">
             <mat-card-content>
                 <div>{{ entry.name }}</div>
-                <label>
-                    Radius:
-                    <input (change)="updateRadius(entry, $event)" matInput placeholder="radius ..." />
-                </label>
+                <div class="entry-force">
+                    <label>
+                        Points:
+                        <input (change)="updatePoints(entry, $event)" matInput placeholder="points ..." />
+                    </label>
+                </div>
+                <div class="entry-force">
+                    <label>
+                        Radius:
+                        <input (change)="updateRadius(entry, $event)" matInput placeholder="radius ..." />
+                    </label>
+                </div>
                 @for (entryForce of types; track entryForce) {
                 <div class="entry-force">
                     <label>

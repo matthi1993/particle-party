@@ -22,7 +22,7 @@ export class ControlsComponent implements OnInit {
   public onDataChange = output();
   public onForcesChange = output();
 
-  public points: number = 1000;
+  public points: number[] = [100, 100, 100, 100];
 
   public types: ParticleType[] = [];
 
@@ -31,6 +31,11 @@ export class ControlsComponent implements OnInit {
   ngOnInit(): void {
     this.types = [RED, BLUE, YELLOW, GREEN];
 
+  }
+
+  updatePoints(type: ParticleType, event: Event) {
+    const inputValue = Number((event.target as HTMLInputElement).value);
+    this.points[type.id] = inputValue;
   }
 
   updateRadius(type: ParticleType, event: Event) {
@@ -61,10 +66,10 @@ export class ControlsComponent implements OnInit {
 
   updateData() {
     let cubeSize = 600;
-    this.data.points = create(this.points, RED, cubeSize)
-      .concat(create(this.points, BLUE, cubeSize))
-      .concat(create(this.points, YELLOW, cubeSize))
-      .concat(create(this.points, GREEN, cubeSize));
+    this.data.points = create(this.points[0], RED, cubeSize)
+      .concat(create(this.points[1], BLUE, cubeSize))
+      .concat(create(this.points[2], YELLOW, cubeSize))
+      .concat(create(this.points[3], GREEN, cubeSize));
 
     this.onDataChange.emit();
   }

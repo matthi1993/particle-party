@@ -44,9 +44,23 @@ export class Render {
                     code: fragmentShaderSource,
                 }),
                 entryPoint: "fragmentMain",
-                targets: [{
-                    format: gpuContext.canvasFormat
-                }]
+                targets: [
+                    {
+                      format: "bgra8unorm", // Color format
+                      blend: {
+                        color: {
+                          srcFactor: "src-alpha", // Use source alpha
+                          dstFactor: "one-minus-src-alpha", // Destination based on source alpha
+                          operation: "add", // Add blended colors
+                        },
+                        alpha: {
+                          srcFactor: "one", // Keep the alpha channel as is
+                          dstFactor: "zero", // Ignore destination alpha
+                          operation: "add",
+                        },
+                      },
+                    },
+                  ]
             }
         });
 
