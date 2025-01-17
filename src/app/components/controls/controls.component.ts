@@ -60,10 +60,11 @@ export class ControlsComponent implements OnInit {
   }
 
   updateData() {
-    this.data.points = create(this.points, RED)
-      .concat(create(this.points, BLUE))
-      .concat(create(this.points, YELLOW))
-      .concat(create(this.points, GREEN));
+    let cubeSize = 600;
+    this.data.points = create(this.points, RED, cubeSize)
+      .concat(create(this.points, BLUE, cubeSize))
+      .concat(create(this.points, YELLOW, cubeSize))
+      .concat(create(this.points, GREEN, cubeSize));
 
     this.onDataChange.emit();
   }

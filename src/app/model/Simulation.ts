@@ -1,5 +1,5 @@
 
-import { ParticleType, Point, Vec4, create } from 'src/app/model/Point';
+import { ParticleType, Point } from 'src/app/model/Point';
 
 export class Force {
   public particleA: ParticleType;

@@ -17,10 +17,14 @@ export const vertexShaderSource = `
         _padding: vec2f, // 8 bytes (to align the struct to 16 bytes)
     }
 
-    @group(0) @binding(0) var<storage> dataIn: array<Particle>;
-    @group(0) @binding(1) var<storage, read_write> dataOut: array<Particle>;
+    struct Uniforms {
+        viewProjectionMatrix: mat4x4<f32>
+    }
 
+
+    @group(0) @binding(0) var<storage> dataIn: array<Particle>;
     @group(0) @binding(2) var<storage> particleTypes: array<ParticleType>;
+    @group(0) @binding(4)  var<uniform> uniforms: Uniforms;
 
     @vertex
     fn vertexMain(
@@ -32,10 +36,12 @@ export const vertexShaderSource = `
         
         var output: VertexOutput;
 
-        var size = f32(2);
-        var distance = f32(350);
+        var size = f32(5);
+        var offset = vec4f(0,0,0,50);
 
-        output.position = vec4f(position, 0, 0) * size + dataIn[instance].position + vec4f(0,0,0,distance);
+        let modelViewProjection = uniforms.viewProjectionMatrix;
+        let localPosition =  offset + dataIn[instance].position;
+        output.position = modelViewProjection * localPosition + vec4f(position * size, 0, 0) ;
         output.color = myType.color;
 
         return output;

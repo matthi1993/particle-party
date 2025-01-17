@@ -1,10 +1,11 @@
-import { create, ParticleType, Vec4 } from "./Point";
+import { vec4 } from "gl-matrix";
+import { create, ParticleType } from "./Point";
 import { Force, SimulationData } from "./Simulation";
 
-export const RED = new ParticleType("Red", 0, new Vec4(1, 0, 0, 1), 500);
-export const BLUE = new ParticleType("Blue", 1, new Vec4(0, 0, 1, 1), 80);
-export const YELLOW = new ParticleType("Yellow", 2, new Vec4(1, 1, 0, 1), 80);
-export const GREEN = new ParticleType("Green", 3, new Vec4(0, 1, 0, 1), 80);
+export const RED = new ParticleType("Red", 0, vec4.fromValues(1, 0, 0, 1), 500);
+export const BLUE = new ParticleType("Blue", 1, vec4.fromValues(0, 0, 1, 1), 80);
+export const YELLOW = new ParticleType("Yellow", 2, vec4.fromValues(1, 1, 0, 1), 80);
+export const GREEN = new ParticleType("Green", 3, vec4.fromValues(0, 1, 0, 1), 80);
 
 
 // ## Be aware that the order of the forces is important in the SHADER!!!
@@ -42,10 +43,10 @@ export function createDefaultSimulationModel() {
     new Force(GREEN, GREEN, -0.25),
   ]);
 
-  data.points = create(4000, RED)
-    .concat(create(4000, BLUE))
-    .concat(create(4000, YELLOW))
-    .concat(create(4000, GREEN));
+  data.points = create(2000, RED, 600)
+    .concat(create(2000, BLUE, 600))
+    .concat(create(2000, YELLOW, 600))
+    .concat(create(2000, GREEN, 600));
 
   return data;
 }

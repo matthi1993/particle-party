@@ -11,6 +11,7 @@ import { GpuContext } from './gpu.context'
 import { ControlsComponent } from './components/controls/controls.component';
 import { SimulationData } from './model/Simulation';
 import { createDefaultSimulationModel } from './model/DefaultSimulationData';
+import { Camera } from './model/Camera';
 
 
 
@@ -32,6 +33,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private forcesStorage?: any;
   private typesStorage?: any;
+  private viewProjectionBuffer?: any;
 
   private UPDATE_INTERVAL = 50;
   private step = 0;
@@ -39,6 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private renderIntervalId: any;
 
   public simulationData: SimulationData = createDefaultSimulationModel();
+  private camera?: Camera;
 
   async ngOnInit() {
     await this.gpuContext.setup();
@@ -88,6 +91,23 @@ export class AppComponent implements OnInit, OnDestroy {
     this.forcesStorage = this.gpuContext.createStorageBuffer("Forces", forcesArray.byteLength);
     this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
 
+    // CAMERA STUFF #######################
+    this.camera = new Camera(this.gpuContext.canvas!!.width, this.gpuContext.canvas!!.height);
+
+    this.viewProjectionBuffer = this.gpuContext.device.createBuffer({
+      size: 64, // 4x4 matrix of 4-byte floats
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+
+    // Write the matrix to the buffer
+    this.gpuContext.device.queue.writeBuffer(
+      this.viewProjectionBuffer,
+      0,
+      new Float32Array(this.camera.getViewProjectionMatrix())
+    );
+    // #######################
+
+
     // create the bind group layout and pipeline layout.
     const bindGroupLayout = this.gpuContext.device.createBindGroupLayout({
       label: "Cell Bind Group Layout",
@@ -107,7 +127,12 @@ export class AppComponent implements OnInit, OnDestroy {
         binding: 3,
         visibility: GPUShaderStage.COMPUTE,
         buffer: { type: "read-only-storage" } // types buffer
-      }]
+      }, {
+        binding: 4,
+        visibility: GPUShaderStage.VERTEX,
+        buffer: { type: "uniform" } // types buffer
+      }
+      ]
     });
 
     const pipelineLayout = this.gpuContext.device.createPipelineLayout({
@@ -132,6 +157,11 @@ export class AppComponent implements OnInit, OnDestroy {
         }, {
           binding: 3,
           resource: { buffer: this.forcesStorage }
+        }, {
+          binding: 4,
+          resource: {
+            buffer: this.viewProjectionBuffer,
+          },
         }],
       }),
       this.gpuContext.device.createBindGroup({
@@ -149,6 +179,11 @@ export class AppComponent implements OnInit, OnDestroy {
         }, {
           binding: 3,
           resource: { buffer: this.forcesStorage }
+        }, {
+          binding: 4,
+          resource: {
+            buffer: this.viewProjectionBuffer,
+          },
         }],
       }),
     ];
@@ -174,9 +209,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   render() { // TODO seperate render and compute loop
-    if (!this.gpuContext.device || !this.gpuContext.context) {
+    if (!this.gpuContext.device || !this.gpuContext.context || !this.camera) {
       return;
     }
+
+    this.camera.updateCamera();
+    this.gpuContext.device.queue.writeBuffer(this.viewProjectionBuffer, 0, new Float32Array(this.camera.getViewProjectionMatrix()));
 
     const encoder = this.gpuContext.device.createCommandEncoder();
 

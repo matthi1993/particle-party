@@ -1,16 +1,5 @@
-export class Vec4 {
-    public x: number = 1;
-    public y: number = 1;
-    public z: number = 1;
-    public w: number = 1;
 
-    constructor(x: number, y: number, z: number, w: number) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
-    }
-}
+import { vec4 } from 'gl-matrix';
 
 export class ParticleType {
     public name;
@@ -18,7 +7,7 @@ export class ParticleType {
     public color;
     public radius;
 
-    constructor(name: string, id: number, color: Vec4, radius: number) {
+    constructor(name: string, id: number, color: vec4, radius: number) {
         this.name = name;
         this.id = id;
         this.color = color;
@@ -28,21 +17,28 @@ export class ParticleType {
 
 
 export class Point {
-    public position: Vec4;
+    public position: vec4;
     public particleType: ParticleType;
 
-    constructor(x: number, y: number, type: ParticleType) {
-        this.position = new Vec4(x, y, 0, 0);
+    constructor(position: vec4, type: ParticleType) {
+        this.position = position;
         this.particleType = type;
     }
 }
 
-export function create(count: number, type: ParticleType) {
+export function create(count: number, type: ParticleType, size: number) {
     let list = [];
-    let size = 600;
-
     for (let i = 0; i < count; i++) {
-        list.push(new Point(Math.random() * size - size / 2, Math.random() * size - size / 2, type));
+        list.push(
+            new Point(
+                vec4.fromValues(
+                    Math.random() * size - size / 2,
+                    Math.random() * size - size / 2,
+                    Math.random() * size - size / 2,
+                    0
+                ),
+                type
+            ));
     }
     return list;
 }

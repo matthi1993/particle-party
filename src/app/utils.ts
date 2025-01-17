@@ -46,10 +46,10 @@ export function createArraysFromPoints(points: Point[]) {
     for (let i = 0; i < points.length; i++) {
         const element = points[i];
 
-        positionArray[i * dimensions] = element.position.x;
-        positionArray[i * dimensions + 1] = element.position.y;
-        positionArray[i * dimensions + 2] = element.position.z;
-        positionArray[i * dimensions + 3] = element.position.w;
+        positionArray[i * dimensions] = element.position[0];
+        positionArray[i * dimensions + 1] = element.position[1];
+        positionArray[i * dimensions + 2] = element.position[2];
+        positionArray[i * dimensions + 3] = element.position[3];
 
         positionArray[i * dimensions + 8] = element.particleType.id;
     };
@@ -62,10 +62,10 @@ export function createTypesArray(types: Map<ParticleType, Force[]>) {
 
     let index = 0;
     types.forEach((value, key) => {
-        typesArray[index * dimensions + 0] = key.color.x;
-        typesArray[index * dimensions + 1] = key.color.y;
-        typesArray[index * dimensions + 2] = key.color.z;
-        typesArray[index * dimensions + 3] = key.color.w;
+        typesArray[index * dimensions + 0] = key.color[0];
+        typesArray[index * dimensions + 1] = key.color[1];
+        typesArray[index * dimensions + 2] = key.color[2];
+        typesArray[index * dimensions + 3] = key.color[3];
 
         typesArray[index * dimensions + 4] = key.id;
         typesArray[index * dimensions + 5] = key.radius;
