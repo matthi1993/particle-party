@@ -32,7 +32,7 @@ export function create(count: number, type: ParticleType, size: number) {
         list.push(
             new Point(
                 vec4.fromValues(
-                    Math.random() * size - size / 2,
+                    0,//Math.random() * size - size / 2,
                     Math.random() * size - size / 2,
                     Math.random() * size - size / 2,
                     0

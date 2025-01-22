@@ -42,7 +42,7 @@ export class Camera {
         // Calculate the new camera position
         this.eye = [
             this.cameraRadius * Math.cos(this.cameraAngle), // X-coordinate
-            10,                                   // Y-coordinate (height of the camera)
+            0,                                   // Y-coordinate (height of the camera)
             this.cameraRadius * Math.sin(this.cameraAngle) // Z-coordinate
         ];
 
