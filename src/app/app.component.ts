@@ -94,6 +94,31 @@ export class AppComponent implements OnInit, OnDestroy {
     // CAMERA STUFF #######################
     this.camera = new Camera(this.gpuContext.canvas!!.width, this.gpuContext.canvas!!.height);
 
+    let isMouseDown = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    this.gpuContext.canvas!!.addEventListener("mousedown", (e: MouseEvent) => {
+      isMouseDown = true;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+    this.gpuContext.canvas!!.addEventListener("mousemove", (e: MouseEvent) => {
+      if (isMouseDown) {
+        const deltaX = e.clientX - lastMouseX;
+        const deltaY = e.clientY - lastMouseY;
+
+        // Update the last mouse position
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+
+        this.camera!!.cameraAngle += deltaX / 100;
+      }
+    });
+    this.gpuContext.canvas!!.addEventListener("mouseup", () => {
+      isMouseDown = false;
+    });
+
     this.viewProjectionBuffer = this.gpuContext.device.createBuffer({
       size: 64, // 4x4 matrix of 4-byte floats
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,

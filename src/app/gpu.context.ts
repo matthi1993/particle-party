@@ -27,11 +27,6 @@ export class GpuContext {
       format: this.canvasFormat, // Match the render pipeline and pass
       alphaMode: "opaque",
     });
-    /*this.context!!.configure({
-      device: this.device,
-      format: "bgra8unorm", // Match the render pipeline and pass
-      alphaMode: "premultiplied",
-    });*/
   }
 
   public createStorageBuffer(label: string, byteLength: number) {

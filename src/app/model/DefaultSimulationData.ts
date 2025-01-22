@@ -43,8 +43,8 @@ export function createDefaultSimulationModel() {
     new Force(GREEN, GREEN, -10),
   ]);
 
-  data.points = create(8000, RED, 600)
-    .concat(create(4000, BLUE, 600))
+  data.points = create(2000, RED, 600)
+    .concat(create(2000, BLUE, 600))
     .concat(create(2000, YELLOW, 600))
     .concat(create(2000, GREEN, 600));
 

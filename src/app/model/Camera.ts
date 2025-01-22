@@ -38,8 +38,6 @@ export class Camera {
     }
 
     updateCamera() {
-        // Update the camera angle
-        this.cameraAngle += this.rotationSpeed;
 
         // Calculate the new camera position
         this.eye = [
