@@ -2,8 +2,8 @@ import { vec4 } from "gl-matrix";
 import { create, ParticleType } from "./Point";
 import { Force, SimulationData } from "./Simulation";
 
-export const RED = new ParticleType("Red", 0, vec4.fromValues(1, 0, 0, 0.125), 100);
-export const BLUE = new ParticleType("Blue", 1, vec4.fromValues(0, 1, 1, 0.125), 120);
+export const RED = new ParticleType("Red", 0, vec4.fromValues(1, 0, 0, 0.125), 120);
+export const BLUE = new ParticleType("Blue", 1, vec4.fromValues(0, 1, 1, 0.125), 100);
 export const YELLOW = new ParticleType("Yellow", 2, vec4.fromValues(1, 1, 0, 0.125), 80);
 export const GREEN = new ParticleType("Green", 3, vec4.fromValues(0, 1, 0, 0.125), 150);
 
@@ -18,35 +18,35 @@ export function createDefaultSimulationModel() {
   data.forceByType.set(RED, [
     new Force(RED, RED, 0.5),
     new Force(RED, BLUE, -0.25),
-    new Force(RED, YELLOW, 10),
-    new Force(RED, GREEN, 10),
+    new Force(RED, YELLOW, 2),
+    new Force(RED, GREEN, 2),
   ]);
 
   data.forceByType.set(BLUE, [
     new Force(BLUE, RED, 0),
     new Force(BLUE, BLUE, 1),
-    new Force(BLUE, YELLOW, -10),
-    new Force(BLUE, GREEN, 10),
+    new Force(BLUE, YELLOW, -2),
+    new Force(BLUE, GREEN, 2),
   ]);
 
   data.forceByType.set(YELLOW, [
     new Force(YELLOW, RED, 0.5),
     new Force(YELLOW, BLUE, 2),
     new Force(YELLOW, YELLOW, -5),
-    new Force(YELLOW, GREEN, 10),
+    new Force(YELLOW, GREEN, 2),
   ]);
 
   data.forceByType.set(GREEN, [
     new Force(GREEN, RED, 0.25),
     new Force(GREEN, BLUE, -0.25),
     new Force(GREEN, YELLOW, -2),
-    new Force(GREEN, GREEN, -10),
+    new Force(GREEN, GREEN, -0.5),
   ]);
 
-  data.points = create(2000, RED, 600)
+  data.points = create(1000, RED, 600)
     .concat(create(2000, BLUE, 600))
     .concat(create(2000, YELLOW, 600))
-    .concat(create(2000, GREEN, 600));
+    .concat(create(1000, GREEN, 600));
 
   return data;
 }
