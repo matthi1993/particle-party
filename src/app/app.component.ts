@@ -35,7 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private typesStorage?: any;
   private viewProjectionBuffer?: any;
 
-  private UPDATE_INTERVAL = 75;
+  private UPDATE_INTERVAL = 50;
   private step = 0;
 
   private renderIntervalId: any;

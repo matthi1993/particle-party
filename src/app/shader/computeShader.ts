@@ -92,9 +92,9 @@ export const computeShader = `
 
                 if (distance > 0.0 && distance <= innerRadius) {
                     force += normalizeVector(direction) * 1;
-                } else if (distance > innerRadius && distance < myType.radius) {
+                } else {
                     var gravity = myForces[i32(other.particleAttributes.x)];
-                    let forceMagnitude = gravity / distance;
+                    let forceMagnitude = gravity / distanceSquared;
                     force += normalizeVector(direction) * forceMagnitude;
                 }
             }

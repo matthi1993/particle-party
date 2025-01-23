@@ -16,7 +16,7 @@ export function createDefaultSimulationModel() {
   data.forceByType = new Map()
 
   data.forceByType.set(RED, [
-    new Force(RED, RED, -0.2),
+    new Force(RED, RED, -1),
     new Force(RED, BLUE, 0),
     new Force(RED, YELLOW, -0.52),
     new Force(RED, GREEN, -0.72),
@@ -30,10 +30,10 @@ export function createDefaultSimulationModel() {
   ]);
 
   data.forceByType.set(YELLOW, [
-    new Force(YELLOW, RED, 0.75),
+    new Force(YELLOW, RED, 10),
     new Force(YELLOW, BLUE, 2),
     new Force(YELLOW, YELLOW, -5),
-    new Force(YELLOW, GREEN, 2),
+    new Force(YELLOW, GREEN, 10),
   ]);
 
   data.forceByType.set(GREEN, [
@@ -43,10 +43,10 @@ export function createDefaultSimulationModel() {
     new Force(GREEN, GREEN, -0.5),
   ]);
 
-  data.points = create(2000, RED, 600)
-    .concat(create(4000, BLUE, 600))
-    .concat(create(4000, YELLOW, 600))
-    .concat(create(3000, GREEN, 600));
+  data.points = create(2000, RED, 1000)
+    .concat(create(2000, BLUE, 1000))
+    .concat(create(2000, YELLOW, 1000))
+    .concat(create(3000, GREEN, 1000));
 
   return data;
 }

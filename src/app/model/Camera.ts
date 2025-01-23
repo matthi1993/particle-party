@@ -22,7 +22,7 @@ export class Camera {
         const fov = Math.PI / 4;
         const aspect = width / height;
         const near = 0.1;
-        const far = 100.0;
+        const far = 500.0;
 
         // Projection matrix
         mat4.perspective(this.projectionMatrix, fov, aspect, near, far);
