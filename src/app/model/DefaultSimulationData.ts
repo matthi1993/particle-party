@@ -2,10 +2,10 @@ import { vec4 } from "gl-matrix";
 import { create, ParticleType } from "./Point";
 import { Force, SimulationData } from "./Simulation";
 
-export const RED = new ParticleType("Red", 0, vec4.fromValues(1, 0, 0, 1), 100);
-export const BLUE = new ParticleType("Blue", 1, vec4.fromValues(0, 1, 1, 1), 100);
-export const YELLOW = new ParticleType("Yellow", 2, vec4.fromValues(1, 1, 0, 1), 100);
-export const GREEN = new ParticleType("Green", 3, vec4.fromValues(0, 1, 0, 1), 100);
+export const RED = new ParticleType("Red", 0, vec4.fromValues(1, 0, 0, 0.5), 100);
+export const BLUE = new ParticleType("Blue", 1, vec4.fromValues(0, 1, 1, 0.5), 100);
+export const YELLOW = new ParticleType("Yellow", 2, vec4.fromValues(1, 1, 0, 0.5), 100);
+export const GREEN = new ParticleType("Green", 3, vec4.fromValues(0, 1, 0, 0.5), 100);
 
 
 // ## Be aware that the order of the forces is important in the SHADER!!!
@@ -16,15 +16,15 @@ export function createDefaultSimulationModel() {
   data.forceByType = new Map()
 
   data.forceByType.set(RED, [
-    new Force(RED, RED, 0),
-    new Force(RED, BLUE, 0),
+    new Force(RED, RED, -1),
+    new Force(RED, BLUE, 2),
     new Force(RED, YELLOW, 0),
     new Force(RED, GREEN, 0),
   ]);
 
   data.forceByType.set(BLUE, [
-    new Force(BLUE, RED, 0),
-    new Force(BLUE, BLUE, 0),
+    new Force(BLUE, RED, -0.5),
+    new Force(BLUE, BLUE, -0.5),
     new Force(BLUE, YELLOW, 0),
     new Force(BLUE, GREEN, 0),
   ]);
@@ -43,10 +43,10 @@ export function createDefaultSimulationModel() {
     new Force(GREEN, GREEN, 0),
   ]);
 
-  data.points = create(100, RED, 1000)
-    .concat(create(100, BLUE, 1000))
-    .concat(create(100, YELLOW, 1000))
-    .concat(create(100, GREEN, 1000));
+  data.points = create(1000, RED, 1200)
+    .concat(create(1000, BLUE, 1200))
+    .concat(create(100, YELLOW, 1200))
+    .concat(create(100, GREEN, 1200));
 
   return data;
 }

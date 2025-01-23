@@ -36,7 +36,7 @@ export const vertexShaderSource = `
         
         var output: VertexOutput;
 
-        var size = f32(15);
+        var size = f32(20);
         var offset = vec4f(0,0,0,50); // TODO why do i need this?
 
         let modelViewProjection = uniforms.viewProjectionMatrix;

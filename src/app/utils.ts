@@ -11,6 +11,41 @@ const SQUARE = new Float32Array([
     -1, 1,
 ]);
 
+const OCTAGON = new Float32Array([
+
+    0, 0,
+    -1, 0,
+    -0.75, 0.75,
+
+    0, 0,
+    -0.75, 0.75,
+    0, 1,
+
+    0, 0,
+    0, 1,
+    0.75, 0.75,
+
+    0, 0,
+    1, 0,
+    0.75, 0.75,
+
+    0, 0,
+    1, 0,
+    0.75, -0.75,
+
+    0, 0,
+    0.75, -0.75,
+    0, -1,
+
+    0, 0,
+    0, -1,
+    -0.75, -0.75,
+
+    0, 0,
+    -0.75, -0.75,
+    -1, 0
+]);
+
 export class Square {
 
     public vertices: any;
@@ -18,7 +53,7 @@ export class Square {
     public vertexBufferLayout;
 
     constructor(device: any) {
-        this.vertices = SQUARE;
+        this.vertices = OCTAGON;
 
         this.vertexBuffer = device.createBuffer({
             label: "Cell vertices",
@@ -86,7 +121,7 @@ export function createForcesArray(types: Map<ParticleType, Force[]>) {
             forceArray[index * dimensions + 0] = force.particleA.id;
             forceArray[index * dimensions + 1] = force.particleB.id;
             forceArray[index * dimensions + 2] = force.force;
-            
+
             index++;
         })
     });

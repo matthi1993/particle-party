@@ -60,5 +60,8 @@
     
     <button mat-flat-button (click)="updateData()">Recreate Points</button>
     <button mat-flat-button (click)="exportForces()">Export Forces</button>
-    <input type="file" (change)="importForces($event)" />
+    <label>
+        Import Forces
+        <input type="file" (change)="importForces($event)" />
+    </label>
 </div>
