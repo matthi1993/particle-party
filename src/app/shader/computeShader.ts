@@ -46,11 +46,11 @@ export const computeShader = `
 
         let index = global_id.x;
 
-        let me = particles[index];
+        var me = particles[index];
         let myType = particleTypes[i32(me.particleAttributes.x)];
 
         let numParticles = arrayLength(&particles);
-        let innerRadius = f32(10); // todo configurable
+        let innerRadius = f32(15); // todo configurable
 
         var forceCounter = 0;
         var myForces: array<f32, 16>; // TODO 16 is the max number of types currently
@@ -91,8 +91,8 @@ export const computeShader = `
 
 
                 if (distance > 0.0 && distance <= innerRadius) {
-                    force += normalizeVector(direction) * 2;
-                } else {
+                    force += normalizeVector(direction) * 1;
+                } else if (distance > 0.0 && distance <= myType.radius){
                     var gravity = myForces[i32(other.particleAttributes.x)];
                     let forceMagnitude = gravity / distance; //distanceSquared;
                     force += normalizeVector(direction) * forceMagnitude;
@@ -112,7 +112,7 @@ export const computeShader = `
         let size = f32(600);
 
         var particle = me;
-        particle.velocity = (particle.velocity + force) * 0.75;
+        particle.velocity = (particle.velocity + force) * 0.9;
 
 
         particle.position += particle.velocity;

@@ -96,12 +96,44 @@ export class ControlsComponent implements OnInit {
   }
 
   updateData() {
-    let cubeSize = 600;
+    let cubeSize = 1200;
     this.data.points = create(this.points[0], RED, cubeSize)
       .concat(create(this.points[1], BLUE, cubeSize))
       .concat(create(this.points[2], YELLOW, cubeSize))
       .concat(create(this.points[3], GREEN, cubeSize));
 
     this.onDataChange.emit();
+  }
+
+  exportForces() {
+    const forces = Array.from(this.data.forceByType.entries());
+    const dataStr = JSON.stringify(forces, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.json';
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  }
+
+  importForces(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          this.data.forceByType = new Map(importedData);
+          console.log('Imported Data:', this.data.forceByType);
+        } catch (error) {
+          console.error('Invalid JSON file:', error);
+        }
+      };
+      reader.readAsText(file);
+      this.onDataChange.emit();
+    }
   }
 }

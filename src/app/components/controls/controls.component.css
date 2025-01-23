@@ -1,4 +1,8 @@
 .force-matrix {
+    input {
+        width: 50px;
+        padding: 0.25rem;
+    }
     display: flex;
     flex-direction: column;
     font-size: 0.75rem;
@@ -12,9 +16,4 @@
             margin: 0.2rem;
         }
     }
-}
-
-input {
-    width: 50px;
-    padding: 0.25rem;
 }
