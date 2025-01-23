@@ -14,7 +14,8 @@ export const vertexShaderSource = `
         color: vec4f,    // 16 bytes
         id: f32,         // 4 bytes
         radius: f32,     // 4 bytes
-        _padding: vec2f, // 8 bytes (to align the struct to 16 bytes)
+        size: f32,       // 4 bytes
+        _padding: f32,   // 4 bytes (to align the struct to 16 bytes)
     }
 
     struct Uniforms {
@@ -36,12 +37,11 @@ export const vertexShaderSource = `
         
         var output: VertexOutput;
 
-        var size = f32(20);
         var offset = vec4f(0,0,0,50); // TODO why do i need this?
 
         let modelViewProjection = uniforms.viewProjectionMatrix;
         let localPosition =  offset + dataIn[instance].position;
-        output.position = modelViewProjection * localPosition + vec4f(position * size, 0, 0) ;
+        output.position = modelViewProjection * localPosition + vec4f(position * myType.size, 0, 0) ;
         output.color = myType.color;
 
         return output;

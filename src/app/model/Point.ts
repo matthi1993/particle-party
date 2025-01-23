@@ -6,12 +6,16 @@ export class ParticleType {
     public id;
     public color;
     public radius;
+    public size;
+    public mass;
 
-    constructor(name: string, id: number, color: vec4, radius: number) {
+    constructor(name: string, id: number, color: vec4, radius: number, size: number, mass: number) {
         this.name = name;
         this.id = id;
         this.color = color;
         this.radius = radius;
+        this.size = size;
+        this.mass = mass;
     }
 }
 

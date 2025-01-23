@@ -104,6 +104,8 @@ export function createTypesArray(types: Map<ParticleType, Force[]>) {
 
         typesArray[index * dimensions + 4] = key.id;
         typesArray[index * dimensions + 5] = key.radius;
+        typesArray[index * dimensions + 6] = key.size;
+        typesArray[index * dimensions + 7] = key.mass;
 
         index++;
     });

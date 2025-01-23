@@ -7,7 +7,7 @@ export class Camera {
     viewProjectionMatrix = mat4.create();
 
     public cameraAngle = 0; // Current angle of rotation
-    cameraRadius = 30; // Distance from the scene center
+    public cameraRadius = 30; // Distance from the scene center
     rotationSpeed = 0.01; // Speed of rotation (radians per frame)
 
     eye = vec3.fromValues(0, 0, 0);    // Camera position

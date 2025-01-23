@@ -34,14 +34,14 @@ export class ControlsComponent implements OnInit {
 
   }
 
-  getRadiusValue(type: ParticleType) {
-    let result = undefined;
+  getParticleType(type: ParticleType): ParticleType {
+    let result;
     this.data.forceByType.forEach((value, key) => {
       if (key.id === type.id) {
-        result = key.radius;
+        result = key;
       }
     })
-    return result;
+    return result!!;
   }
 
   getPointValue(type: ParticleType) {
@@ -59,6 +59,28 @@ export class ControlsComponent implements OnInit {
     this.data.forceByType.forEach((value, key) => {
       if (key.id === type.id) {
         key.radius = inputValue;
+      }
+    })
+    this.onForcesChange.emit();
+  }
+
+  updateSize(type: ParticleType, event: Event) {
+    const inputValue = Number((event.target as HTMLInputElement).value);
+
+    this.data.forceByType.forEach((value, key) => {
+      if (key.id === type.id) {
+        key.size = inputValue;
+      }
+    })
+    this.onForcesChange.emit();
+  }
+
+  updateMass(type: ParticleType, event: Event) {
+    const inputValue = Number((event.target as HTMLInputElement).value);
+
+    this.data.forceByType.forEach((value, key) => {
+      if (key.id === type.id) {
+        key.mass = inputValue;
       }
     })
     this.onForcesChange.emit();
@@ -105,9 +127,26 @@ export class ControlsComponent implements OnInit {
     this.onDataChange.emit();
   }
 
+  multiplyForces(factor: number) {
+    this.data.forceByType.forEach((value, key) => {
+      value.forEach(force => {
+        force.force *= factor;
+      })
+    })
+    this.onForcesChange.emit();
+  }
+
   exportForces() {
+
     const forces = Array.from(this.data.forceByType.entries());
-    const dataStr = JSON.stringify(forces, null, 2);
+
+    const exportObj = {
+      forces: forces,
+      points: this.points
+    }
+
+
+    const dataStr = JSON.stringify(exportObj, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = window.URL.createObjectURL(blob);
 
@@ -126,7 +165,10 @@ export class ControlsComponent implements OnInit {
       reader.onload = (e: any) => {
         try {
           const importedData = JSON.parse(e.target.result);
-          this.data.forceByType = new Map(importedData);
+
+          this.data.forceByType = new Map(importedData.forces);
+          this.points = importedData.points;
+
           console.log('Imported Data:', this.data.forceByType);
         } catch (error) {
           console.error('Invalid JSON file:', error);

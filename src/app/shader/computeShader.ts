@@ -12,7 +12,8 @@ export const computeShader = `
         color: vec4f,    // 16 bytes
         id: f32,         // 4 bytes
         radius: f32,     // 4 bytes
-        _padding: vec2f, // 8 bytes (to align the struct to 16 bytes)
+        size: f32,       // 4 bytes
+        mass: f32,       // 4 bytes (to align the struct to 16 bytes)
     }
 
     struct Force {
@@ -50,10 +51,11 @@ export const computeShader = `
         let myType = particleTypes[i32(me.particleAttributes.x)];
 
         let numParticles = arrayLength(&particles);
-        let innerRadius = f32(15); // todo configurable
-
-        var forceCounter = 0;
+        let G = f32(6.674);
         var myForces: array<f32, 16>; // TODO 16 is the max number of types currently
+        
+        
+        var forceCounter = 0;
         for (var i: u32 = 0; i < arrayLength(&forces); i++) {
             if(forces[i].idParticleA == me.particleAttributes.x) {
                 myForces[forceCounter] = forces[i].force;
@@ -75,6 +77,8 @@ export const computeShader = `
 
             workgroupBarrier(); // Ensure all threads have loaded the data
 
+
+
             // Calculate interactions with particles in shared memory
             for (var i = 0u; i < ${WORKGROUP_SIZE}; i++) {
                 
@@ -84,19 +88,35 @@ export const computeShader = `
                 }
                     
                 let other = sharedParticles[i];
+                let otherType = particleTypes[i32(other.particleAttributes.x)];
 
                 let direction = me.position - other.position;
                 let distanceSquared = max(dot(direction, direction), 1e-6); // Avoid division by zero
                 let distance = sqrt(distanceSquared);
 
+                let massFactor = (myType.mass * otherType.mass);
 
-                if (distance > 0.0 && distance <= innerRadius) {
-                    force += normalizeVector(direction) * 1;
-                } else if (distance > 0.0 && distance <= myType.radius){
-                    var gravity = myForces[i32(other.particleAttributes.x)];
-                    let forceMagnitude = gravity / distance; //distanceSquared;
-                    force += normalizeVector(direction) * forceMagnitude;
+                // ##### inner atomar force #####
+                if (distance > 0.0 && distance <= myType.size) {
+                    let diff = myType.size - distance;
+                    force += normalizeVector(direction) * diff;
+                } else {
+                    
+                    // ##### attraction force #####
+                    if (distance > 0.0 && distance <= myType.radius){
+                        var attraction = myForces[i32(other.particleAttributes.x)];
+                        let forceMagnitude = attraction / distance;
+                        
+                        force += normalizeVector(direction) * forceMagnitude;
+                    }
+
+                    // ##### gravity force #####
+                    let gravityMagnitude = G * massFactor / distanceSquared;
+                    force -= normalizeVector(direction) * gravityMagnitude;
                 }
+                
+
+
             }
 
             workgroupBarrier(); // Synchronize before loading the next chunk
@@ -107,31 +127,29 @@ export const computeShader = `
 
 
 
-        // Update the velocity and position of the particle
 
-        let size = f32(600);
+        let size = f32(1600);
 
-        var particle = me;
-        particle.velocity = (particle.velocity + force) * 0.9;
-
-
-        particle.position += particle.velocity;
+        // ##### Update the velocity and position of the particle #####
+        me.velocity = (me.velocity + force) * 0.85;
+        me.position += me.velocity;
 
 
-        if(particle.position.x > size || particle.position.x < -1 * size) {
-            particle.velocity.x = particle.velocity.x * -1;
-            particle.position.x += particle.velocity.x;
+        // ##### Bounding Box #####
+        if(me.position.x > size || me.position.x < -1 * size) {
+            me.velocity.x = me.velocity.x * -1;
+            me.position.x += me.velocity.x;
         }
-        if(particle.position.y > size || particle.position.y < -1 * size) {
-            particle.velocity.y = particle.velocity.y * -1;
-            particle.position.y += particle.velocity.y;
+        if(me.position.y > size || me.position.y < -1 * size) {
+            me.velocity.y = me.velocity.y * -1;
+            me.position.y += me.velocity.y;
         }
-        if(particle.position.z > size || particle.position.z < -1 * size) {
-            particle.velocity.z = particle.velocity.z * -1;
-            particle.position.z += particle.velocity.z;
+        if(me.position.z > size || me.position.z < -1 * size) {
+            me.velocity.z = me.velocity.z * -1;
+            me.position.z += me.velocity.z;
         }
 
-        particlesOut[index] = particle;
+        particlesOut[index] = me;
         
     }
 `

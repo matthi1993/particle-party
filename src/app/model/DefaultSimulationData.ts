@@ -2,10 +2,10 @@ import { vec4 } from "gl-matrix";
 import { create, ParticleType } from "./Point";
 import { Force, SimulationData } from "./Simulation";
 
-export const RED = new ParticleType("Red", 0, vec4.fromValues(1, 0, 0, 0.5), 100);
-export const BLUE = new ParticleType("Blue", 1, vec4.fromValues(0, 1, 1, 0.5), 100);
-export const YELLOW = new ParticleType("Yellow", 2, vec4.fromValues(1, 1, 0, 0.5), 100);
-export const GREEN = new ParticleType("Green", 3, vec4.fromValues(0, 1, 0, 0.5), 100);
+export const RED = new ParticleType("Red", 0, vec4.fromValues(1, 0, 0, 0.5), 100, 15, 0.01);
+export const BLUE = new ParticleType("Blue", 1, vec4.fromValues(0, 1, 1, 0.5), 100, 10, 0.01);
+export const YELLOW = new ParticleType("Yellow", 2, vec4.fromValues(1, 1, 0, 0.5), 100,20, 1);
+export const GREEN = new ParticleType("Green", 3, vec4.fromValues(0, 1, 0, 0.5), 100, 20, 2);
 
 
 // ## Be aware that the order of the forces is important in the SHADER!!!

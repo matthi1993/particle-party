@@ -98,6 +98,17 @@ export class AppComponent implements OnInit, OnDestroy {
     let lastMouseX = 0;
     let lastMouseY = 0;
 
+    this.gpuContext.canvas!!.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      if (this.camera) {
+        if(event.deltaY < 0 && this.camera.cameraRadius <= 10) {
+          this.camera.cameraRadius = 10;
+        } else {
+          this.camera.cameraRadius += event.deltaY / 30;
+        }
+      }
+    });
+
     this.gpuContext.canvas!!.addEventListener("mousedown", (e: MouseEvent) => {
       isMouseDown = true;
       lastMouseX = e.clientX;
