@@ -41,10 +41,25 @@ export class ControlsComponent implements OnInit {
     this.onDataChange.emit();
   }
 
+  randomForces() {
+    this.data.types.forEach((type, rowIndex) => {
+      type.radius = Math.random() * 300 + 50;
+      type.mass = Math.random() * 2;
+      type.size = Math.random() * 15 + 5;
+
+     //this.data.pointsPerType[rowIndex] = Math.random() * 1000 + 100;
+
+      this.data.types.forEach((col, colIndex) => {
+        this.data.forces[rowIndex][colIndex] = (Math.random() * 6) - 3;
+      })
+    });
+    this.onForcesChange.emit();
+  }
+
   multiplyForces(factor: number) {
-    this.data.forces.forEach(row => {
-      row.forEach(value => {
-        value *= factor;
+    this.data.forces.forEach((row, rowIndex) => {
+      row.forEach((col, colIndex) => {
+        this.data.forces[rowIndex][colIndex] *= factor;
       })
     })
     this.onForcesChange.emit();
