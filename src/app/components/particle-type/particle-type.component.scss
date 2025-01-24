@@ -2,22 +2,10 @@
     display: flex;
     padding: 0;
     justify-content: space-between;
+    flex-wrap: wrap;
 
     input {
         width: 50px;
-    }
-
-    .attribute {
-        width: 50px;
-        font-weight: bold;
-        text-align: right;
-        margin-right: 0.5rem;
-    }
-
-    .input-pair {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
     }
 
     .left-particle {
@@ -52,4 +40,23 @@
         background-color: white;
         position: absolute;
     }
+}
+
+.attribute {
+    min-width: 50px;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.input-pair {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+input.particle-name {
+    font-size: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bolder;
 }

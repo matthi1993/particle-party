@@ -1,21 +1,29 @@
 
 import { ParticleType, Point } from 'src/app/model/Point';
 
-export class Force {
-  public particleA: ParticleType;
-  public particleB: ParticleType;
-  public force: number;
+export class ParticleTypeWithForces {
+  public type!: ParticleType;
+  public forces: number[] = [];
 
-  constructor(particleA: ParticleType, particleB: ParticleType, force: number) {
-    this.particleA = particleA;
-    this.particleB = particleB;
-    this.force = force;
+  constructor(type: ParticleType) {
+    this.type = type;
   }
 }
 
 export class SimulationData {
   public points: Point[] = [];
-  public forceByType: Map<ParticleType, Force[]> = new Map();
+
+  public types: ParticleType[] = [];
+  public forces: number[][] = [[]];
+  public pointsPerType: number [] = [];
 
   constructor() { }
+
+  public addType(newType: ParticleType) {
+    this.types.push(newType);
+    this.forces.push(
+      Array(this.types.length).fill(0)
+    );
+    this.pointsPerType.push(100);
+  }
 }

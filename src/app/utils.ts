@@ -1,5 +1,4 @@
 import { ParticleType, Point } from './model/Point'
-import { Force } from './model/Simulation';
 
 
 const SQUARE = new Float32Array([
@@ -91,12 +90,12 @@ export function createArraysFromPoints(points: Point[]) {
     return positionArray;
 }
 
-export function createTypesArray(types: Map<ParticleType, Force[]>) {
+export function createTypesArray(types: ParticleType[]) {
     let dimensions = 8;
-    let typesArray = new Float32Array(types.size * dimensions);
+    let typesArray = new Float32Array(types.length * dimensions);
 
     let index = 0;
-    types.forEach((value, key) => {
+    types.forEach((key) => {
         typesArray[index * dimensions + 0] = key.color[0];
         typesArray[index * dimensions + 1] = key.color[1];
         typesArray[index * dimensions + 2] = key.color[2];
@@ -112,20 +111,19 @@ export function createTypesArray(types: Map<ParticleType, Force[]>) {
     return typesArray;
 }
 
-export function createForcesArray(types: Map<ParticleType, Force[]>) {
+export function createForcesArray(forces: number[][]) {
     let dimensions = 3;
-    const flattenedValues = Array.from(types.values()).flat();
-    let forceArray = new Float32Array(flattenedValues.length * dimensions);
+    let forceArray = new Float32Array(forces.flat().length * dimensions);
 
     let index = 0;
-    types.forEach((value, key) => {
-        value.forEach(force => {
-            forceArray[index * dimensions + 0] = force.particleA.id;
-            forceArray[index * dimensions + 1] = force.particleB.id;
-            forceArray[index * dimensions + 2] = force.force;
+    forces.forEach((row, rowIndex) => {
+        row.forEach((col, colIndex) => {
+            forceArray[index * dimensions + 0] = rowIndex;
+            forceArray[index * dimensions + 1] = colIndex;
+            forceArray[index * dimensions + 2] = col;
 
             index++;
-        })
+        });
     });
 
     return forceArray;

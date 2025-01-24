@@ -4,6 +4,7 @@ import { ParticleType } from 'src/app/model/Point';
 import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { vec4 } from 'gl-matrix';
+import { SimulationData } from 'src/app/model/Simulation';
 
 @Component({
   selector: 'app-particle-type',
@@ -13,7 +14,7 @@ import { vec4 } from 'gl-matrix';
 })
 export class ParticleTypeComponent implements OnInit {
 
-  @Input() public allTypes!: ParticleType[];
+  @Input() public simulationData!: SimulationData;
   @Input() public particleType!: ParticleType;
 
   selectedParticleIndex = 0;
@@ -21,7 +22,7 @@ export class ParticleTypeComponent implements OnInit {
   public onDataChange = output();
 
   ngOnInit(): void {
-    this.particleType = this.allTypes[0];
+    this.particleType = this.simulationData.types[0];
   }
 
   onValueChange() {
@@ -43,34 +44,39 @@ export class ParticleTypeComponent implements OnInit {
   delete() {
     let index = this.selectedParticleIndex;
     this.next();
-    this.allTypes = this.allTypes.splice(index, index);
-    // TODO this is not working yet
+    this.simulationData.types.splice(index, 1);
   }
 
   add() {
-    this.allTypes.push(
-      new ParticleType("New Particle", this.allTypes.length, vec4.fromValues(1, 1, 1, 1), 100, 10, 0)
-    );
-    this.selectedParticleIndex = this.allTypes.length - 1;
-    // TODO this is not working yet
+    this.simulationData.addType(
+      new ParticleType(
+        "New Particle",
+        this.simulationData.types.length,
+        vec4.fromValues(Math.random(), Math.random(), Math.random(), 1),
+        100,
+        Math.random() * 25 + 5,
+        0
+      )
+    )
+    this.selectedParticleIndex = this.simulationData.types.length - 1;
+    this.particleType = this.simulationData.types[this.selectedParticleIndex];
   }
 
   next() {
-    console.log(this.allTypes);
-    if (this.selectedParticleIndex < this.allTypes.length - 1) {
+    if (this.selectedParticleIndex < this.simulationData.types.length - 1) {
       this.selectedParticleIndex++;
     } else {
       this.selectedParticleIndex = 0;
     }
-    this.particleType = this.allTypes[this.selectedParticleIndex];
+    this.particleType = this.simulationData.types[this.selectedParticleIndex];
   }
+
   prev() {
-    console.log(this.allTypes);
     if (this.selectedParticleIndex > 0) {
       this.selectedParticleIndex--;
     } else {
-      this.selectedParticleIndex = this.allTypes.length - 1;
+      this.selectedParticleIndex = this.simulationData.types.length - 1;
     }
-    this.particleType = this.allTypes[this.selectedParticleIndex];
+    this.particleType = this.simulationData.types[this.selectedParticleIndex];
   }
 }

@@ -110,10 +110,10 @@ export class SceneComponent implements OnInit, OnDestroy {
   }
 
   public updateForcesAndTypes() {
-    let forcesArray = createForcesArray(this.simulationData.forceByType);
+    let forcesArray = createForcesArray(this.simulationData.forces);
     this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
 
-    let typesArray = createTypesArray(this.simulationData.forceByType);
+    let typesArray = createTypesArray(this.simulationData.types);
     this.gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
   }
 
@@ -127,11 +127,11 @@ export class SceneComponent implements OnInit, OnDestroy {
     ];
     this.gpuContext.device.queue.writeBuffer(positionsStorage[0], 0, positionArray);
 
-    let typesArray = createTypesArray(this.simulationData.forceByType);
+    let typesArray = createTypesArray(this.simulationData.types);
     this.typesStorage = this.gpuContext.createStorageBuffer("Types", typesArray.byteLength);
     this.gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
 
-    let forcesArray = createForcesArray(this.simulationData.forceByType);
+    let forcesArray = createForcesArray(this.simulationData.forces);
     this.forcesStorage = this.gpuContext.createStorageBuffer("Forces", forcesArray.byteLength);
     this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
 

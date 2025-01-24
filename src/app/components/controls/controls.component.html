@@ -1,53 +1,25 @@
-<mat-card>
-    <mat-card-header>
-        Force Matrix
-    </mat-card-header>
-    <mat-card-content>
-        <div class="force-matrix">
-
-            <!--   HEADLINE ROW   -->
-            <div class="force-row">
-                <div class="force-column">
-                    -
-                </div>
-                @for (entryTypeA of getAllParticleTypes(); track entryTypeA) {
-                <div class="force-column">
-                    {{ entryTypeA.name }}
-                </div>
-                }
-            </div>
-
-
-            <!--   OTHER ROWS  -->
-            @for (entryTypeA of getAllParticleTypes(); track entryTypeA) {
-            <div class="force-row">
-                <div class="force-column">
-                    {{ entryTypeA.name }}
-                </div>
-                @for (entryTypeB of getAllParticleTypes(); track entryTypeB) {
-                <div class="force-column">
-                    <input [value]="getForceValue(entryTypeA, entryTypeB)" type="number" step="0.25"
-                        (change)="updateForce(entryTypeA, entryTypeB, $event)" matInput placeholder="force ..." />
-                </div>
-                }
-            </div>
-            }
-        </div>
-        <div>
-            Multiply:
-            <button mat-button (click)="multiplyForces(2)"> *2 </button>
-            <button mat-button (click)="multiplyForces(0.5)"> 1/2 </button>
-        </div>
-
-    </mat-card-content>
-</mat-card>
-
 <!-- TYPE Config-->
-<app-particle-type [allTypes]="getAllParticleTypes()" (onDataChange)="onDataChange.emit()"></app-particle-type>
+<app-particle-type [simulationData]="this.data" (onDataChange)="onDataChange.emit()"></app-particle-type>
 
-<button color="primary" (click)="updateData()">Recreate Points</button>
+<button mat-flat-button (click)="updateData()">Recreate Points</button>
 <button mat-flat-button (click)="exportForces()">Export Forces</button>
-<label>
+<div>
     Import Forces
     <input type="file" (change)="importForces($event)" />
-</label>
+</div>
+<div>
+    Points:
+    @for (typeEntry of this.data.types; track typeEntry) {
+    <div>
+        {{ typeEntry.name }}:
+        <mat-slider step="1" min="1" max="5000" showTickMarks discrete>
+            <input [(ngModel)]="this.data.pointsPerType[$index]" matSliderThumb />
+        </mat-slider>
+    </div>
+    }
+</div>
+<div>
+    Multiply all forces:
+    <button mat-button (click)="multiplyForces(2)"> *2 </button>
+    <button mat-button (click)="multiplyForces(0.5)"> 1/2 </button>
+</div>
