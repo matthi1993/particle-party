@@ -1,0 +1,542 @@
+{
+  "forces": [
+    [
+      {
+        "name": "Red",
+        "id": 0,
+        "color": {
+          "0": 1,
+          "1": 0,
+          "2": 0,
+          "3": 0.5
+        },
+        "radius": 100,
+        "size": 20,
+        "mass": 0
+      },
+      [
+        {
+          "particleA": {
+            "name": "Red",
+            "id": 0,
+            "color": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 50,
+            "size": 15,
+            "mass": 0.01
+          },
+          "particleB": {
+            "name": "Red",
+            "id": 0,
+            "color": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 50,
+            "size": 15,
+            "mass": 0.01
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Red",
+            "id": 0,
+            "color": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 50,
+            "size": 15,
+            "mass": 0.01
+          },
+          "particleB": {
+            "name": "Blue",
+            "id": 1,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 1,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 10,
+            "mass": 0.01
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Red",
+            "id": 0,
+            "color": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 50,
+            "size": 15,
+            "mass": 0.01
+          },
+          "particleB": {
+            "name": "Yellow",
+            "id": 2,
+            "color": {
+              "0": 1,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 20,
+            "mass": 1
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Red",
+            "id": 0,
+            "color": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 50,
+            "size": 15,
+            "mass": 0.01
+          },
+          "particleB": {
+            "name": "Green",
+            "id": 3,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 200,
+            "size": 20,
+            "mass": 0
+          },
+          "force": 0
+        }
+      ]
+    ],
+    [
+      {
+        "name": "Blue",
+        "id": 1,
+        "color": {
+          "0": 0,
+          "1": 1,
+          "2": 1,
+          "3": 0.5
+        },
+        "radius": 100,
+        "size": 20,
+        "mass": 0
+      },
+      [
+        {
+          "particleA": {
+            "name": "Blue",
+            "id": 1,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 1,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 10,
+            "mass": 0.01
+          },
+          "particleB": {
+            "name": "Red",
+            "id": 0,
+            "color": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 50,
+            "size": 15,
+            "mass": 0.01
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Blue",
+            "id": 1,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 1,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 10,
+            "mass": 0.01
+          },
+          "particleB": {
+            "name": "Blue",
+            "id": 1,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 1,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 10,
+            "mass": 0.01
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Blue",
+            "id": 1,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 1,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 10,
+            "mass": 0.01
+          },
+          "particleB": {
+            "name": "Yellow",
+            "id": 2,
+            "color": {
+              "0": 1,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 20,
+            "mass": 1
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Blue",
+            "id": 1,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 1,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 10,
+            "mass": 0.01
+          },
+          "particleB": {
+            "name": "Green",
+            "id": 3,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 200,
+            "size": 20,
+            "mass": 0
+          },
+          "force": 0
+        }
+      ]
+    ],
+    [
+      {
+        "name": "Yellow",
+        "id": 2,
+        "color": {
+          "0": 1,
+          "1": 1,
+          "2": 0,
+          "3": 0.5
+        },
+        "radius": 100,
+        "size": 20,
+        "mass": 0
+      },
+      [
+        {
+          "particleA": {
+            "name": "Yellow",
+            "id": 2,
+            "color": {
+              "0": 1,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 20,
+            "mass": 1
+          },
+          "particleB": {
+            "name": "Red",
+            "id": 0,
+            "color": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 50,
+            "size": 15,
+            "mass": 0.01
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Yellow",
+            "id": 2,
+            "color": {
+              "0": 1,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 20,
+            "mass": 1
+          },
+          "particleB": {
+            "name": "Blue",
+            "id": 1,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 1,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 10,
+            "mass": 0.01
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Yellow",
+            "id": 2,
+            "color": {
+              "0": 1,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 20,
+            "mass": 1
+          },
+          "particleB": {
+            "name": "Yellow",
+            "id": 2,
+            "color": {
+              "0": 1,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 20,
+            "mass": 1
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Yellow",
+            "id": 2,
+            "color": {
+              "0": 1,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 20,
+            "mass": 1
+          },
+          "particleB": {
+            "name": "Green",
+            "id": 3,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 200,
+            "size": 20,
+            "mass": 0
+          },
+          "force": 0
+        }
+      ]
+    ],
+    [
+      {
+        "name": "Green",
+        "id": 3,
+        "color": {
+          "0": 0,
+          "1": 1,
+          "2": 0,
+          "3": 0.5
+        },
+        "radius": 100,
+        "size": 20,
+        "mass": 0
+      },
+      [
+        {
+          "particleA": {
+            "name": "Green",
+            "id": 3,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 200,
+            "size": 20,
+            "mass": 0
+          },
+          "particleB": {
+            "name": "Red",
+            "id": 0,
+            "color": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 50,
+            "size": 15,
+            "mass": 0.01
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Green",
+            "id": 3,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 200,
+            "size": 20,
+            "mass": 0
+          },
+          "particleB": {
+            "name": "Blue",
+            "id": 1,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 1,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 10,
+            "mass": 0.01
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Green",
+            "id": 3,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 200,
+            "size": 20,
+            "mass": 0
+          },
+          "particleB": {
+            "name": "Yellow",
+            "id": 2,
+            "color": {
+              "0": 1,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 100,
+            "size": 20,
+            "mass": 1
+          },
+          "force": 0
+        },
+        {
+          "particleA": {
+            "name": "Green",
+            "id": 3,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 200,
+            "size": 20,
+            "mass": 0
+          },
+          "particleB": {
+            "name": "Green",
+            "id": 3,
+            "color": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 0.5
+            },
+            "radius": 200,
+            "size": 20,
+            "mass": 0
+          },
+          "force": 0
+        }
+      ]
+    ]
+  ],
+  "points": [
+    100,
+    100,
+    100,
+    100
+  ]
+}
