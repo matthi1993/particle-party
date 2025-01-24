@@ -1,5 +1,5 @@
 <!-- TYPE Config-->
-<app-particle-type [simulationData]="this.data" (onDataChange)="onDataChange.emit()"></app-particle-type>
+<app-particle-type [simulationData]="this.data" (onDataChange)="onForcesChange.emit()"></app-particle-type>
 
 <button mat-flat-button (click)="updateData()">Recreate Points</button>
 <button mat-flat-button (click)="exportForces()">Export Forces</button>
@@ -12,9 +12,7 @@
     @for (typeEntry of this.data.types; track typeEntry) {
     <div>
         {{ typeEntry.name }}:
-        <mat-slider step="1" min="1" max="5000" showTickMarks discrete>
-            <input [(ngModel)]="this.data.pointsPerType[$index]" matSliderThumb />
-        </mat-slider>
+        <input [(ngModel)]="this.data.pointsPerType[$index]" step="1" min="1" max="5000" />
     </div>
     }
 </div>

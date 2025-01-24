@@ -22,7 +22,7 @@ export class SimulationData {
   public addType(newType: ParticleType) {
     this.types.push(newType);
     this.forces.push(
-      Array(this.types.length).fill(0)
+      Array(this.types.length).fill(0) //TODO, update all forces of all particles and set init value
     );
     this.pointsPerType.push(100);
   }

@@ -48,6 +48,7 @@ export class ParticleTypeComponent implements OnInit {
   }
 
   add() {
+    console.log("click");
     this.simulationData.addType(
       new ParticleType(
         "New Particle",
@@ -58,6 +59,8 @@ export class ParticleTypeComponent implements OnInit {
         0
       )
     )
+
+    console.log("type added");
     this.selectedParticleIndex = this.simulationData.types.length - 1;
     this.particleType = this.simulationData.types[this.selectedParticleIndex];
   }
