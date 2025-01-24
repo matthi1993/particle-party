@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
-import { BLUE, GREEN, RED, YELLOW } from 'src/app/model/DefaultSimulationData';
+import { Neutron, GREEN, PROTON, YELLOW } from 'src/app/model/DefaultSimulationData';
 import { SimulationData } from 'src/app/model/Simulation';
 import { create, ParticleType } from 'src/app/model/Point';
 import { MatCardModule } from '@angular/material/card';
@@ -121,8 +121,8 @@ export class ControlsComponent implements OnInit {
 
   updateData() {
     let cubeSize = 1200;
-    this.data.points = create(this.points[0], RED, cubeSize)
-      .concat(create(this.points[1], BLUE, cubeSize))
+    this.data.points = create(this.points[0], PROTON, cubeSize)
+      .concat(create(this.points[1], Neutron, cubeSize))
       .concat(create(this.points[2], YELLOW, cubeSize))
       .concat(create(this.points[3], GREEN, cubeSize));
 
