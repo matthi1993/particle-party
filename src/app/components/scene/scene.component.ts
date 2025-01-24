@@ -1,14 +1,11 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 import { SimulationData } from '../../model/Simulation';
-import { createDefaultSimulationModel } from '../../model/DefaultSimulationData';
 import { Square, createArraysFromPoints, createForcesArray, createTypesArray } from '../../utils';
-import { vertexShaderSource } from '../../shader/vertexShader';
-import { fragmentShaderSource } from '../../shader/fragmentShader';
 import { computeShader } from '../../shader/computeShader'
-import { Compute } from '../../gpu.compute'
-import { Render } from '../../gpu.render'
-import { GpuContext } from '../../gpu.context'
+import { Compute } from '../../gpu/gpu.compute'
+import { Render } from '../../gpu/gpu.render'
+import { GpuContext } from '../../gpu/gpu.context'
 
 import { Camera } from '../../model/Camera';
 
@@ -35,14 +32,15 @@ export class SceneComponent implements OnInit, OnDestroy {
   private step = 0;
 
   private renderIntervalId: any;
-  private camera?: Camera;
+  private camera!: Camera;
 
 
   async ngOnInit() {
     await this.gpuContext.setup().then(() => {
       this.setupCamera();
-      this.recreateScene();
       this.addCameraListeners(this.gpuContext.canvas!!);
+
+      this.recreateScene();
       this.startRenderLoop();
     });
   }
@@ -82,12 +80,10 @@ export class SceneComponent implements OnInit, OnDestroy {
 
     element.addEventListener('wheel', (event) => {
       event.preventDefault();
-      if (this.camera) {
-        if (event.deltaY < 0 && this.camera.cameraRadius <= 10) {
-          this.camera.cameraRadius = 10;
-        } else {
-          this.camera.cameraRadius += event.deltaY / 30;
-        }
+      if (event.deltaY < 0 && this.camera.cameraRadius <= 10) {
+        this.camera.cameraRadius = 10;
+      } else {
+        this.camera.cameraRadius += event.deltaY / 30;
       }
     });
 
@@ -139,122 +135,31 @@ export class SceneComponent implements OnInit, OnDestroy {
     this.forcesStorage = this.gpuContext.createStorageBuffer("Forces", forcesArray.byteLength);
     this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
 
-    // create the bind group layout and pipeline layout.
-    const bindGroupLayout = this.gpuContext.device.createBindGroupLayout({
-      label: "Cell Bind Group Layout",
-      entries: [{
-        binding: 0,
-        visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
-        buffer: { type: "read-only-storage" } // position in buffer
-      }, {
-        binding: 1,
-        visibility: GPUShaderStage.COMPUTE,
-        buffer: { type: "storage" } // position out buffer
-      }, {
-        binding: 2,
-        visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
-        buffer: { type: "read-only-storage" } // types buffer
-      }, {
-        binding: 3,
-        visibility: GPUShaderStage.COMPUTE,
-        buffer: { type: "read-only-storage" } // types buffer
-      }, {
-        binding: 4,
-        visibility: GPUShaderStage.VERTEX,
-        buffer: { type: "uniform" } // types buffer
-      }
-      ]
-    });
-
-    const pipelineLayout = this.gpuContext.device.createPipelineLayout({
-      label: "Cell Pipeline Layout",
-      bindGroupLayouts: [bindGroupLayout],
-    });
-
-    // Create a bind group to pass the grid uniforms into the pipeline
-    const bindGroups = [
-      this.gpuContext.device.createBindGroup({
-        label: "Cell renderer bind group A",
-        layout: bindGroupLayout,
-        entries: [{
-          binding: 0,
-          resource: { buffer: positionsStorage[0] }
-        }, {
-          binding: 1,
-          resource: { buffer: positionsStorage[1] }
-        }, {
-          binding: 2,
-          resource: { buffer: this.typesStorage }
-        }, {
-          binding: 3,
-          resource: { buffer: this.forcesStorage }
-        }, {
-          binding: 4,
-          resource: {
-            buffer: this.viewProjectionBuffer,
-          },
-        }],
-      }),
-      this.gpuContext.device.createBindGroup({
-        label: "Cell renderer bind group B",
-        layout: bindGroupLayout,
-        entries: [{
-          binding: 0,
-          resource: { buffer: positionsStorage[1] }
-        }, {
-          binding: 1,
-          resource: { buffer: positionsStorage[0] }
-        }, {
-          binding: 2,
-          resource: { buffer: this.typesStorage }
-        }, {
-          binding: 3,
-          resource: { buffer: this.forcesStorage }
-        }, {
-          binding: 4,
-          resource: {
-            buffer: this.viewProjectionBuffer,
-          },
-        }],
-      }),
-    ];
-
-
     this.simulationCompute = new Compute(
       this.gpuContext.device,
-      pipelineLayout,
-      bindGroups,
       this.simulationData.points.length,
       computeShader
     )
+    this.simulationCompute.updateBindGroups(this.gpuContext.device, positionsStorage, this.typesStorage, this.forcesStorage);
 
     this.simulationRenderer = new Render(
       this.gpuContext,
-      pipelineLayout,
-      bindGroups,
-      vertexShaderSource,
-      fragmentShaderSource,
       new Square(this.gpuContext.device),
       this.simulationData.points.length
     )
+    this.simulationRenderer.updateBindGroups(this.gpuContext.device, positionsStorage, this.typesStorage, this.forcesStorage, this.viewProjectionBuffer)
   }
 
-  render() { // TODO seperate render and compute loop
-    if (!this.gpuContext.device || !this.gpuContext.context || !this.camera) {
-      return;
-    }
-    console.log("render");
-
+  render() {
     this.camera.updateCamera();
     this.gpuContext.device.queue.writeBuffer(this.viewProjectionBuffer, 0, new Float32Array(this.camera.getViewProjectionMatrix()));
 
     const encoder = this.gpuContext.device.createCommandEncoder();
 
     this.simulationCompute?.execute(encoder, this.step);
-    this.step++; //TODO don't use this for render
+    this.step++;
     this.simulationRenderer?.execute(encoder, this.step, this.gpuContext.context.getCurrentTexture().createView());
 
     this.gpuContext.device.queue.submit([encoder.finish()]);
   }
-
 }

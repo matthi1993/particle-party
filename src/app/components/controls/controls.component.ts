@@ -168,8 +168,6 @@ export class ControlsComponent implements OnInit {
 
           this.data.forceByType = new Map(importedData.forces);
           this.points = importedData.points;
-
-          console.log('Imported Data:', this.data.forceByType);
         } catch (error) {
           console.error('Invalid JSON file:', error);
         }
