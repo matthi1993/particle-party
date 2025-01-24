@@ -29,24 +29,8 @@ export function createDefaultSimulationModel() {
     new Force(BLUE, GREEN, 0),
   ]);
 
-  data.forceByType.set(YELLOW, [
-    new Force(YELLOW, RED, 0),
-    new Force(YELLOW, BLUE, 0),
-    new Force(YELLOW, YELLOW, 0),
-    new Force(YELLOW, GREEN, 0),
-  ]);
-
-  data.forceByType.set(GREEN, [
-    new Force(GREEN, RED, 0),
-    new Force(GREEN, BLUE, 0),
-    new Force(GREEN, YELLOW, 0),
-    new Force(GREEN, GREEN, 0),
-  ]);
-
   data.points = create(1000, RED, 1200)
-    .concat(create(1000, BLUE, 1200))
-    .concat(create(100, YELLOW, 1200))
-    .concat(create(100, GREEN, 1200));
+    .concat(create(1000, BLUE, 1200));
 
   return data;
 }

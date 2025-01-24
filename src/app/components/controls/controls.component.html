@@ -10,7 +10,7 @@
                 <div class="force-column">
                     -
                 </div>
-                @for (entryTypeA of types; track entryTypeA) {
+                @for (entryTypeA of getAllParticleTypes(); track entryTypeA) {
                 <div class="force-column">
                     {{ entryTypeA.name }}
                 </div>
@@ -19,12 +19,12 @@
 
 
             <!--   OTHER ROWS  -->
-            @for (entryTypeA of types; track entryTypeA) {
+            @for (entryTypeA of getAllParticleTypes(); track entryTypeA) {
             <div class="force-row">
                 <div class="force-column">
                     {{ entryTypeA.name }}
                 </div>
-                @for (entryTypeB of types; track entryTypeB) {
+                @for (entryTypeB of getAllParticleTypes(); track entryTypeB) {
                 <div class="force-column">
                     <input [value]="getForceValue(entryTypeA, entryTypeB)" type="number" step="0.25"
                         (change)="updateForce(entryTypeA, entryTypeB, $event)" matInput placeholder="force ..." />
@@ -42,33 +42,10 @@
     </mat-card-content>
 </mat-card>
 
+<!-- TYPE Config-->
 <div class="force-matrix">
-    @for (entry of types; track entry) {
-    <mat-card>
-        <mat-card-content>
-            <div>{{ entry.name }}</div>
-            <div>
-                Points:
-                <input type="number" step="1" [value]="getPointValue(entry)" (change)="updatePoints(entry, $event)"
-                    matInput placeholder="points ..." />
-            </div>
-            <div>
-                Radius:
-                <input type="number" step="1" [value]="getParticleType(entry).radius"
-                    (change)="updateRadius(entry, $event)" matInput placeholder="radius ..." />
-            </div>
-            <div>
-                Size:
-                <input type="number" step="1" [value]="getParticleType(entry).size" (change)="updateSize(entry, $event)"
-                    matInput placeholder="size ..." />
-            </div>
-            <div>
-                Mass:
-                <input type="number" step="0.1" [value]="getParticleType(entry).mass"
-                    (change)="updateMass(entry, $event)" matInput placeholder="mass ..." />
-            </div>
-        </mat-card-content>
-    </mat-card>
+    @for (entry of getAllParticleTypes(); track entry) {
+        <app-particle-type [particleType]="entry" (onDataChange)="onDataChange.emit()"></app-particle-type>
     }
 
 </div>

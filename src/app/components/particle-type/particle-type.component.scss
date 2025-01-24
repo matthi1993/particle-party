@@ -1,0 +1,56 @@
+mat-card-content.mat-mdc-card-content.particle-type-card {
+    display: flex;
+    padding-top: 2rem;
+    justify-content: space-between;
+
+    input {
+        width: 50px;
+    }
+
+    .attribute {
+        width: 50px;
+        font-weight: bold;
+        text-align: right;
+        margin-right: 0.5rem;
+    }
+
+    .input-pair {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .left-particle {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
+    }
+
+    .right-particle {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        align-content: center;
+        justify-content: flex-end;
+    }
+
+
+    .particle-circle {
+        width: 60px;
+        height: 60px;
+        position: absolute;
+        top: 1rem;
+    }
+    .particle-circle-outer {
+        width: 58px;
+        height: 58px;
+        border: solid 1px rgba(255, 255, 255, 0.386);
+        border-radius: 50%;
+    }
+    .particle-circle-inner {
+        border-radius: 50%;
+        background-color: white;
+        position: absolute;
+    }
+}

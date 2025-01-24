@@ -8,11 +8,12 @@ import { SimulationData } from 'src/app/model/Simulation';
 import { create, ParticleType } from 'src/app/model/Point';
 import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material/slider';
+import { ParticleTypeComponent } from "../particle-type/particle-type.component";
 
 
 @Component({
   selector: 'app-controls',
-  imports: [MatSliderModule, MatButtonModule, MatInputModule, FormsModule, MatFormFieldModule, MatCardModule],
+  imports: [MatSliderModule, MatButtonModule, MatInputModule, FormsModule, MatFormFieldModule, MatCardModule, ParticleTypeComponent],
   templateUrl: './controls.component.html',
   styleUrls: ['./controls.component.css'],
 })
@@ -25,13 +26,14 @@ export class ControlsComponent implements OnInit {
   public onForcesChange = output();
 
 
-  public types: ParticleType[] = [];
 
   constructor() { }
 
   ngOnInit(): void {
-    this.types = [RED, BLUE, YELLOW, GREEN];
+  }
 
+  getAllParticleTypes(): ParticleType[] {
+    return Array.from(this.data.forceByType.keys());
   }
 
   getParticleType(type: ParticleType): ParticleType {
