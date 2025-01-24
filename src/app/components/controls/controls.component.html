@@ -43,12 +43,7 @@
 </mat-card>
 
 <!-- TYPE Config-->
-<div class="force-matrix">
-    @for (entry of getAllParticleTypes(); track entry) {
-        <app-particle-type [particleType]="entry" (onDataChange)="onDataChange.emit()"></app-particle-type>
-    }
-
-</div>
+<app-particle-type [allTypes]="getAllParticleTypes()" (onDataChange)="onDataChange.emit()"></app-particle-type>
 
 <button color="primary" (click)="updateData()">Recreate Points</button>
 <button mat-flat-button (click)="exportForces()">Export Forces</button>

@@ -1,4 +1,4 @@
-mat-card-content.mat-mdc-card-content.particle-type-card {
+.card-content.particle-type-card {
     display: flex;
     padding: 0;
     justify-content: space-between;
@@ -23,7 +23,7 @@ mat-card-content.mat-mdc-card-content.particle-type-card {
     .left-particle {
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
+        justify-content: center;
         align-items: flex-start;
     }
 
@@ -39,8 +39,7 @@ mat-card-content.mat-mdc-card-content.particle-type-card {
     .particle-circle {
         width: 60px;
         height: 60px;
-        position: absolute;
-        top: 1rem;
+        position: relative;
     }
     .particle-circle-outer {
         width: 58px;
