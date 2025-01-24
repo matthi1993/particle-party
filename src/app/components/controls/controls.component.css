@@ -1,7 +1,6 @@
 .force-matrix {
     input {
-        width: 50px;
-        padding: 0.25rem;
+        width: 45px;
     }
     display: flex;
     flex-direction: column;
@@ -12,7 +11,7 @@
         align-items: center;
 
         .force-column {
-            width: 100px;
+            width: 55px;
             margin: 0.2rem;
         }
     }

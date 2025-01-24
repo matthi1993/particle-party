@@ -1,77 +1,81 @@
-<div class="controls-wrapper">
+<mat-card>
+    <mat-card-header>
+        Force Matrix
+    </mat-card-header>
+    <mat-card-content>
+        <div class="force-matrix">
 
-    <mat-card appearance="outlined">
-        <mat-card-header>
-            Force Matrix
-            <button mat-flat-button (click)="multiplyForces(2)"> *2 </button>
-            <button mat-flat-button (click)="multiplyForces(0.5)"> 1/2 </button>
-        </mat-card-header>
-        <mat-card-content>
-            <div class="force-matrix">
-
-                <!--   HEADLINE ROW   -->
-                <div class="force-row">
-                    <div class="force-column">
-                        -
-                    </div>
-                    @for (entryTypeA of types; track entryTypeA) {
-                    <div class="force-column">
-                        {{ entryTypeA.name }}
-                    </div>
-                    }
+            <!--   HEADLINE ROW   -->
+            <div class="force-row">
+                <div class="force-column">
+                    -
                 </div>
-
-
-                <!--   OTHER ROWS  -->
                 @for (entryTypeA of types; track entryTypeA) {
-                <div class="force-row">
-                    <div class="force-column">
-                        {{ entryTypeA.name }}
-                    </div>
-                    @for (entryTypeB of types; track entryTypeB) {
-                    <div class="force-column">
-                        <input [value]="getForceValue(entryTypeA, entryTypeB)" type="number" step="0.25"
-                            (change)="updateForce(entryTypeA, entryTypeB, $event)" matInput placeholder="force ..." />
-                    </div>
-                    }
+                <div class="force-column">
+                    {{ entryTypeA.name }}
                 </div>
                 }
             </div>
 
+
+            <!--   OTHER ROWS  -->
+            @for (entryTypeA of types; track entryTypeA) {
+            <div class="force-row">
+                <div class="force-column">
+                    {{ entryTypeA.name }}
+                </div>
+                @for (entryTypeB of types; track entryTypeB) {
+                <div class="force-column">
+                    <input [value]="getForceValue(entryTypeA, entryTypeB)" type="number" step="0.25"
+                        (change)="updateForce(entryTypeA, entryTypeB, $event)" matInput placeholder="force ..." />
+                </div>
+                }
+            </div>
+            }
+        </div>
+        <div>
+            Multiply:
+            <button mat-button (click)="multiplyForces(2)"> *2 </button>
+            <button mat-button (click)="multiplyForces(0.5)"> 1/2 </button>
+        </div>
+
+    </mat-card-content>
+</mat-card>
+
+<div class="force-matrix">
+    @for (entry of types; track entry) {
+    <mat-card>
+        <mat-card-content>
+            <div>{{ entry.name }}</div>
+            <div>
+                Points:
+                <input type="number" step="1" [value]="getPointValue(entry)" (change)="updatePoints(entry, $event)"
+                    matInput placeholder="points ..." />
+            </div>
+            <div>
+                Radius:
+                <input type="number" step="1" [value]="getParticleType(entry).radius"
+                    (change)="updateRadius(entry, $event)" matInput placeholder="radius ..." />
+            </div>
+            <div>
+                Size:
+                <input type="number" step="1" [value]="getParticleType(entry).size" (change)="updateSize(entry, $event)"
+                    matInput placeholder="size ..." />
+            </div>
+            <div>
+                Mass:
+                <input type="number" step="0.1" [value]="getParticleType(entry).mass"
+                    (change)="updateMass(entry, $event)" matInput placeholder="mass ..." />
+            </div>
         </mat-card-content>
     </mat-card>
+    }
 
-    <div class="force-matrix">
-        @for (entry of types; track entry) {
-        <mat-card appearance="outlined">
-            <mat-card-content>
-                <div>{{ entry.name }}</div>
-                    <label>
-                        Points:
-                        <input type="number" step="1" [value]="getPointValue(entry)" (change)="updatePoints(entry, $event)" matInput placeholder="points ..." />
-                    </label>
-                    <label>
-                        Radius:
-                        <input type="number" step="1" [value]="getParticleType(entry).radius" (change)="updateRadius(entry, $event)" matInput placeholder="radius ..." />
-                    </label>
-                    <label>
-                        Size:
-                        <input type="number" step="1" [value]="getParticleType(entry).size" (change)="updateSize(entry, $event)" matInput placeholder="size ..." />
-                    </label>
-                    <label>
-                        Mass:
-                        <input type="number" step="0.1" [value]="getParticleType(entry).mass" (change)="updateMass(entry, $event)" matInput placeholder="mass ..." />
-                    </label>
-            </mat-card-content>
-        </mat-card>
-        }
-
-    </div>
-    
-    <button mat-flat-button (click)="updateData()">Recreate Points</button>
-    <button mat-flat-button (click)="exportForces()">Export Forces</button>
-    <label>
-        Import Forces
-        <input type="file" (change)="importForces($event)" />
-    </label>
 </div>
+
+<button color="primary" (click)="updateData()">Recreate Points</button>
+<button mat-flat-button (click)="exportForces()">Export Forces</button>
+<label>
+    Import Forces
+    <input type="file" (change)="importForces($event)" />
+</label>

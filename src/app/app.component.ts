@@ -44,9 +44,10 @@ export class AppComponent implements OnInit, OnDestroy {
   private camera?: Camera;
 
   async ngOnInit() {
-    await this.gpuContext.setup();
-    this.updateData();
-    this.startRenderLoop();
+    await this.gpuContext.setup().then(() => {
+      this.updateData();
+      this.startRenderLoop();
+    });
   }
 
   startRenderLoop() {
@@ -101,7 +102,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.gpuContext.canvas!!.addEventListener('wheel', (event) => {
       event.preventDefault();
       if (this.camera) {
-        if(event.deltaY < 0 && this.camera.cameraRadius <= 10) {
+        if (event.deltaY < 0 && this.camera.cameraRadius <= 10) {
           this.camera.cameraRadius = 10;
         } else {
           this.camera.cameraRadius += event.deltaY / 30;

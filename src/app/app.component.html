@@ -1,10 +1,29 @@
-<div class="wrapper">
-    <div class="canvas-wrapper">
-        <canvas id="gpuCanvas" width="700" height="700"></canvas>
+<header>
+    <div>LOGO</div>
+    <nav>
+        Buttons
+    </nav>
+    <div>ANOTHER LOGO</div>
+</header>
+
+<main class="wrapper">
+
+    <div class="left-column">
+        <app-controls [data]="simulationData" (onDataChange)="onDataChange()"
+            (onForcesChange)="onForcesChange()"></app-controls>
     </div>
-    <app-controls 
-        [data]="simulationData" 
-        (onDataChange)="onDataChange()"
-        (onForcesChange)="onForcesChange()"
-    ></app-controls>
-</div>
+
+    <div class="middle-column">
+        <canvas id="gpuCanvas" width="600" height="600"></canvas>
+    </div>
+
+    <div class="right-column">
+        RIGHT CONTROLS
+    </div>
+
+</main>
+
+<footer>
+   <div>IMPRESSUM</div> 
+   <div>OTHERS</div> 
+</footer>
