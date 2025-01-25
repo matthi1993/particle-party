@@ -24,6 +24,6 @@ export class SimulationData {
     this.forces.push(
       Array(this.types.length).fill(0) //TODO, update all forces of all particles and set init value
     );
-    this.pointsPerType.push(500);
+    this.pointsPerType.push(200);
   }
 }
