@@ -1,35 +1,33 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 
-import { ControlsComponent } from './components/controls/controls.component';
 import { SimulationData } from './model/Simulation';
 import { createDefaultSimulationModel } from './model/DefaultSimulationData';
-import { SceneComponent } from './components/scene/scene.component';
+import { SimulationComponent } from "./components/simulation/simulation.component";
+import { PhysicsComponent } from "./components/physics/physics.component";
+import { MoleculesComponent } from "./components/molecules/molecules.component";
 
 
+export enum Page {
+  SIMULATION,
+  PHYSICS,
+  MOLECULES
+}
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
-  imports: [SceneComponent, ControlsComponent]
+  styleUrls: ['./app.component.scss'],
+  imports: [SimulationComponent, PhysicsComponent, MoleculesComponent]
 })
-export class AppComponent implements OnInit {
-  title = 'default';
+export class AppComponent {
+  title = 'Simulation';
 
   public simulationData: SimulationData = createDefaultSimulationModel();
+  public page = Page.SIMULATION;
+  pageEnum = Page;
 
-  @ViewChild(SceneComponent) scene!: SceneComponent;
-
-  public onDataChange() {
-    this.scene.recreateScene();
+  switchPage(page: Page) {
+    this.page = page;
   }
-
-  public onForcesChange() {
-    this.scene.updateForcesAndTypes();
-  }
-
-  async ngOnInit() {
-  }
-
 }
 

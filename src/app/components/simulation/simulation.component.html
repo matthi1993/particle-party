@@ -1,0 +1,16 @@
+<main class="wrapper">
+
+    <div class="left-column">
+        <app-controls [data]="simulationData" (onDataChange)="onDataChange()"
+            (onForcesChange)="onForcesChange()"></app-controls>
+    </div>
+
+    <div class="middle-column">
+        <app-scene [simulationData]="simulationData"></app-scene>
+    </div>
+
+    <div class="right-column">
+        RIGHT CONTROLS
+    </div>
+
+</main>

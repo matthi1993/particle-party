@@ -1,29 +1,29 @@
 <header>
-    <div>LOGO</div>
-    <nav>
-        Buttons
-    </nav>
-    <div>ANOTHER LOGO</div>
+    <div class="main-header">
+        <div>LOGO</div>
+        <nav>
+            <button (click)="switchPage(pageEnum.SIMULATION)">Simulation</button>
+            <button (click)="switchPage(pageEnum.PHYSICS)">Physics</button>
+            <button (click)="switchPage(pageEnum.MOLECULES)">Molecules</button>
+        </nav>
+        <div>ANOTHER LOGO</div>
+    </div>
+    <div class="sub-header">
+        sub
+    </div>
 </header>
 
-<main class="wrapper">
-
-    <div class="left-column">
-        <app-controls [data]="simulationData" (onDataChange)="onDataChange()"
-            (onForcesChange)="onForcesChange()"></app-controls>
-    </div>
-
-    <div class="middle-column">
-        <app-scene [simulationData]="simulationData"></app-scene>
-    </div>
-
-    <div class="right-column">
-        RIGHT CONTROLS
-    </div>
-
-</main>
+@if (page === pageEnum.SIMULATION) {
+    <app-simulation [simulationData]="simulationData"></app-simulation>
+} 
+@if (page === pageEnum.PHYSICS) {
+    <app-physics></app-physics>
+} 
+@if (page === pageEnum.MOLECULES) {
+    <app-molecules></app-molecules>
+} 
 
 <footer>
-   <div>IMPRESSUM</div> 
-   <div>OTHERS</div> 
+    <div>IMPRESSUM</div>
+    <div>OTHERS</div>
 </footer>
