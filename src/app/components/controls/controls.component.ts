@@ -64,47 +64,4 @@ export class ControlsComponent implements OnInit {
     })
     this.onForcesChange.emit();
   }
-
-
-  exportForces() {
-    // TODO
-    /*const forces = Array.from(this.data.forceByType.entries());
-
-    const exportObj = {
-      forces: forces,
-      points: this.points
-    }
-
-
-    const dataStr = JSON.stringify(exportObj, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'data.json';
-    a.click();
-
-    window.URL.revokeObjectURL(url);*/
-  }
-
-  importForces(event: any) {
-    // TODO
-    /*const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        try {
-          const importedData = JSON.parse(e.target.result);
-
-          this.data.forceByType = new Map(importedData.forces);
-          this.points = importedData.points;
-        } catch (error) {
-          console.error('Invalid JSON file:', error);
-        }
-      };
-      reader.readAsText(file);
-      this.onDataChange.emit();
-    }*/
-  }
 }

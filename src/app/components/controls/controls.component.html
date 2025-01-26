@@ -1,12 +1,13 @@
 <!-- TYPE Config-->
 <app-particle-type [simulationData]="this.data" (onDataChange)="onForcesChange.emit()"></app-particle-type>
 
-<button mat-flat-button (click)="updateData()">Recreate Points</button>
-<button mat-flat-button (click)="exportForces()">Export Forces</button>
 <div>
-    Import Forces
-    <input type="file" (change)="importForces($event)" />
+    <button mat-button (click)="randomForces()"> Random particle types </button>
+    Multiply all forces:
+    <button mat-button (click)="multiplyForces(2)"> *2 </button>
+    <button mat-button (click)="multiplyForces(0.5)"> 1/2 </button>
 </div>
+
 <div>
     Points:
     @for (typeEntry of this.data.types; track typeEntry) {
@@ -16,9 +17,4 @@
     </div>
     }
 </div>
-<div>
-    <button mat-button (click)="randomForces()"> Make it Random </button>
-    Multiply all forces:
-    <button mat-button (click)="multiplyForces(2)"> *2 </button>
-    <button mat-button (click)="multiplyForces(0.5)"> 1/2 </button>
-</div>
+<button mat-flat-button (click)="updateData()">Recreate Points</button>

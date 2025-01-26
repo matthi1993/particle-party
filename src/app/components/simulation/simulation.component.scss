@@ -1,27 +1,5 @@
-.wrapper {
-    display: flex;
-    justify-content: space-between;
-    height: 100%;
-}
-
 :host {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-}
-
-.right-column {
-    width: 5rem;
-    overflow: hidden;
-    padding-left: 1rem;
-}
-
-.left-column {
-    overflow: hidden;
-    width: 22rem;
-    padding-right: 0.5rem;
-}
-
-.middle-column {
-    display: flex;
 }

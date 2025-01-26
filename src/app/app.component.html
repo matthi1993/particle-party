@@ -1,15 +1,23 @@
 <header>
     <div class="main-header">
-        <div>LOGO</div>
+        <div class="header-side">Particle Simulator</div>
         <nav>
             <button (click)="switchPage(pageEnum.SIMULATION)">Simulation</button>
             <button (click)="switchPage(pageEnum.PHYSICS)">Physics</button>
             <button (click)="switchPage(pageEnum.MOLECULES)">Molecules</button>
         </nav>
-        <div>ANOTHER LOGO</div>
+        <div class="header-side">O</div>
     </div>
     <div class="sub-header">
-        sub
+        @if (page === pageEnum.SIMULATION) {
+            simulation
+        } 
+        @if (page === pageEnum.PHYSICS) {
+            physics
+        } 
+        @if (page === pageEnum.MOLECULES) {
+            molecules
+        } 
     </div>
 </header>
 
@@ -17,13 +25,11 @@
     <app-simulation [simulationData]="simulationData"></app-simulation>
 } 
 @if (page === pageEnum.PHYSICS) {
-    <app-physics></app-physics>
+    <app-physics [simulationData]="simulationData"></app-physics>
 } 
 @if (page === pageEnum.MOLECULES) {
     <app-molecules></app-molecules>
 } 
 
 <footer>
-    <div>IMPRESSUM</div>
-    <div>OTHERS</div>
 </footer>
