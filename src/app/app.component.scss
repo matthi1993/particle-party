@@ -1,4 +1,4 @@
-@import '../themes/main-theme.scss';
+@use '../themes/main-theme' as theme;
 
 header,
 footer {
@@ -6,7 +6,7 @@ footer {
 }
 
 header {
-    box-shadow: $box-shadow;
+    box-shadow: theme.$box-shadow;
     margin: 0.5rem 0.5rem 1.5rem 0.5rem;
 }
 
