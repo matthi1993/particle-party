@@ -1,0 +1,10 @@
+<app-scene [physicsData]="physicsData" [points]="points"></app-scene>
+
+@for (item of physicsData.types; track item) {
+<div>
+    @if (item === selectedType) {
+    <span>x</span>
+    }
+    <button (click)="selectType(item)">{{ item.name }}</button>
+</div>
+}

@@ -12,10 +12,12 @@ export class ParticleTypeWithForces {
 
 export class SimulationData {
   public points: Point[] = [];
+}
 
+export class PhysicsData {
+  
   public types: ParticleType[] = [];
   public forces: number[][] = [[]];
-  public pointsPerType: number [] = [];
 
   constructor() { }
 
@@ -24,6 +26,5 @@ export class SimulationData {
     this.forces.push(
       Array(this.types.length).fill(0) //TODO, update all forces of all particles and set init value
     );
-    this.pointsPerType.push(200);
   }
 }

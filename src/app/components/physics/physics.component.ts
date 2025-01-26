@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { ControlsComponent } from "../controls/controls.component";
-import { SimulationData } from 'src/app/model/Simulation';
+import { PhysicsData } from 'src/app/model/Simulation';
 
 @Component({
   selector: 'app-physics',
@@ -10,6 +10,6 @@ import { SimulationData } from 'src/app/model/Simulation';
 })
 export class PhysicsComponent {
 
-  @Input() public simulationData!: SimulationData;
+  @Input() public physicsData!: PhysicsData;
 
 }

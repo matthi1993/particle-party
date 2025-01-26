@@ -4,7 +4,7 @@ import { ParticleType } from 'src/app/model/Point';
 import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { vec4 } from 'gl-matrix';
-import { SimulationData } from 'src/app/model/Simulation';
+import { PhysicsData } from 'src/app/model/Simulation';
 
 @Component({
   selector: 'app-particle-type',
@@ -14,7 +14,7 @@ import { SimulationData } from 'src/app/model/Simulation';
 })
 export class ParticleTypeComponent implements OnInit {
 
-  @Input() public simulationData!: SimulationData;
+  @Input() public simulationData!: PhysicsData;
   @Input() public particleType!: ParticleType;
 
   selectedParticleIndex = 0;

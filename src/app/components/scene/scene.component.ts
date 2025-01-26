@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
-import { SimulationData } from '../../model/Simulation';
+import { PhysicsData, SimulationData } from '../../model/Simulation';
 import { Square, createArraysFromPoints, createForcesArray, createTypesArray } from '../../utils';
 import { computeShader } from '../../shader/computeShader'
 import { Compute } from '../../gpu/gpu.compute'
@@ -8,6 +8,7 @@ import { Render } from '../../gpu/gpu.render'
 import { GpuContext } from '../../gpu/gpu.context'
 
 import { Camera } from '../../model/Camera';
+import { Point } from 'src/app/model/Point';
 
 @Component({
   selector: 'app-scene',
@@ -17,8 +18,10 @@ import { Camera } from '../../model/Camera';
 })
 export class SceneComponent implements OnInit, OnDestroy {
 
-  @Input()
-  public simulationData!: SimulationData;
+  @Input() public physicsData!: PhysicsData;
+  @Input() public points!: Point[];
+  @Input() public canvasWidth = 300;
+  @Input() public canvasHeight = 300;
 
   private gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
@@ -110,16 +113,16 @@ export class SceneComponent implements OnInit, OnDestroy {
   }
 
   public updateForcesAndTypes() {
-    let forcesArray = createForcesArray(this.simulationData.forces);
+    let forcesArray = createForcesArray(this.physicsData.forces);
     this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
 
-    let typesArray = createTypesArray(this.simulationData.types);
+    let typesArray = createTypesArray(this.physicsData.types);
     this.gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
   }
 
   public recreateScene() {
     this.step = 0;
-    let positionArray = createArraysFromPoints(this.simulationData.points);
+    let positionArray = createArraysFromPoints(this.points);
 
     const positionsStorage = [
       this.gpuContext.createStorageBuffer("Positions In", positionArray.byteLength),
@@ -127,17 +130,17 @@ export class SceneComponent implements OnInit, OnDestroy {
     ];
     this.gpuContext.device.queue.writeBuffer(positionsStorage[0], 0, positionArray);
 
-    let typesArray = createTypesArray(this.simulationData.types);
+    let typesArray = createTypesArray(this.physicsData.types);
     this.typesStorage = this.gpuContext.createStorageBuffer("Types", typesArray.byteLength);
     this.gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
 
-    let forcesArray = createForcesArray(this.simulationData.forces);
+    let forcesArray = createForcesArray(this.physicsData.forces);
     this.forcesStorage = this.gpuContext.createStorageBuffer("Forces", forcesArray.byteLength);
     this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
 
     this.simulationCompute = new Compute(
       this.gpuContext.device,
-      this.simulationData.points.length,
+      this.points.length,
       computeShader
     )
     this.simulationCompute.updateBindGroups(this.gpuContext.device, positionsStorage, this.typesStorage, this.forcesStorage);
@@ -145,7 +148,7 @@ export class SceneComponent implements OnInit, OnDestroy {
     this.simulationRenderer = new Render(
       this.gpuContext,
       new Square(this.gpuContext.device),
-      this.simulationData.points.length
+      this.points.length
     )
     this.simulationRenderer.updateBindGroups(this.gpuContext.device, positionsStorage, this.typesStorage, this.forcesStorage, this.viewProjectionBuffer)
   }

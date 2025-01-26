@@ -4,7 +4,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { NEUTRON, GREEN, PROTON, YELLOW } from 'src/app/model/DefaultSimulationData';
-import { SimulationData } from 'src/app/model/Simulation';
+import { PhysicsData } from 'src/app/model/Simulation';
 import { create, ParticleType } from 'src/app/model/Point';
 import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material/slider';
@@ -19,7 +19,7 @@ import { ParticleTypeComponent } from "../particle-type/particle-type.component"
 })
 export class ControlsComponent implements OnInit {
 
-  @Input() public data: SimulationData = new SimulationData();
+  @Input() public data: PhysicsData = new PhysicsData();
 
   public onDataChange = output();
   public onForcesChange = output();
@@ -29,25 +29,11 @@ export class ControlsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-
-  updateData() {
-    let cubeSize = 1200;
-    this.data.points = [];
-
-    this.data.types.forEach((value, index) => {
-      this.data.points.push(...create(this.data.pointsPerType[index], value, cubeSize));
-    })
-
-    this.onDataChange.emit();
-  }
-
   randomForces() {
     this.data.types.forEach((type, rowIndex) => {
       type.radius = Math.random() * 300 + 50;
       type.mass = Math.random() * 2;
       type.size = Math.random() * 15 + 5;
-
-     //this.data.pointsPerType[rowIndex] = Math.random() * 1000 + 100;
 
       this.data.types.forEach((col, colIndex) => {
         this.data.forces[rowIndex][colIndex] = (Math.random() * 6) - 3;

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
-import { SimulationData } from './model/Simulation';
-import { createDefaultSimulationModel } from './model/DefaultSimulationData';
+import { PhysicsData } from './model/Simulation';
+import { createDefaultPhysicsModel } from './model/DefaultSimulationData';
 import { SimulationComponent } from "./components/simulation/simulation.component";
 import { PhysicsComponent } from "./components/physics/physics.component";
 import { MoleculesComponent } from "./components/molecules/molecules.component";
@@ -22,7 +22,8 @@ export enum Page {
 export class AppComponent {
   title = 'Simulation';
 
-  public simulationData: SimulationData = createDefaultSimulationModel();
+  public physicsData: PhysicsData = createDefaultPhysicsModel();
+  
   public page = Page.SIMULATION;
   pageEnum = Page;
 

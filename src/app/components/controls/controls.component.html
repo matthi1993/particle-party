@@ -7,14 +7,3 @@
     <button mat-button (click)="multiplyForces(2)"> *2 </button>
     <button mat-button (click)="multiplyForces(0.5)"> 1/2 </button>
 </div>
-
-<div>
-    Points:
-    @for (typeEntry of this.data.types; track typeEntry) {
-    <div>
-        {{ typeEntry.name }}:
-        <input [(ngModel)]="this.data.pointsPerType[$index]" step="1" min="1" max="5000" />
-    </div>
-    }
-</div>
-<button mat-flat-button (click)="updateData()">Recreate Points</button>

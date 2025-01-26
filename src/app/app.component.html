@@ -22,13 +22,13 @@
 </header>
 
 @if (page === pageEnum.SIMULATION) {
-    <app-simulation [simulationData]="simulationData"></app-simulation>
+    <app-simulation [physicsData]="physicsData"></app-simulation>
 } 
 @if (page === pageEnum.PHYSICS) {
-    <app-physics [simulationData]="simulationData"></app-physics>
+    <app-physics [physicsData]="physicsData"></app-physics>
 } 
 @if (page === pageEnum.MOLECULES) {
-    <app-molecules></app-molecules>
+    <app-molecules [physicsData]="physicsData"></app-molecules>
 } 
 
 <footer>
