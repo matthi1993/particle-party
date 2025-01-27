@@ -21,7 +21,7 @@ export class Camera {
         const near = 0.1;
         const far = 500.0;
 
-        this.position = vec3.fromValues(0, 0, 20); 
+        this.position = vec3.fromValues(0, 0, distance); 
 
         // Projection matrix
         mat4.perspective(this.projectionMatrix, fov, aspect, near, far);

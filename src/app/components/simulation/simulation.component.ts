@@ -14,13 +14,8 @@ import { vec4 } from 'gl-matrix';
 export class SimulationComponent {
 
   @Input() public points: Point[] = [
-    new Point(vec4.fromValues(0,0,0,1), PROTON),
-    new Point(vec4.fromValues(1,0,0,1), PROTON),
-    new Point(vec4.fromValues(0,1,0,1), PROTON),
-    new Point(vec4.fromValues(5,5,0,1), PROTON),
-    new Point(vec4.fromValues(-5,-5,0,1), PROTON),
-    new Point(vec4.fromValues(5,-5,0,1), PROTON),
-    new Point(vec4.fromValues(-5,5,0,1), NEUTRON)
+    ...create(1000, PROTON, 100),
+    ...create(1000, NEUTRON, 100)
   ];
   @Input() public physicsData!: PhysicsData;
 

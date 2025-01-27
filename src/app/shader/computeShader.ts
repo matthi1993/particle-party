@@ -44,14 +44,16 @@ export const computeShader = `
         @builtin(local_invocation_id) local_id: vec3<u32>, 
         @builtin(workgroup_id) workgroup_id: vec3<u32>
     ) {
+        let G = f32(0.006674);
+        let attractionFactor = 0.05;
 
         let index = global_id.x;
 
         var me = particles[index];
         let myType = particleTypes[i32(me.particleAttributes.x)];
-
         let numParticles = arrayLength(&particles);
-        let G = f32(6.674);
+
+
         var myForces: array<f32, 16>; // TODO 16 is the max number of types currently
         
         
@@ -78,7 +80,6 @@ export const computeShader = `
             workgroupBarrier(); // Ensure all threads have loaded the data
 
 
-
             // Calculate interactions with particles in shared memory
             for (var i = 0u; i < ${WORKGROUP_SIZE}; i++) {
                 
@@ -102,7 +103,7 @@ export const computeShader = `
                     
                     // ##### attraction force #####
                     if (distance > 0.0 && distance <= myType.radius){
-                        var attraction = myForces[i32(other.particleAttributes.x)];
+                        var attraction = myForces[i32(other.particleAttributes.x)] * attractionFactor;
                         let forceMagnitude = attraction / (distance + 1e-6);
                         
                         force += normalizeVector(direction) * forceMagnitude;

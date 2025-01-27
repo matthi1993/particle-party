@@ -25,7 +25,7 @@ export class SceneComponent implements OnInit, OnDestroy {
   @Input() public points!: Point[];
   @Input() public canvasWidth = 300;
   @Input() public canvasHeight = 300;
-  @Input() public camera: Camera = new Camera(this.canvasWidth, this.canvasHeight, 15);
+  @Input() public camera: Camera = new Camera(this.canvasWidth, this.canvasHeight, 150);
 
   private gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
@@ -52,7 +52,7 @@ export class SceneComponent implements OnInit, OnDestroy {
 
       this.createScene();
       this.startRenderLoop();
-      this.simulationLoop(false);
+      this.simulationLoop(true);
     });
   }
 
