@@ -31,8 +31,7 @@ export class MoleculesComponent implements OnInit {
   selectType(type: ParticleType) {
       this.selectedType = type;
       this.editingPointStructure = [
-        new Point(vec4.fromValues(0, 0, 0, 0), 
-        this.selectedType)
+        new Point(vec4.fromValues(0, 0, 0, 0), this.selectedType)
       ];
   }
 
