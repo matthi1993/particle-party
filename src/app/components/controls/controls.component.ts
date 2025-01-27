@@ -29,15 +29,15 @@ export class ControlsComponent implements OnInit {
 
   randomForces() {
     this.data.types.forEach((type, rowIndex) => {
-      type.radius = Math.random() * 300 + 50;
-      type.mass = Math.random() * 2;
-      type.size = Math.random() * 15 + 5;
+      type.radius = Math.random() * 10 + 3;
+      type.mass = Math.random() * 0.05;
+      type.size = Math.random() * 1 + 0.75;
 
       this.data.types.forEach((col, colIndex) => {
-        this.data.forces[rowIndex][colIndex] = (Math.random() * 6) - 3;
+        this.data.forces[rowIndex][colIndex] = (Math.random() * 0.5) - 0.25;
       })
     });
-    this.onForcesChange.emit();
+    this.onDataChange.emit();
   }
 
   multiplyForces(factor: number) {

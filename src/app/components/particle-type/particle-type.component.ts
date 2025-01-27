@@ -54,8 +54,8 @@ export class ParticleTypeComponent implements OnInit {
         "New Particle",
         this.simulationData.types.length,
         vec4.fromValues(Math.random(), Math.random(), Math.random(), 1),
-        100,
-        Math.random() * 25 + 5,
+        10,
+        Math.random() * 1 + 0.5,
         0
       )
     )

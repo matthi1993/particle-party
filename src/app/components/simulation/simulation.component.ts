@@ -22,6 +22,15 @@ export class SimulationComponent {
 
   @ViewChild(SceneComponent) scene!: SceneComponent;
 
+  public newAnimation() {
+    let newPoints:Point[] = [];
+    this.physicsData.types.forEach(type => {
+      newPoints.push(...create(200, type, 100));
+    })
+    this.points = newPoints;
+    this.scene.createScene();
+  }
+
   public onDataChange() {
     this.scene.createScene();
   }

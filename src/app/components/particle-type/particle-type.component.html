@@ -33,25 +33,9 @@
                     [style.height.px]="particleType.size * 2" [style.backgroundColor]="getParticleColor()"
                     [style.left.px]="30 - particleType.size" [style.top.px]="30 - particleType.size"></div>
             </div>
-            <mat-slider step="1" min="5" max="30" showTickMarks discrete>
+            <mat-slider step="0.05" min="0.5" max="4" showTickMarks discrete>
                 <input [(ngModel)]="particleType.size" matSliderThumb (ngModelChange)="onValueChange()">
             </mat-slider>
-        </div>
-        <div>
-            <div>Forces:</div>
-            @for (typeEntry of this.simulationData.types; track typeEntry) {
-            <div class="force-column">
-                <div class="input-pair">
-                    <div class="attribute">
-                        {{ typeEntry.name }}:
-                    </div>
-                    <div class="attribute-value">
-                        <input [(ngModel)]="this.simulationData.forces[this.selectedParticleIndex][$index]" type="number"
-                            step="0.1" matInput placeholder="force ..." (ngModelChange)="onValueChange()" />
-                    </div>
-                </div>
-            </div>
-            }
         </div>
     </div>
     
