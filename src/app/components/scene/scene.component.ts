@@ -10,6 +10,8 @@ import { GpuContext } from '../../gpu/gpu.context'
 import { Camera } from '../../model/Camera';
 import { Point } from 'src/app/model/Point';
 import { SceneStorage } from './scene.gpu.storage';
+import { mat4, vec4 } from 'gl-matrix';
+import { getMouseNDC, ndcToWorld, projectToScenePlane } from './scene.mousevent';
 
 @Component({
   selector: 'app-scene',
@@ -38,6 +40,10 @@ export class SceneComponent implements OnInit, OnDestroy {
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
 
+  // Editing
+  @Input() public editingPointStructure?: Point[];
+
+
 
   async ngOnInit() {
     await this.gpuContext.setup().then(() => {
@@ -46,18 +52,18 @@ export class SceneComponent implements OnInit, OnDestroy {
 
       this.createScene();
       this.startRenderLoop();
-      this.simulationLoop(true);
+      this.simulationLoop(false);
     });
   }
 
   public simulationLoop(shouldPlay: boolean) {
     this.isPlaying = shouldPlay;
     console.log(this.isPlaying);
-    if(shouldPlay && !this.simulateIntervalId) {
+    if (shouldPlay && !this.simulateIntervalId) {
       this.simulateIntervalId = setInterval(() => {
         this.simulate();
       }, this.SIMULATION_UPDATE_INTERVAL);
-    } else if(this.simulateIntervalId){
+    } else if (this.simulateIntervalId) {
       clearInterval(this.simulateIntervalId);
       this.simulateIntervalId = undefined;
     }
@@ -70,47 +76,45 @@ export class SceneComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if(this.renderIntervalId){
+    if (this.renderIntervalId) {
       clearInterval(this.renderIntervalId);
     }
-    if(this.simulateIntervalId){
+    if (this.simulateIntervalId) {
       clearInterval(this.simulateIntervalId);
     }
   }
 
   addCameraListeners(element: HTMLElement) {
-    let isMouseDown = false;
-    let lastMouseX = 0;
-    let lastMouseY = 0;
+    element.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+
+      if (this.editingPointStructure) {
+        const ndc = getMouseNDC(event, element);
+        const worldPoint = ndcToWorld(ndc, this.camera);
+        const scenePoint = projectToScenePlane(worldPoint, this.camera);
+        
+        let pointsToAdd: Point[] = [];
+        this.editingPointStructure.forEach(point => {
+          let newPosition = vec4.fromValues(0, 0, 0, 0);
+          vec4.add(newPosition, point.position, vec4.fromValues(scenePoint[0], scenePoint[1], scenePoint[2], 1));
+          pointsToAdd.push(new Point(
+            newPosition,
+            point.particleType
+          ));
+        })
+
+        this.points.push(...pointsToAdd);
+        this.createScene();
+      }
+    });
 
     element.addEventListener('wheel', (event) => {
       event.preventDefault();
-      if (event.deltaY < 0 && this.camera.cameraRadius <= 5) {
-        this.camera.cameraRadius = 5;
+      if (event.deltaY < 0 && this.camera.position[2] <= 5) {
+        this.camera.position[2] = 5;
       } else {
-        this.camera.cameraRadius += event.deltaY / 30;
+        this.camera.position[2] += event.deltaY / 30;
       }
-    });
-
-    element.addEventListener("mousedown", (e: MouseEvent) => {
-      isMouseDown = true;
-      lastMouseX = e.clientX;
-      lastMouseY = e.clientY;
-    });
-    element.addEventListener("mousemove", (e: MouseEvent) => {
-      if (isMouseDown) {
-        const deltaX = e.clientX - lastMouseX;
-        const deltaY = e.clientY - lastMouseY;
-
-        // Update the last mouse position
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-
-        this.camera!!.cameraAngle += deltaX / 100;
-      }
-    });
-    element.addEventListener("mouseup", () => {
-      isMouseDown = false;
     });
   }
 
@@ -129,7 +133,10 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   public createScene() {
     this.step = 0;
-    this.simulationLoop(false);
+
+    if (!this.points || this.points.length == 0) {
+      return;
+    }
 
     this.sceneStorage.createPointStorage(this.gpuContext, this.points);
     this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);

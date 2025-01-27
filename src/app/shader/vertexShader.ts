@@ -37,11 +37,8 @@ export const vertexShaderSource = `
         
         var output: VertexOutput;
 
-        var offset = vec4f(0,0,0,50); // TODO why do i need this?
-
         let modelViewProjection = uniforms.viewProjectionMatrix;
-        let localPosition =  offset + dataIn[instance].position;
-        output.position = modelViewProjection * localPosition + vec4f(position * myType.size, 0, 0) ;
+        output.position = modelViewProjection * dataIn[instance].position + vec4f(position * myType.size, 0, 0) ;
         output.color = myType.color;
 
         return output;

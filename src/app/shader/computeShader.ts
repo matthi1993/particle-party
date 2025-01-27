@@ -94,8 +94,6 @@ export const computeShader = `
                 let distanceSquared = max(dot(direction, direction), 1e-6); // Avoid division by zero
                 let distance = sqrt(distanceSquared);
 
-                let massFactor = (myType.mass * otherType.mass);
-
                 // ##### inner atomar force #####
                 if (distance > 0.0 && distance <= myType.size) {
                     let diff = myType.size - distance;
@@ -105,13 +103,13 @@ export const computeShader = `
                     // ##### attraction force #####
                     if (distance > 0.0 && distance <= myType.radius){
                         var attraction = myForces[i32(other.particleAttributes.x)];
-                        let forceMagnitude = attraction / distance;
+                        let forceMagnitude = attraction / (distance + 1e-6);
                         
                         force += normalizeVector(direction) * forceMagnitude;
                     }
 
                     // ##### gravity force #####
-                    let gravityMagnitude = G * massFactor / distanceSquared;
+                    let gravityMagnitude = G * otherType.mass / (distanceSquared + 1e-6);
                     force -= normalizeVector(direction) * gravityMagnitude;
                 }
                 

@@ -6,16 +6,13 @@ export class Camera {
 
     viewProjectionMatrix = mat4.create();
 
-    public cameraAngle = 0; // Current angle of rotation
-    public cameraRadius = 30; // Distance from the scene center
-    rotationSpeed = 0.01; // Speed of rotation (radians per frame)
-
-    eye = vec3.fromValues(0, 0, 0);    // Camera position
+    position = vec3.fromValues(0, 0, 10);    // Camera position
     center = vec3.fromValues(0, 0, 0); // Look-at point
     up = vec3.fromValues(0, 1, 0);     // Up vector
 
     viewMatrix = mat4.create();
     projectionMatrix = mat4.create();
+    orthoMatrix = mat4.create();
 
     constructor(width: number, height: number, distance: number) {
 
@@ -24,12 +21,13 @@ export class Camera {
         const near = 0.1;
         const far = 500.0;
 
-        this.cameraRadius = distance;
+        this.position = vec3.fromValues(0, 0, 20); 
 
         // Projection matrix
         mat4.perspective(this.projectionMatrix, fov, aspect, near, far);
+        mat4.ortho(this.orthoMatrix, -100, 100, -100, 100, near, far);
         // View matrix
-        mat4.lookAt(this.viewMatrix, this.eye, this.center, this.up);
+        mat4.lookAt(this.viewMatrix, this.position, this.center, this.up);
 
         // Combine into a view-projection matrix
         mat4.multiply(this.viewProjectionMatrix, this.projectionMatrix, this.viewMatrix);
@@ -40,17 +38,9 @@ export class Camera {
     }
 
     updateCamera() {
-
-        // Calculate the new camera position
-        this.eye = [
-            this.cameraRadius * Math.cos(this.cameraAngle), // X-coordinate
-            0,                                   // Y-coordinate (height of the camera)
-            this.cameraRadius * Math.sin(this.cameraAngle) // Z-coordinate
-        ];
-
         // Create the view matrix (camera looking at the center)
         this.viewMatrix = mat4.create();
-        mat4.lookAt(this.viewMatrix, this.eye, this.center, this.up);
+        mat4.lookAt(this.viewMatrix, this.position, this.center, this.up);
         mat4.multiply(this.viewProjectionMatrix, this.projectionMatrix, this.viewMatrix);
     }
 }
