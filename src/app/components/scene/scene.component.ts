@@ -9,6 +9,7 @@ import { GpuContext } from '../../gpu/gpu.context'
 
 import { Camera } from '../../model/Camera';
 import { Point } from 'src/app/model/Point';
+import { SceneStorage } from './scene.gpu.storage';
 
 @Component({
   selector: 'app-scene',
@@ -27,10 +28,7 @@ export class SceneComponent implements OnInit, OnDestroy {
   private gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
   private simulationRenderer?: Render;
-
-  private forcesStorage?: any;
-  private typesStorage?: any;
-  private viewProjectionBuffer?: any;
+  private sceneStorage: SceneStorage = new SceneStorage();
 
   private step = 0;
   public isPlaying = false;
@@ -43,10 +41,10 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     await this.gpuContext.setup().then(() => {
-      this.setupCamera();
+      this.sceneStorage.createCameraBuffer(this.gpuContext, this.camera);
       this.addCameraListeners(this.gpuContext.canvas!!);
 
-      this.recreateScene();
+      this.createScene();
       this.startRenderLoop();
       this.simulationLoop(true);
     });
@@ -78,20 +76,6 @@ export class SceneComponent implements OnInit, OnDestroy {
     if(this.simulateIntervalId){
       clearInterval(this.simulateIntervalId);
     }
-  }
-
-  setupCamera() {
-    this.viewProjectionBuffer = this.gpuContext.device.createBuffer({
-      size: 64, // 4x4 matrix of 4-byte floats
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
-
-    // Write the matrix to the buffer
-    this.gpuContext.device.queue.writeBuffer(
-      this.viewProjectionBuffer,
-      0,
-      new Float32Array(this.camera.getViewProjectionMatrix())
-    );
   }
 
   addCameraListeners(element: HTMLElement) {
@@ -131,63 +115,54 @@ export class SceneComponent implements OnInit, OnDestroy {
   }
 
   public updateForcesAndTypes() {
-    let forcesArray = createForcesArray(this.physicsData.forces);
-    this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
-
-    let typesArray = createTypesArray(this.physicsData.types);
-    this.gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
+    this.sceneStorage.updateForceValues(this.gpuContext, this.physicsData);
+    this.sceneStorage.updateTypeValues(this.gpuContext, this.physicsData);
   }
 
-  public recreateScene() {
+  public updateScene() {
+    this.sceneStorage.updateForceValues(this.gpuContext, this.physicsData);
+    this.sceneStorage.updateTypeValues(this.gpuContext, this.physicsData);
+    this.sceneStorage.updatePointValues(this.gpuContext, this.points);
+
     this.step = 0;
-    let positionArray = createArraysFromPoints(this.points);
+  }
 
-    const positionsStorage = [
-      this.gpuContext.createStorageBuffer("Positions In", positionArray.byteLength),
-      this.gpuContext.createStorageBuffer("Positions Out", positionArray.byteLength)
-    ];
-    this.gpuContext.device.queue.writeBuffer(positionsStorage[0], 0, positionArray);
+  public createScene() {
+    this.step = 0;
+    this.simulationLoop(false);
 
-    let typesArray = createTypesArray(this.physicsData.types);
-    this.typesStorage = this.gpuContext.createStorageBuffer("Types", typesArray.byteLength);
-    this.gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
-
-    let forcesArray = createForcesArray(this.physicsData.forces);
-    this.forcesStorage = this.gpuContext.createStorageBuffer("Forces", forcesArray.byteLength);
-    this.gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
+    this.sceneStorage.createPointStorage(this.gpuContext, this.points);
+    this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
+    this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
 
     this.simulationCompute = new Compute(
       this.gpuContext.device,
       this.points.length,
       computeShader
     )
-    this.simulationCompute.updateBindGroups(this.gpuContext.device, positionsStorage, this.typesStorage, this.forcesStorage);
+    this.simulationCompute.updateBindGroups(this.gpuContext.device, this.sceneStorage.positionsStorage, this.sceneStorage.typesStorage, this.sceneStorage.forcesStorage);
 
     this.simulationRenderer = new Render(
       this.gpuContext,
       new Square(this.gpuContext.device),
       this.points.length
     )
-    this.simulationRenderer.updateBindGroups(this.gpuContext.device, positionsStorage, this.typesStorage, this.forcesStorage, this.viewProjectionBuffer)
+    this.simulationRenderer.updateBindGroups(this.gpuContext.device, this.sceneStorage.positionsStorage, this.sceneStorage.typesStorage, this.sceneStorage.forcesStorage, this.sceneStorage.viewProjectionBuffer)
   }
 
   render() {
     this.camera.updateCamera();
-    this.gpuContext.device.queue.writeBuffer(this.viewProjectionBuffer, 0, new Float32Array(this.camera.getViewProjectionMatrix()));
+    this.sceneStorage.updateCameraBuffer(this.gpuContext, this.camera);
 
     const encoder = this.gpuContext.device.createCommandEncoder();
-
     this.simulationRenderer?.execute(encoder, this.step, this.gpuContext.context.getCurrentTexture().createView());
-
     this.gpuContext.device.queue.submit([encoder.finish()]);
   }
 
   simulate() {
     const encoder = this.gpuContext.device.createCommandEncoder();
-
     this.simulationCompute?.execute(encoder, this.step);
     this.step++;
-
     this.gpuContext.device.queue.submit([encoder.finish()]);
   }
 }

@@ -21,7 +21,7 @@ export class SimulationComponent {
   @ViewChild(SceneComponent) scene!: SceneComponent;
 
   public onDataChange() {
-    this.scene.recreateScene();
+    this.scene.createScene();
   }
 
   public onForcesChange() {
