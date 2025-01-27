@@ -25,7 +25,7 @@ export class SceneComponent implements OnInit, OnDestroy {
   @Input() public points!: Point[];
   @Input() public canvasWidth = 300;
   @Input() public canvasHeight = 300;
-  @Input() public camera: Camera = new Camera(this.canvasWidth, this.canvasHeight, 150);
+  @Input() public camera: Camera = new Camera(this.canvasWidth, this.canvasHeight, 80);
 
   private gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
