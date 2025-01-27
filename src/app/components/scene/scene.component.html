@@ -1,1 +1,9 @@
 <canvas id="gpuCanvas" [width]="canvasWidth" [height]="canvasHeight"></canvas>
+<div class="action-buttons">
+    @if (isPlaying) {
+        <button class="pause-button" (click)="simulationLoop(false)"></button>
+    } 
+    @if (!isPlaying) {
+        <button class="play-button" (click)="simulationLoop(true)"></button>
+    }
+</div>

@@ -17,12 +17,14 @@ export class Camera {
     viewMatrix = mat4.create();
     projectionMatrix = mat4.create();
 
-    constructor(width: number, height: number) {
+    constructor(width: number, height: number, distance: number) {
 
         const fov = Math.PI / 4;
         const aspect = width / height;
         const near = 0.1;
         const far = 500.0;
+
+        this.cameraRadius = distance;
 
         // Projection matrix
         mat4.perspective(this.projectionMatrix, fov, aspect, near, far);

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
-import { PhysicsData, SimulationData } from '../../model/Simulation';
+import { PhysicsData } from '../../model/Simulation';
 import { Square, createArraysFromPoints, createForcesArray, createTypesArray } from '../../utils';
 import { computeShader } from '../../shader/computeShader'
 import { Compute } from '../../gpu/gpu.compute'
@@ -22,6 +22,7 @@ export class SceneComponent implements OnInit, OnDestroy {
   @Input() public points!: Point[];
   @Input() public canvasWidth = 300;
   @Input() public canvasHeight = 300;
+  @Input() public camera: Camera = new Camera(this.canvasWidth, this.canvasHeight, 15);
 
   private gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
@@ -31,11 +32,13 @@ export class SceneComponent implements OnInit, OnDestroy {
   private typesStorage?: any;
   private viewProjectionBuffer?: any;
 
-  private UPDATE_INTERVAL = 50;
   private step = 0;
+  public isPlaying = false;
+  private RENDER_UPDATE_INTERVAL = 50;
+  private SIMULATION_UPDATE_INTERVAL = 25;
 
-  private renderIntervalId: any;
-  private camera!: Camera;
+  private simulateIntervalId: any = undefined;
+  private renderIntervalId: any = undefined;
 
 
   async ngOnInit() {
@@ -45,24 +48,39 @@ export class SceneComponent implements OnInit, OnDestroy {
 
       this.recreateScene();
       this.startRenderLoop();
+      this.simulationLoop(true);
     });
+  }
+
+  public simulationLoop(shouldPlay: boolean) {
+    this.isPlaying = shouldPlay;
+    console.log(this.isPlaying);
+    if(shouldPlay && !this.simulateIntervalId) {
+      this.simulateIntervalId = setInterval(() => {
+        this.simulate();
+      }, this.SIMULATION_UPDATE_INTERVAL);
+    } else if(this.simulateIntervalId){
+      clearInterval(this.simulateIntervalId);
+      this.simulateIntervalId = undefined;
+    }
   }
 
   startRenderLoop() {
     this.renderIntervalId = setInterval(() => {
       this.render();
-    }, this.UPDATE_INTERVAL);
+    }, this.RENDER_UPDATE_INTERVAL);
   }
 
   ngOnDestroy() {
-    if (this.renderIntervalId) {
+    if(this.renderIntervalId){
       clearInterval(this.renderIntervalId);
+    }
+    if(this.simulateIntervalId){
+      clearInterval(this.simulateIntervalId);
     }
   }
 
   setupCamera() {
-    this.camera = new Camera(this.gpuContext.canvas!!.width, this.gpuContext.canvas!!.height);
-
     this.viewProjectionBuffer = this.gpuContext.device.createBuffer({
       size: 64, // 4x4 matrix of 4-byte floats
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -83,8 +101,8 @@ export class SceneComponent implements OnInit, OnDestroy {
 
     element.addEventListener('wheel', (event) => {
       event.preventDefault();
-      if (event.deltaY < 0 && this.camera.cameraRadius <= 10) {
-        this.camera.cameraRadius = 10;
+      if (event.deltaY < 0 && this.camera.cameraRadius <= 5) {
+        this.camera.cameraRadius = 5;
       } else {
         this.camera.cameraRadius += event.deltaY / 30;
       }
@@ -159,9 +177,16 @@ export class SceneComponent implements OnInit, OnDestroy {
 
     const encoder = this.gpuContext.device.createCommandEncoder();
 
+    this.simulationRenderer?.execute(encoder, this.step, this.gpuContext.context.getCurrentTexture().createView());
+
+    this.gpuContext.device.queue.submit([encoder.finish()]);
+  }
+
+  simulate() {
+    const encoder = this.gpuContext.device.createCommandEncoder();
+
     this.simulationCompute?.execute(encoder, this.step);
     this.step++;
-    this.simulationRenderer?.execute(encoder, this.step, this.gpuContext.context.getCurrentTexture().createView());
 
     this.gpuContext.device.queue.submit([encoder.finish()]);
   }

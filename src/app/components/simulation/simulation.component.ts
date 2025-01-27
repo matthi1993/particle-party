@@ -1,5 +1,5 @@
 import { Component, Input, ViewChild } from '@angular/core';
-import { PhysicsData, SimulationData } from 'src/app/model/Simulation';
+import { PhysicsData } from 'src/app/model/Simulation';
 import { SceneComponent } from '../scene/scene.component';
 import { Point, create } from 'src/app/model/Point';
 import { NEUTRON, PROTON } from 'src/app/model/DefaultSimulationData';

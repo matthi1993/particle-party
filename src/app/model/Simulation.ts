@@ -10,10 +10,6 @@ export class ParticleTypeWithForces {
   }
 }
 
-export class SimulationData {
-  public points: Point[] = [];
-}
-
 export class PhysicsData {
   
   public types: ParticleType[] = [];
