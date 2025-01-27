@@ -22,6 +22,7 @@ export class ParticleType {
 
 export class Point {
     public position: vec4;
+    public velocity: vec4 = vec4.fromValues(0,0,0,0);
     public particleType: ParticleType;
 
     constructor(position: vec4, type: ParticleType) {

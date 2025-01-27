@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 import { PhysicsData } from '../../model/Simulation';
-import { Square, createArraysFromPoints, createForcesArray, createTypesArray } from '../../utils';
+import { Square } from '../../utils';
 import { computeShader } from '../../shader/computeShader'
 import { Compute } from '../../gpu/gpu.compute'
 import { Render } from '../../gpu/gpu.render'
@@ -10,7 +10,7 @@ import { GpuContext } from '../../gpu/gpu.context'
 import { Camera } from '../../model/Camera';
 import { Point } from 'src/app/model/Point';
 import { SceneStorage } from './scene.gpu.storage';
-import { mat4, vec4 } from 'gl-matrix';
+import { vec4 } from 'gl-matrix';
 import { getMouseNDC, ndcToWorld, projectToScenePlane } from './scene.mousevent';
 
 @Component({
@@ -58,7 +58,7 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   public simulationLoop(shouldPlay: boolean) {
     this.isPlaying = shouldPlay;
-    console.log(this.isPlaying);
+
     if (shouldPlay && !this.simulateIntervalId) {
       this.simulateIntervalId = setInterval(() => {
         this.simulate();
@@ -66,6 +66,7 @@ export class SceneComponent implements OnInit, OnDestroy {
     } else if (this.simulateIntervalId) {
       clearInterval(this.simulateIntervalId);
       this.simulateIntervalId = undefined;
+      this.updatePositionsFromCompute();
     }
   }
 
@@ -92,7 +93,7 @@ export class SceneComponent implements OnInit, OnDestroy {
         const ndc = getMouseNDC(event, element);
         const worldPoint = ndcToWorld(ndc, this.camera);
         const scenePoint = projectToScenePlane(worldPoint, this.camera);
-        
+
         let pointsToAdd: Point[] = [];
         this.editingPointStructure.forEach(point => {
           let newPosition = vec4.fromValues(0, 0, 0, 0);
@@ -171,5 +172,30 @@ export class SceneComponent implements OnInit, OnDestroy {
     this.simulationCompute?.execute(encoder, this.step);
     this.step++;
     this.gpuContext.device.queue.submit([encoder.finish()]);
+  }
+
+  async updatePositionsFromCompute() {
+    const readBuffer = this.gpuContext.device.createBuffer({
+      size: this.sceneStorage.positionsStorage!![0].size,
+      usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+    });
+
+    const commandEncoder = this.gpuContext.device.createCommandEncoder();
+    commandEncoder.copyBufferToBuffer(this.sceneStorage.positionsStorage!![0], 0, readBuffer, 0, this.sceneStorage.positionsStorage!![0].size);
+    const commands = commandEncoder.finish();
+    this.gpuContext.device.queue.submit([commands]);
+
+    // Now, map the buffer to access the data
+    await readBuffer.mapAsync(GPUMapMode.READ);
+    const data = new Float32Array(readBuffer.getMappedRange());
+    this.points.forEach((point, index) => {
+      point.position = vec4.fromValues(
+        data[index * 12 + 0],
+        data[index * 12 + 1],
+        data[index * 12 + 2],
+        data[index * 12 + 3]
+      );
+    })
+    readBuffer.unmap();
   }
 }

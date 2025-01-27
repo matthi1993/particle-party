@@ -14,7 +14,7 @@ export function createDefaultPhysicsModel() {
   data.addType(NEUTRON);
   data.forces = [
     [-0.1,0],
-    [0, -0.1]
+    [0, -0.01]
   ]
 
   return data;

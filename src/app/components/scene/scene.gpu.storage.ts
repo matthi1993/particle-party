@@ -11,6 +11,8 @@ export class SceneStorage {
   public typesStorage?: any;
   public positionsStorage?: any;
 
+  public positionBuffer?:any;
+
   public viewProjectionBuffer?: any;
 
   constructor() {
