@@ -1,35 +1,6 @@
 @use '../../../themes/main-theme' as theme;
 
-:host {
-    display: block;
-    position: static;
-}
 canvas {
-    margin: auto;
-    box-shadow: theme.$box-shadow;
-}
-.action-buttons {
-    width: 30px;
-    height: 1rem;
-    position: relative;
-    top: -5rem;
-    z-index: 100000;
-}
-button.play-button {
-    background: yellow;
-    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
-    width: 20px;
-    height: 30px;
-    padding: 1rem;
-    margin: 1rem;
-    box-shadow: theme.$box-shadow;
-}
-
-button.pause-button {
-    background: yellow;
-    width: 30px;
-    height: 30px;
-    padding: 1rem;
-    margin: 1rem;
-    box-shadow: theme.$box-shadow;
+    width: 900px;
+    height: 900px;
 }

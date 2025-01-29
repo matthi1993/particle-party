@@ -23,9 +23,7 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   @Input() public physicsData!: PhysicsData;
   @Input() public points!: Point[];
-  @Input() public canvasWidth = 300;
-  @Input() public canvasHeight = 300;
-  @Input() public camera: Camera = new Camera(this.canvasWidth, this.canvasHeight, 80);
+  @Input() public camera!: Camera;;
 
   private gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
@@ -43,10 +41,18 @@ export class SceneComponent implements OnInit, OnDestroy {
   // Editing
   @Input() public editingPointStructure?: Point[];
 
-
-
   async ngOnInit() {
     await this.gpuContext.setup().then(() => {
+      console.log(this.gpuContext.canvas!.width = this.gpuContext.canvas!.offsetWidth)
+
+      this.gpuContext.canvas!.width = 900;
+      this.gpuContext.canvas!.height = 900;
+
+      this.camera = new Camera(
+        this.gpuContext.canvas!.width, 
+        this.gpuContext.canvas!.height, 
+        80
+      );
       this.sceneStorage.createCameraBuffer(this.gpuContext, this.camera);
       this.addCameraListeners(this.gpuContext.canvas!!);
 

@@ -1,35 +1,23 @@
 <header>
     <div class="main-header">
-        <div class="header-side">Particle Simulator</div>
-        <nav>
-            <button (click)="switchPage(pageEnum.SIMULATION)">Simulation</button>
-            <button (click)="switchPage(pageEnum.PHYSICS)">Physics</button>
-            <button (click)="switchPage(pageEnum.MOLECULES)">Molecules</button>
-        </nav>
-        <div class="header-side">O</div>
+        <div class="main-header-element">=</div>
+        <div class="main-header-element"><h1>Particle simulator</h1></div>
+        <div class="main-header-element">O</div>
     </div>
-    <div class="sub-header">
-        @if (page === pageEnum.SIMULATION) {
-            simulation
-        } 
-        @if (page === pageEnum.PHYSICS) {
-            physics
-        } 
-        @if (page === pageEnum.MOLECULES) {
-            molecules
-        } 
-    </div>
+    <nav class="sub-header">
+        <button class="main-menu-button" (click)="switchPage(pageEnum.SIMULATION)">Simulation</button>
+        <button class="main-menu-button" (click)="switchPage(pageEnum.PHYSICS)">Physics</button>
+        <button class="main-menu-button" (click)="switchPage(pageEnum.MOLECULES)">Molecules</button>
+    </nav>
 </header>
-
-@if (page === pageEnum.SIMULATION) {
-    <app-simulation [physicsData]="physicsData"></app-simulation>
-} 
-@if (page === pageEnum.PHYSICS) {
-    <app-physics [physicsData]="physicsData"></app-physics>
-} 
-@if (page === pageEnum.MOLECULES) {
-    <app-molecules [physicsData]="physicsData"></app-molecules>
-} 
-
-<footer>
-</footer>
+<content>
+    @if (page === pageEnum.SIMULATION) {
+    <app-simulation class="grid-wrapper" [physicsData]="physicsData"></app-simulation>
+    }
+    @if (page === pageEnum.PHYSICS) {
+    <app-physics class="grid-wrapper" [physicsData]="physicsData"></app-physics>
+    }
+    @if (page === pageEnum.MOLECULES) {
+    <app-molecules class="grid-wrapper" [physicsData]="physicsData"></app-molecules>
+    }
+</content>

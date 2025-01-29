@@ -1,2 +1,19 @@
-<app-scene [physicsData]="physicsData" [points]="points" [canvasWidth]="600" [canvasHeight]="600"></app-scene>
-<button (click)="newAnimation()">New Animation</button>
+<div class="col-3 card">
+    <h1>Simulation View</h1>
+    <p>In this simulation mode, you can create and manipulate particles, explore their interactions, and capture complex
+        structures. Adjust variables in real time to see how the particles behave and gain a hands-on understanding of
+        complex systems.</p>
+    <button (click)="newAnimation()" class="primary-button">New Animation</button>
+</div>
+<div class="col-2 card" style="grid-row-start: 2;">
+    <h1>World creator</h1>
+    <p>create a new world</p>
+    <button (click)="newAnimation()" class="primary-button">Create World</button>
+</div>
+<div class="col-8 card" style="grid-row: span 10;">
+    <app-scene [physicsData]="physicsData" [points]="points"></app-scene>
+
+</div>
+<div class="card">
+    Molecules
+</div>

@@ -1,17 +1,16 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { PhysicsData } from 'src/app/model/Simulation';
 import { SceneComponent } from '../scene/scene.component';
 import { Point, create } from 'src/app/model/Point';
 import { ELECTRON, NEUTRON, PROTON } from 'src/app/model/DefaultSimulationData';
-import { vec4 } from 'gl-matrix';
 
 @Component({
   selector: 'app-simulation',
   imports: [SceneComponent],
   templateUrl: './simulation.component.html',
-  styleUrls: ['./simulation.component.scss'],
+  styleUrls: ['./simulation.component.scss']
 })
-export class SimulationComponent {
+export class SimulationComponent implements OnInit{
 
   @Input() public points: Point[] = [
     ...create(200, PROTON, 50),
@@ -20,7 +19,13 @@ export class SimulationComponent {
   ];
   @Input() public physicsData!: PhysicsData;
 
+  public canvasWidth = 1000;
+  public canvasHeight = 1000;
+
   @ViewChild(SceneComponent) scene!: SceneComponent;
+
+  ngOnInit(): void {
+  }
 
   public newAnimation() {
     let newPoints:Point[] = [];
