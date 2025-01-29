@@ -1,5 +1,8 @@
 <app-scene [physicsData]="physicsData" [points]="points" [camera]="camera" [editingPointStructure]="editingPointStructure"></app-scene>
 
+<textarea [(ngModel)]="aiInput" maxlength="100" placeholder="create with AI. Add description of what should be created"></textarea>
+<button (click)="createWithAi()">create points with AI</button>
+
 @for (item of physicsData.types; track item) {
 <div>
     @if (item === selectedType) {
