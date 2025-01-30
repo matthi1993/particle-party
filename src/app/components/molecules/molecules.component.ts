@@ -22,14 +22,11 @@ export class MoleculesComponent implements OnInit {
 
   public selectedType!: ParticleType;
   public editingPointStructure?: Point[];
-
   public aiInput: string = "";
-
-  canvasWidth = 400;
-  canvasHeight = 400;
-  camera = new Camera(this.canvasWidth, this.canvasHeight, 15)
-
   public points: Point[] = [];
+
+  camera = new Camera(800, 800, 15)
+
 
   constructor(private dataService: DataService) {
   }
