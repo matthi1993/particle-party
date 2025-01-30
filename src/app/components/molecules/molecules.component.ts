@@ -5,7 +5,6 @@ import { ParticleType, Point, create } from 'src/app/model/Point';
 import { Camera } from 'src/app/model/Camera';
 import { vec4 } from 'gl-matrix';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { DataService } from 'src/app/services/data.service';
 import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-card.component";
 import { getMouseNDC } from '../scene/scene.mousevent';
@@ -28,7 +27,7 @@ export class MoleculesComponent implements OnInit {
 
   canvasWidth = 400;
   canvasHeight = 400;
-  camera = new Camera(this.canvasWidth, this.canvasHeight, 5)
+  camera = new Camera(this.canvasWidth, this.canvasHeight, 15)
 
   public points: Point[] = [];
 

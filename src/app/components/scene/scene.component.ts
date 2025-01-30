@@ -24,11 +24,13 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   @Input() public physicsData!: PhysicsData;
   @Input() public points!: Point[];
-  @Input() public camera!: Camera;
-
   @Input() public canvasWidth: number = 900;
   @Input() public canvasHeight: number = 900;
-
+  @Input() public camera: Camera = new Camera(
+    this.canvasWidth,
+    this.canvasHeight,
+    80
+  );
   public gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
   private simulationRenderer?: Render;
@@ -47,11 +49,6 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.gpuContext.canvas!.width = this.canvasWidth;
       this.gpuContext.canvas!.height = this.canvasHeight;
 
-      this.camera = new Camera(
-        this.gpuContext.canvas!.width,
-        this.gpuContext.canvas!.height,
-        80
-      );
       this.sceneStorage.createCameraBuffer(this.gpuContext, this.camera);
       this.addCameraListeners(this.gpuContext.canvas!!);
 
