@@ -128,7 +128,7 @@ export class SceneComponent implements OnInit, OnDestroy {
   public updateScene() {
     this.sceneStorage.updateForceValues(this.gpuContext, this.physicsData);
     this.sceneStorage.updateTypeValues(this.gpuContext, this.physicsData);
-    this.sceneStorage.updatePointValues(this.gpuContext, this.points);
+    this.sceneStorage.updatePointValues(this.gpuContext, this.points, this.physicsData);
 
     this.step = 0;
   }
@@ -137,7 +137,7 @@ export class SceneComponent implements OnInit, OnDestroy {
     this.step = 0;
     this.points = points;
 
-    this.sceneStorage.createPointStorage(this.gpuContext, this.points);
+    this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
     this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
     this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
 

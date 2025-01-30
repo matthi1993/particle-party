@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { PhysicsData } from 'src/app/model/Simulation';
 import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material/slider';
+import { randomRounded } from 'src/app/utils';
 
 
 @Component({
@@ -26,18 +27,14 @@ export class ControlsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  randomRounded(from: number, to: number):number {
-    return Math.round((Math.random() * (to - from) + from) * 100) / 100;
-  }
-
   randomForces() {
     this.data.types.forEach((type, rowIndex) => {
-      type.radius = this.randomRounded(0, 200);
-      type.mass = this.randomRounded(0, 0.25);
-      type.size = this.randomRounded(0.25, 3)
+      type.radius = randomRounded(0, 20);
+      type.mass = randomRounded(0, 0.25);
+      type.size = randomRounded(0.25, 3)
 
       this.data.types.forEach((col, colIndex) => {
-        this.data.forces[rowIndex][colIndex] = this.randomRounded(-0.2, 0.2);
+        this.data.forces[rowIndex][colIndex] = randomRounded(-0.4, 0.4);
       })
     });
     this.onDataChange.emit();

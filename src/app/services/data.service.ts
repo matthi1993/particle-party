@@ -4,6 +4,7 @@ import { map, Observable } from 'rxjs';
 import { ParticleType, Point } from '../model/Point';
 import { vec4 } from 'gl-matrix';
 import { PROTON } from '../model/DefaultSimulationData';
+import { PhysicsData } from '../model/Simulation';
 
 interface AiInterfacePoint {
     position_x: number,
@@ -20,16 +21,51 @@ interface AiResponse {
     message: string
 }
 
+interface PhysicsResponse {
+    id: number,
+    name: string,
+    particle_types: any[]
+}
+
 @Injectable({ providedIn: 'root' })
 export class DataService {
 
-    private apiUrl = 'http://127.0.0.1:5000/point-ai';
+    private apiUrl = 'http://127.0.0.1:5000';
+
+    private aiGenerateUrl = '/editor/ai-generate';
+
+    private getPhysicsUrl = '/physics-model/get';
+    private savePhysics = '/physics-model/get';
 
     constructor(private http: HttpClient) {
     }
 
-    getData(prompt: string): Observable<Point[]> {
-        return this.http.get<AiResponse>(this.apiUrl, {
+    getPhysics(id: number): Observable<PhysicsData> {
+        let url = this.apiUrl + this.getPhysicsUrl;
+
+        return this.http.get<PhysicsResponse>(url, {
+            params: { id: id },
+        }).pipe(
+            map((response: PhysicsResponse) => {
+                let physics = new PhysicsData();
+                response.particle_types.forEach(type => {
+                    physics.addType(new ParticleType(
+                        type.name,
+                        type.id,
+                        vec4.fromValues(type.color.r, type.color.g, type.color.b, 1),
+                        type.radius,
+                        type.size,
+                        type.mass
+                    ));
+                });
+                return physics;
+            }));
+    }
+
+    getAiResponse(prompt: string): Observable<Point[]> {
+        let url = this.apiUrl + this.aiGenerateUrl;
+
+        return this.http.get<AiResponse>(url, {
             params: { prompt: prompt },
         }).pipe(
             map((response: AiResponse) => {

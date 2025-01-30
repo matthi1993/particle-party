@@ -13,7 +13,7 @@ export class ParticleTypeWithForces {
 export class PhysicsData {
 
   public types: ParticleType[] = [];
-  public forces: number[][] = [[]];
+  public forces: number[][] = [];
 
   constructor() { }
 

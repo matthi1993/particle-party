@@ -51,7 +51,7 @@ export class MoleculesComponent implements OnInit {
   }
 
   async createWithAi() {
-    this.dataService.getData(this.aiInput).subscribe(generatedPoints => {
+    this.dataService.getAiResponse(this.aiInput).subscribe(generatedPoints => {
       this.editingPointStructure = generatedPoints;
       this.scene.addPointsToScene(0, 0, generatedPoints);
     });

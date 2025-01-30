@@ -54,8 +54,8 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
   }
 
-  public createPointStorage(gpuContext: GpuContext, points: Point[]) {
-    let positionArray = createArraysFromPoints(points);
+  public createPointStorage(gpuContext: GpuContext, points: Point[], physicsData: PhysicsData) {
+    let positionArray = createArraysFromPoints(points, physicsData);
     this.positionsStorage = [
       gpuContext.createStorageBuffer("Positions In", positionArray.byteLength),
       gpuContext.createStorageBuffer("Positions Out", positionArray.byteLength)
@@ -63,8 +63,8 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.positionsStorage[0], 0, positionArray);
   }
 
-  public updatePointValues(gpuContext: GpuContext, points: Point[]) {
-    let positionArray = createArraysFromPoints(points);
+  public updatePointValues(gpuContext: GpuContext, points: Point[], physicsData: PhysicsData) {
+    let positionArray = createArraysFromPoints(points, physicsData);
     gpuContext.device.queue.writeBuffer(this.positionsStorage[0], 0, positionArray);
   }
 }

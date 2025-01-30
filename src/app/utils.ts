@@ -1,5 +1,9 @@
 import { ParticleType, Point } from './model/Point'
+import { PhysicsData } from './model/Simulation';
 
+export function randomRounded(from: number, to: number):number {
+    return Math.round((Math.random() * (to - from) + from) * 100) / 100;
+  }
 
 const SQUARE = new Float32Array([
     -1, -1,
@@ -73,19 +77,19 @@ export class Square {
     }
 }
 
-export function createArraysFromPoints(points: Point[]) {
+export function createArraysFromPoints(points: Point[], physicsData: PhysicsData) {
     let dimensions = 12;
     let positionArray = new Float32Array(points.length * dimensions);
 
-    for (let i = 0; i < points.length; i++) {
-        const element = points[i];
+    for (let index = 0; index < points.length; index++) {
+        const element = points[index];
 
-        positionArray[i * dimensions] = element.position[0];
-        positionArray[i * dimensions + 1] = element.position[1];
-        positionArray[i * dimensions + 2] = element.position[2];
-        positionArray[i * dimensions + 3] = element.position[3];
+        positionArray[index * dimensions] = element.position[0];
+        positionArray[index * dimensions + 1] = element.position[1];
+        positionArray[index * dimensions + 2] = element.position[2];
+        positionArray[index * dimensions + 3] = element.position[3];
 
-        positionArray[i * dimensions + 8] = element.particleType.id;
+        positionArray[index * dimensions + 8] = physicsData.types.indexOf(element.particleType);
     };
     return positionArray;
 }
@@ -101,7 +105,7 @@ export function createTypesArray(types: ParticleType[]) {
         typesArray[index * dimensions + 2] = key.color[2];
         typesArray[index * dimensions + 3] = key.color[3];
 
-        typesArray[index * dimensions + 4] = key.id;
+        typesArray[index * dimensions + 4] = index;
         typesArray[index * dimensions + 5] = key.radius;
         typesArray[index * dimensions + 6] = key.size;
         typesArray[index * dimensions + 7] = key.mass;

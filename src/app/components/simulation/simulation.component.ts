@@ -12,11 +12,7 @@ import { ELECTRON, NEUTRON, PROTON } from 'src/app/model/DefaultSimulationData';
 })
 export class SimulationComponent implements OnInit{
 
-  @Input() public points: Point[] = [
-    ...create(200, PROTON, 50),
-    ...create(200, NEUTRON, 50),
-    ...create(200, ELECTRON, 50)
-  ];
+  @Input() public points!: Point[];
   @Input() public physicsData!: PhysicsData;
 
   public canvasWidth = 1000;
@@ -35,6 +31,7 @@ export class SimulationComponent implements OnInit{
   public createRandomWorld() {
     let newPoints:Point[] = [];
     this.physicsData.types.forEach(type => {
+      console.log(type);
       newPoints.push(...create(300, type, 100));
     })
     this.points = newPoints;
