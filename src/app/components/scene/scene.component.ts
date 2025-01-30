@@ -34,11 +34,10 @@ export class SceneComponent implements OnInit, OnDestroy {
   private simulationRenderer?: Render;
   private sceneStorage: SceneStorage = new SceneStorage();
 
-  private step = 0;
+  public step = 0;
   public isPlaying = false;
   private RENDER_UPDATE_INTERVAL = 50;
   private SIMULATION_UPDATE_INTERVAL = 25;
-
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
 
@@ -56,7 +55,7 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.sceneStorage.createCameraBuffer(this.gpuContext, this.camera);
       this.addCameraListeners(this.gpuContext.canvas!!);
 
-      this.createScene();
+      this.createScene(this.points);
       this.startRenderLoop();
       this.simulationLoop(true);
     });
@@ -109,7 +108,7 @@ export class SceneComponent implements OnInit, OnDestroy {
     })
 
     this.points.push(...pointsToAdd);
-    this.createScene();
+    this.createScene(this.points);
   }
 
   addCameraListeners(element: HTMLElement) {
@@ -137,12 +136,9 @@ export class SceneComponent implements OnInit, OnDestroy {
     this.step = 0;
   }
 
-  public createScene() {
+  public createScene(points: Point[]) {
     this.step = 0;
-
-    if (!this.points || this.points.length == 0) {
-      return;
-    }
+    this.points = points;
 
     this.sceneStorage.createPointStorage(this.gpuContext, this.points);
     this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);

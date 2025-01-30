@@ -2,7 +2,10 @@
 <div class="col-12">
     <app-controls [data]="physicsData"></app-controls>
 </div>
-
+<div class="col-12">
+    <button (click)="addType()" class="primary-button">add type</button>
+    <button (click)="removeSelectedType()" [disabled]="this.physicsData.types.length <= 1" class="secondary-button">delete selected type</button>
+</div>
 <div class="col-2">
     @for (item of physicsData.types; track item) {
         <app-particle-type-card [selected]="item === selectedType" (click)="selectType(item)" [particleType]="item"></app-particle-type-card>

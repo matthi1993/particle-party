@@ -4,6 +4,7 @@ import { ParticleType } from 'src/app/model/Point';
 import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { PhysicsData } from 'src/app/model/Simulation';
+import { MatIcon } from '@angular/material/icon';
 
 interface Position {
   x: number,
@@ -12,7 +13,7 @@ interface Position {
 
 @Component({
   selector: 'app-particle-type',
-  imports: [MatSliderModule, MatCardModule, FormsModule],
+  imports: [MatIcon, MatSliderModule, MatCardModule, FormsModule],
   templateUrl: './particle-type.component.html',
   styleUrls: ['./particle-type.component.scss'],
 })
@@ -20,15 +21,17 @@ export class ParticleTypeComponent implements OnInit {
 
   @Input() public physicsData!: PhysicsData;
   @Input() public particleType!: ParticleType;
-  public orbitRadius = 250;
+  public orbitRadius = 200;
 
   public onDataChange = output();
 
   ngOnInit(): void {
+    console.log(this.physicsData.types);
   }
 
   getOrbitPosition(index: number): Position {
-    const angle = (index / this.physicsData.forces.length) * 2 * Math.PI;
+    const angleOffset = Math.PI / this.physicsData.forces.length;
+    const angle = (index / this.physicsData.forces.length) * 2 * Math.PI + angleOffset;
     const x = this.orbitRadius * Math.cos(angle);
     const y = this.orbitRadius * Math.sin(angle);
     return { x: x, y: y }
@@ -73,7 +76,7 @@ export class ParticleTypeComponent implements OnInit {
   }
 
   getCircleRadius(type: ParticleType) {
-    return type.size * 50;
+    return type.size * 15 + 60;
   }
 
   onValueChange() {

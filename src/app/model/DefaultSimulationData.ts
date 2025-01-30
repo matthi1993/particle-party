@@ -16,7 +16,7 @@ export function createDefaultPhysicsModel() {
   data.addType(BOSON);
   
   data.forces = [
-    [-0.25, 0.4, 0, 0],
+    [-0.25, 0.1, 0, 0],
     [-0.1, -0.1, 0.1, 0],
     [-0.3,-0.3, 0, -0.30],
     [-0.33, 0.23, 0, 1]

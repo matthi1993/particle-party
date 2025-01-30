@@ -27,17 +27,22 @@ export class SimulationComponent implements OnInit{
   ngOnInit(): void {
   }
 
-  public newAnimation() {
+  public createEmptyWorld() {
+    this.points = [];
+    this.scene.createScene(this.points);
+  }
+
+  public createRandomWorld() {
     let newPoints:Point[] = [];
     this.physicsData.types.forEach(type => {
-      newPoints.push(...create(200, type, 100));
+      newPoints.push(...create(300, type, 100));
     })
     this.points = newPoints;
-    this.scene.createScene();
+    this.scene.createScene(this.points);
   }
 
   public onDataChange() {
-    this.scene.createScene();
+    this.scene.createScene(this.points);
   }
 
   public onForcesChange() {

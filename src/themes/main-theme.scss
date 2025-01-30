@@ -5,6 +5,8 @@
 $dark-grey: #171b21;
 $primary: #7FD650;
 $primary-highlight: #a0d981;
+$secondary: #4b74f2;
+$secondary-highlight: #8da6f2;
 $success: #7FD650;
 $error: #ed5a81;
 
@@ -69,16 +71,31 @@ body {
 // BUTTONS
 button {
   padding: 0.5rem 1.5rem;
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
   border: none;
   cursor: pointer;
+  font-weight: bold;
 }
 .primary-button {
   background-color: $primary;
   color: black;
-  font-weight: bold;
+}
+.primary-button[disabled]{
+  background-color: $primary-highlight;
 }
 .primary-button:hover {
   background-color: $primary-highlight;
+}
+.secondary-button {
+  background-color: $secondary;
+  color: black;
+}
+.secondary-button[disabled]{
+  background-color: $secondary-highlight;
+}
+.secondary-button:hover {
+  background-color: $secondary-highlight;
 }
 
 // CARDS

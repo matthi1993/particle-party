@@ -11,7 +11,7 @@ export class ParticleTypeWithForces {
 }
 
 export class PhysicsData {
-  
+
   public types: ParticleType[] = [];
   public forces: number[][] = [[]];
 
@@ -22,5 +22,16 @@ export class PhysicsData {
     this.forces.push(
       Array(this.types.length).fill(0) //TODO, update all forces of all particles and set init value
     );
+  }
+
+  public removeType(type: ParticleType) {
+    let index = this.types.indexOf(type);
+    if (this.types.length > 1) {
+      this.types.splice(index, 1)
+      this.forces.splice(index, 1);
+      this.forces.forEach(row => {
+        row.splice(index, 1);
+      })
+    }
   }
 }
