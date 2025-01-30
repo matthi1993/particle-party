@@ -1,13 +1,15 @@
 
-<div class="col-6 grid-6">
-    @for (item of physicsData.types; track item) {
-        <app-particle-type-card (click)="selectType(item)" [particleType]="item"></app-particle-type-card>
-    }
+<div class="col-12">
+    <app-controls [data]="physicsData"></app-controls>
 </div>
 
-<div class="col-6">
+<div class="col-2">
+    @for (item of physicsData.types; track item) {
+        <app-particle-type-card [selected]="item === selectedType" (click)="selectType(item)" [particleType]="item"></app-particle-type-card>
+    }
+</div>
+<div class="col-10">
     <app-particle-type [particleType]="selectedType" [physicsData]="physicsData"></app-particle-type>
 </div>
-<app-controls [data]="physicsData"></app-controls>
 
 

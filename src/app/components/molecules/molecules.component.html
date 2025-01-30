@@ -1,13 +1,20 @@
-<app-scene [physicsData]="physicsData" [points]="points" [camera]="camera" [editingPointStructure]="editingPointStructure"></app-scene>
-
-<textarea [(ngModel)]="aiInput" maxlength="100" placeholder="create with AI. Add description of what should be created"></textarea>
-<button (click)="createWithAi()">create points with AI</button>
-
-@for (item of physicsData.types; track item) {
-<div>
-    @if (item === selectedType) {
-    <span>x</span>
-    }
-    <button (click)="selectType(item)">{{ item.name }}</button>
+<div class="col-3 card">
+    <h1>Structures view</h1>
+    <p>What to do in the structre view?</p>
 </div>
-}
+<div class="col-3 card" style="grid-row-start: 2;">
+    <textarea [(ngModel)]="aiInput" maxlength="100"
+        placeholder="create with AI. Add description of what should be created"></textarea>
+    <button (click)="createWithAi()">create points with AI</button>
+</div>
+<div class="col-6 card" style="grid-row: span 8;">
+    <app-scene [physicsData]="physicsData" [points]="points" [camera]="camera"
+        [editingPointStructure]="editingPointStructure"></app-scene>
+</div>
+<div class="col-3" style="grid-row: span 8;">
+    @for (item of physicsData.types; track item) {
+    <div class="col-1 card">
+        <app-particle-type-card [selected]="item === selectedType" (click)="selectType(item)" [particleType]="item"></app-particle-type-card>
+    </div>
+    }
+</div>

@@ -26,14 +26,18 @@ export class ControlsComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  randomRounded():number {
+    return Math.round(Math.random() * 100) / 100;
+  }
+
   randomForces() {
     this.data.types.forEach((type, rowIndex) => {
-      type.radius = Math.random() * 10 + 3;
-      type.mass = Math.random() * 0.05;
-      type.size = Math.random() * 1 + 0.75;
+      type.radius = (this.randomRounded() * 1 + 1);
+      type.mass = (this.randomRounded() * 0.05);
+      type.size = (this.randomRounded() * 1 + 0.75);
 
       this.data.types.forEach((col, colIndex) => {
-        this.data.forces[rowIndex][colIndex] = (Math.random() * 0.5) - 0.25;
+        this.data.forces[rowIndex][colIndex] = (this.randomRounded() * 0.5) - 0.25;
       })
     });
     this.onDataChange.emit();

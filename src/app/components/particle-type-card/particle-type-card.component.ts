@@ -9,6 +9,7 @@ import { ParticleType } from 'src/app/model/Point';
 export class ParticleTypeCardComponent {
 
   @Input() public particleType!: ParticleType;
+  @Input() public selected = false;
 
   getParticleColor() {
     return `rgba(

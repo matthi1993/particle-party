@@ -7,10 +7,11 @@ import { vec4 } from 'gl-matrix';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { DataService } from 'src/app/services/data.service';
+import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-card.component";
 
 @Component({
   selector: 'app-molecules',
-  imports: [FormsModule, SceneComponent],
+  imports: [FormsModule, SceneComponent, ParticleTypeCardComponent],
   templateUrl: './molecules.component.html',
   styleUrl: './molecules.component.scss'
 })
@@ -33,7 +34,7 @@ export class MoleculesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.selectedType = this.physicsData.types[0];
+    this.selectType(this.physicsData.types[0]);
   }
 
   selectType(type: ParticleType) {

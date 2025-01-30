@@ -37,7 +37,18 @@
   margin: auto;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  top: 50px;
+  position: absolute;
+
+  .circle-attribute{
+    display: flex;
+  } 
+
+  input {
+    width: 40px;
+    text-align: center;
+    margin-left: 0.5rem;
+  }
 }
 
 .line {
@@ -72,13 +83,16 @@
   color: theme.$success;
   border-color: theme.$success;
 }
+
 .error {
   color: theme.$error;
   border-color: theme.$error;
 }
+
 .success-background {
   background-color: theme.$success;
 }
+
 .error-background {
   background-color: theme.$error;
 }

@@ -20,7 +20,7 @@ export class ParticleTypeComponent implements OnInit {
 
   @Input() public physicsData!: PhysicsData;
   @Input() public particleType!: ParticleType;
-  public orbitRadius = 200;
+  public orbitRadius = 250;
 
   public onDataChange = output();
 

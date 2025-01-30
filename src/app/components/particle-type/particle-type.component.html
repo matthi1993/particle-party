@@ -2,6 +2,10 @@
     <div class="circle" [style.width]="getCircleRadius(particleType) + 'px'"
         [style.height]="getCircleRadius(particleType) + 'px'" [style.backgroundColor]="getParticleColor(particleType)">
         <div class="circle-name">{{particleType.name}}</div>
+        <div class="circle-inputs">
+            <div class="circle-attribute">mass: <input [(ngModel)]="particleType.mass" /></div>
+            <div class="circle-attribute">radius: <input [(ngModel)]="particleType.radius" /></div>
+        </div>
     </div>
 
     @for (item of physicsData.types; track $index) {
@@ -24,8 +28,4 @@
     }
 
     <div class="circle-radius" [style.width]="orbitRadius * 2 + 'px'" [style.height]="orbitRadius * 2 + 'px'"></div>
-</div>
-<div class="circle-inputs">
-    <div>mass: <input [(ngModel)]="particleType.mass" /></div>
-    <div>radius: <input [(ngModel)]="particleType.radius" /></div>
 </div>
