@@ -1,46 +1,31 @@
-<div class="card">
-    <div class="card-header">
-        <button class="prev" (click)="prev()"></button>
-        <input class="particle-name" type="text" step="1" [(ngModel)]="particleType.name" matInput
-            placeholder="Name ..." />
-        <button class="next" (click)="next()"></button>
+<div class="container">
+    <div class="circle" [style.width]="getCircleRadius(particleType) + 'px'"
+        [style.height]="getCircleRadius(particleType) + 'px'" [style.backgroundColor]="getParticleColor(particleType)">
+        <div class="circle-name">{{particleType.name}}</div>
     </div>
-    <div class="card-content particle-type-card">
-        <div class="left-particle">
-            <div class="input-pair">
-                <div class="attribute">
-                    Radius:
-                </div>
-                <div class="attribute-value">
-                    <input type="number" step="1" [(ngModel)]="particleType.radius" matInput placeholder="radius ..."
-                        (ngModelChange)="onValueChange()" />
-                </div>
-            </div>
-            <div class="input-pair">
-                <div class="attribute">
-                    Mass:
-                </div>
-                <div class="attribute-value">
-                    <input type="number" step="0.1" [(ngModel)]="particleType.mass" matInput placeholder="mass ..."
-                        (ngModelChange)="onValueChange()" />
-                </div>
-            </div>
-        </div>
-        <div class="right-particle">
-            <div class="particle-circle">
-                <div class="particle-circle-outer"></div>
-                <div class="particle-circle-inner" [style.width.px]="particleType.size * 2"
-                    [style.height.px]="particleType.size * 2" [style.backgroundColor]="getParticleColor()"
-                    [style.left.px]="30 - particleType.size" [style.top.px]="30 - particleType.size"></div>
-            </div>
-            <mat-slider step="0.05" min="0.5" max="4" showTickMarks discrete>
-                <input [(ngModel)]="particleType.size" matSliderThumb (ngModelChange)="onValueChange()">
-            </mat-slider>
+
+    @for (item of physicsData.types; track $index) {
+    <div class="orbit" [style.left]="getOrbitStyle($index, item).left" [style.top]="getOrbitStyle($index, item).top">
+        <div class="circle" [style.width]="getCircleRadius(item) + 'px'" [style.height]="getCircleRadius(item) + 'px'"
+            [style.backgroundColor]="getParticleColor(item)">
+            <div class="circle-name">{{item.name}}</div>
         </div>
     </div>
-    
-    <div class="card-footer">
-        <button (click)="delete()" [disabled]="simulationData.types.length == 1">Delete</button>
-        <button (click)="add()">Add</button>
+    <div class="line" [class.success-background]="physicsData.forces[getTypeIndex(particleType)][$index] > 0"
+        [class.error-background]="physicsData.forces[getTypeIndex(particleType)][$index] < 0"
+        [style.transform]="getLine($index).transform" [style.width]="getLine($index).length + 'px'"
+        [style.transform-origin]="'0 0'">
+
+        <input type="number" step="0.1" max="10" min="-10" [style.transform]="getLine($index).inputRotate"
+            [class.success]="physicsData.forces[getTypeIndex(particleType)][$index] > 0"
+            [class.error]="physicsData.forces[getTypeIndex(particleType)][$index] < 0" class="force-input"
+            [(ngModel)]="physicsData.forces[getTypeIndex(particleType)][$index]" />
     </div>
+    }
+
+    <div class="circle-radius" [style.width]="orbitRadius * 2 + 'px'" [style.height]="orbitRadius * 2 + 'px'"></div>
+</div>
+<div class="circle-inputs">
+    <div>mass: <input [(ngModel)]="particleType.mass" /></div>
+    <div>radius: <input [(ngModel)]="particleType.radius" /></div>
 </div>

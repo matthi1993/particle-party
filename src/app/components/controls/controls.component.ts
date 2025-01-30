@@ -6,12 +6,11 @@ import { FormsModule } from '@angular/forms';
 import { PhysicsData } from 'src/app/model/Simulation';
 import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material/slider';
-import { ParticleTypeComponent } from "../particle-type/particle-type.component";
 
 
 @Component({
   selector: 'app-controls',
-  imports: [MatSliderModule, MatButtonModule, MatInputModule, FormsModule, MatFormFieldModule, MatCardModule, ParticleTypeComponent],
+  imports: [MatSliderModule, MatButtonModule, MatInputModule, FormsModule, MatFormFieldModule, MatCardModule],
   templateUrl: './controls.component.html',
   styleUrls: ['./controls.component.css'],
 })

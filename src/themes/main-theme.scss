@@ -5,6 +5,8 @@
 $dark-grey: #171b21;
 $primary: #7FD650;
 $primary-highlight: #a0d981;
+$success: #7FD650;
+$error: #ed5a81;
 
 $box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
 $card-color: rgba($color: #384044, $alpha: 0.2);
@@ -26,9 +28,14 @@ body {
 }
 
 // GRID
-.grid-wrapper {
+.grid-12 {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
+  gap: 10px;
+}
+.grid-6 {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
   gap: 10px;
 }
 .col-12 {
@@ -72,4 +79,5 @@ button {
 .card {
   background: $card-color;
   padding: 2rem;
+  box-shadow: $box-shadow;
 }

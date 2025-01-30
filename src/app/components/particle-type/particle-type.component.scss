@@ -1,62 +1,84 @@
-.card-content.particle-type-card {
-    display: flex;
-    padding: 0;
-    justify-content: space-between;
-    flex-wrap: wrap;
+@use '../../../themes/main-theme' as theme;
 
-    input {
-        width: 50px;
-    }
-
-    .left-particle {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-    }
-
-    .right-particle {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        align-content: center;
-        justify-content: flex-end;
-    }
-
-
-    .particle-circle {
-        width: 60px;
-        height: 60px;
-        position: relative;
-    }
-    .particle-circle-outer {
-        width: 58px;
-        height: 58px;
-        border: solid 1px rgba(255, 255, 255, 0.386);
-        border-radius: 50%;
-    }
-    .particle-circle-inner {
-        border-radius: 50%;
-        background-color: white;
-        position: absolute;
-    }
+.container {
+  position: relative;
+  height: 600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.attribute {
-    min-width: 50px;
-    font-weight: bold;
-    margin-right: 0.5rem;
+.circle {
+  position: absolute;
+  background-color: #3498db;
+  border-radius: 50%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: theme.$box-shadow;
 }
 
-.input-pair {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+.circle-radius {
+  position: absolute;
+  background: none;
+  border: dashed white 1px;
+  border-radius: 50%;
+  z-index: -100;
 }
 
-input.particle-name {
-    font-size: 1rem;
-    text-align: center;
-    text-transform: uppercase;
-    font-weight: bolder;
+.orbit {
+  position: absolute;
+}
+
+.circle-inputs {
+  display: flex;
+  margin: auto;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.line {
+  position: absolute;
+  height: 2px;
+  background-color: white;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.force-input {
+  width: 60px;
+  text-align: center;
+  position: absolute;
+  height: 20px;
+  border: solid 2px white;
+}
+
+.circle-name {
+  font-weight: bold;
+  color: black;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+
+// Base styles
+.success {
+  color: theme.$success;
+  border-color: theme.$success;
+}
+.error {
+  color: theme.$error;
+  border-color: theme.$error;
+}
+.success-background {
+  background-color: theme.$success;
+}
+.error-background {
+  background-color: theme.$error;
 }
