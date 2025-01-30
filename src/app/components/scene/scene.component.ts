@@ -11,11 +11,12 @@ import { Camera } from '../../model/Camera';
 import { Point } from 'src/app/model/Point';
 import { SceneStorage } from './scene.gpu.storage';
 import { vec4 } from 'gl-matrix';
-import { getMouseNDC, ndcToWorld, projectToScenePlane } from './scene.mousevent';
+import { MatIconModule } from '@angular/material/icon';
+import { ndcToWorld, projectToScenePlane } from './scene.mousevent';
 
 @Component({
   selector: 'app-scene',
-  imports: [],
+  imports: [MatIconModule],
   templateUrl: './scene.component.html',
   styleUrls: ['./scene.component.scss'],
 })
@@ -23,9 +24,12 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   @Input() public physicsData!: PhysicsData;
   @Input() public points!: Point[];
-  @Input() public camera!: Camera;;
+  @Input() public camera!: Camera;
 
-  private gpuContext: GpuContext = new GpuContext();
+  @Input() public canvasWidth: number = 900;
+  @Input() public canvasHeight: number = 900;
+
+  public gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
   private simulationRenderer?: Render;
   private sceneStorage: SceneStorage = new SceneStorage();
@@ -38,15 +42,12 @@ export class SceneComponent implements OnInit, OnDestroy {
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
 
-  // Editing
-  @Input() public editingPointStructure?: Point[];
-
-  async ngOnInit() {
-    await this.gpuContext.setup().then(() => {
+  constructor() {
+    this.gpuContext.setup().then(() => {
       console.log(this.gpuContext.canvas!.width = this.gpuContext.canvas!.offsetWidth)
 
-      this.gpuContext.canvas!.width = 900;
-      this.gpuContext.canvas!.height = 900;
+      this.gpuContext.canvas!.width = this.canvasWidth;
+      this.gpuContext.canvas!.height = this.canvasHeight;
 
       this.camera = new Camera(
         this.gpuContext.canvas!.width, 
@@ -60,6 +61,9 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.startRenderLoop();
       this.simulationLoop(true);
     });
+  }
+  
+  ngOnInit(): void {
   }
 
   public simulationLoop(shouldPlay: boolean) {
@@ -91,29 +95,25 @@ export class SceneComponent implements OnInit, OnDestroy {
     }
   }
 
+  addPointsToScene(originX: number, originY: number, points: Point[]) {
+    const worldPoint = ndcToWorld({x: originX, y: originY}, this.camera);
+    const scenePoint = projectToScenePlane(worldPoint, this.camera);
+
+    let pointsToAdd: Point[] = [];
+    points.forEach(point => {
+      let newPosition = vec4.fromValues(0, 0, 0, 0);
+      vec4.add(newPosition, point.position, vec4.fromValues(scenePoint[0], scenePoint[1], scenePoint[2], 1));
+      pointsToAdd.push(new Point(
+        newPosition,
+        point.particleType
+      ));
+    })
+
+    this.points.push(...pointsToAdd);
+    this.createScene();
+  }
+
   addCameraListeners(element: HTMLElement) {
-    element.addEventListener('mousedown', (event) => {
-      event.preventDefault();
-
-      if (this.editingPointStructure) {
-        const ndc = getMouseNDC(event, element);
-        const worldPoint = ndcToWorld(ndc, this.camera);
-        const scenePoint = projectToScenePlane(worldPoint, this.camera);
-
-        let pointsToAdd: Point[] = [];
-        this.editingPointStructure.forEach(point => {
-          let newPosition = vec4.fromValues(0, 0, 0, 0);
-          vec4.add(newPosition, point.position, vec4.fromValues(scenePoint[0], scenePoint[1], scenePoint[2], 1));
-          pointsToAdd.push(new Point(
-            newPosition,
-            point.particleType
-          ));
-        })
-
-        this.points.push(...pointsToAdd);
-        this.createScene();
-      }
-    });
 
     element.addEventListener('wheel', (event) => {
       event.preventDefault();
@@ -181,13 +181,15 @@ export class SceneComponent implements OnInit, OnDestroy {
   }
 
   async updatePositionsFromCompute() {
+    let bufferIndex = this.step % 2;
+
     const readBuffer = this.gpuContext.device.createBuffer({
-      size: this.sceneStorage.positionsStorage!![0].size,
+      size: this.sceneStorage.positionsStorage!![bufferIndex].size,
       usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
     });
 
     const commandEncoder = this.gpuContext.device.createCommandEncoder();
-    commandEncoder.copyBufferToBuffer(this.sceneStorage.positionsStorage!![0], 0, readBuffer, 0, this.sceneStorage.positionsStorage!![0].size);
+    commandEncoder.copyBufferToBuffer(this.sceneStorage.positionsStorage!![bufferIndex], 0, readBuffer, 0, this.sceneStorage.positionsStorage!![bufferIndex].size);
     const commands = commandEncoder.finish();
     this.gpuContext.device.queue.submit([commands]);
 

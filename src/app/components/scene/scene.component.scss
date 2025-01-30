@@ -1,6 +1,26 @@
 @use '../../../themes/main-theme' as theme;
 
 canvas {
-    width: 900px;
-    height: 900px;
+    width: 100%;
+    height: auto;
+}
+
+.play-button, .pause-button {
+    padding: 0;
+    color: theme.$primary;
+    background: none;
+    
+    .mat-icon {
+        width: 3rem;
+        height: 3rem;
+        font-size: 3rem;
+    }
+}
+
+.action-buttons {
+    position: relative;
+    display: block;
+    top: -4rem;
+    z-index: 10000;
+    margin: 0.5rem;
 }

@@ -1,9 +1,13 @@
 <canvas id="gpuCanvas"></canvas>
 <div class="action-buttons">
     @if (isPlaying) {
-        <button class="pause-button" (click)="simulationLoop(false)"></button>
+        <button class="pause-button" (click)="simulationLoop(false)">
+            <mat-icon>pause_circle</mat-icon>
+        </button>
     } 
     @if (!isPlaying) {
-        <button class="play-button" (click)="simulationLoop(true)"></button>
+        <button class="play-button" (click)="simulationLoop(true)">
+            <mat-icon>play_circle</mat-icon>
+        </button>
     }
 </div>
