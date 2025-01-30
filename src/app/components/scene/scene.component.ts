@@ -44,14 +44,13 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.gpuContext.setup().then(() => {
-      console.log(this.gpuContext.canvas!.width = this.gpuContext.canvas!.offsetWidth)
 
       this.gpuContext.canvas!.width = this.canvasWidth;
       this.gpuContext.canvas!.height = this.canvasHeight;
 
       this.camera = new Camera(
-        this.gpuContext.canvas!.width, 
-        this.gpuContext.canvas!.height, 
+        this.gpuContext.canvas!.width,
+        this.gpuContext.canvas!.height,
         80
       );
       this.sceneStorage.createCameraBuffer(this.gpuContext, this.camera);
@@ -62,7 +61,7 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.simulationLoop(true);
     });
   }
-  
+
   ngOnInit(): void {
   }
 
@@ -96,7 +95,7 @@ export class SceneComponent implements OnInit, OnDestroy {
   }
 
   addPointsToScene(originX: number, originY: number, points: Point[]) {
-    const worldPoint = ndcToWorld({x: originX, y: originY}, this.camera);
+    const worldPoint = ndcToWorld({ x: originX, y: originY }, this.camera);
     const scenePoint = projectToScenePlane(worldPoint, this.camera);
 
     let pointsToAdd: Point[] = [];
@@ -182,6 +181,10 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   async updatePositionsFromCompute() {
     let bufferIndex = this.step % 2;
+
+    if (!this.points || this.points.length === 0) {
+      return;
+    }
 
     const readBuffer = this.gpuContext.device.createBuffer({
       size: this.sceneStorage.positionsStorage!![bufferIndex].size,
