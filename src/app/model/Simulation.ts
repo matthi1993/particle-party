@@ -12,10 +12,15 @@ export class ParticleTypeWithForces {
 
 export class PhysicsData {
 
+  public id: number;
+  public name: string;
   public types: ParticleType[] = [];
   public forces: number[][] = [];
 
-  constructor() { }
+  constructor(id: number, name: string) { 
+    this.id = id;
+    this.name = name;
+  }
 
   public addType(newType: ParticleType) {
     this.types.push(newType);

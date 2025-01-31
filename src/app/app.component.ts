@@ -1,13 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { PhysicsData } from './model/Simulation';
-import { createDefaultPhysicsModel } from './model/DefaultSimulationData';
 import { SimulationComponent } from "./components/simulation/simulation.component";
 import { PhysicsComponent } from "./components/physics/physics.component";
 import { MoleculesComponent } from "./components/molecules/molecules.component";
 import { DataService } from './services/data.service';
 import { create, Point } from './model/Point';
-import { randomRounded } from './utils';
 
 
 export enum Page {
@@ -37,8 +35,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     // Load initial Physics
-    this.dataService.getPhysics(1).subscribe(physicsData => {
-      this.physicsData = physicsData;
+    this.dataService.listPhysicsModels().subscribe(physicsData => {
+      this.physicsData = physicsData[0];
 
       this.points = [];
       this.physicsData.types.forEach(type => {

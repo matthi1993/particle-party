@@ -17,7 +17,7 @@ import { randomRounded } from 'src/app/utils';
 })
 export class ControlsComponent implements OnInit {
 
-  @Input() public data: PhysicsData = new PhysicsData();
+  @Input() public data!: PhysicsData;
 
   public onDataChange = output();
   public onForcesChange = output();

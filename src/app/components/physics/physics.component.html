@@ -1,18 +1,33 @@
+<div class="col-4">
+    <mat-form-field>
+        <mat-label>Physics Model</mat-label>
+        <mat-select [(value)]="physicsData" (valueChange)="selectType(physicsData.types[0])">
+            @for (item of physicsDataOptions; track $index) {
+            <mat-option [value]="item">{{ item.name }}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    <button (click)="saveModel()" class="primary-button">save physics model</button>
+</div>
 
-<div class="col-12">
+@if(physicsData) {
+<div class="col-8">
     <app-controls [data]="physicsData"></app-controls>
 </div>
 <div class="col-12">
     <button (click)="addType()" class="primary-button">add type</button>
-    <button (click)="removeSelectedType()" [disabled]="this.physicsData.types.length <= 1" class="secondary-button">delete selected type</button>
+    <button (click)="removeSelectedType()" [disabled]="this.physicsData.types.length <= 1"
+        class="secondary-button">delete selected type</button>
 </div>
-<div class="col-2">
+<div class="col-6">
     @for (item of physicsData.types; track item) {
-        <app-particle-type-card [selected]="item === selectedType" (click)="selectType(item)" [particleType]="item"></app-particle-type-card>
+    <app-particle-type-card [selected]="item === selectedType" (click)="selectType(item)"
+        [particleType]="item"></app-particle-type-card>
     }
 </div>
-<div class="col-10">
+<div class="col-6">
+    @if(this.selectedType) {
     <app-particle-type [particleType]="selectedType" [physicsData]="physicsData"></app-particle-type>
+    }
 </div>
-
-
+}

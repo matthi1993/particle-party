@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { ParticleType, Point } from '../model/Point';
 import { vec4 } from 'gl-matrix';
 import { PROTON } from '../model/DefaultSimulationData';
 import { PhysicsData } from '../model/Simulation';
+import { mapPhysicsRequest, PhysicsResponse } from './physics.mapper';
 
 interface AiInterfacePoint {
     position_x: number,
@@ -21,12 +22,6 @@ interface AiResponse {
     message: string
 }
 
-interface PhysicsResponse {
-    id: number,
-    name: string,
-    particle_types: any[]
-}
-
 @Injectable({ providedIn: 'root' })
 export class DataService {
 
@@ -34,10 +29,58 @@ export class DataService {
 
     private aiGenerateUrl = '/structure/ai-generate';
 
+    private listPhysicsUrl = '/physics-model/list';
     private getPhysicsUrl = '/physics-model/get';
-    private savePhysics = '/physics-model/get';
+    private savePhysicsUrl = '/physics-model/save';
 
     constructor(private http: HttpClient) {
+    }
+
+    savePhysics(physicsData: PhysicsData): Observable<PhysicsData> {
+        let url = this.apiUrl + this.savePhysicsUrl;
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+        });
+
+        let data = {
+            physics_model: {
+                name: physicsData.name
+            },
+            types: physicsData.types.map((type, index) => {
+                return {
+                    name: type.name,
+                    radius: type.radius,
+                    size: type.size,
+                    mass: type.mass,
+                    color: {
+                        x: type.color[0],
+                        y: type.color[1],
+                        z: type.color[2]
+                    },
+                    forces: physicsData.forces[index]
+                }
+            })
+
+        }
+
+        return this.http.post<PhysicsResponse>(url, data, { headers }).pipe(
+            map((response: PhysicsResponse) => {
+                console.log(response)
+                return mapPhysicsRequest(response);
+            }));
+    }
+
+    listPhysicsModels(): Observable<PhysicsData[]> {
+        let url = this.apiUrl + this.listPhysicsUrl;
+
+        return this.http.get<PhysicsResponse[]>(url, {}).pipe(
+            map((responseList: PhysicsResponse[]) => {
+                let physicsList: PhysicsData[] = []
+                responseList.forEach(response => {
+                    physicsList.push(mapPhysicsRequest(response));
+                })
+                return physicsList;
+            }));
     }
 
     getPhysics(id: number): Observable<PhysicsData> {
@@ -46,23 +89,7 @@ export class DataService {
         return this.http.get<PhysicsResponse>(url, {
             params: { id: id },
         }).pipe(
-            map((response: PhysicsResponse) => {
-                let physics = new PhysicsData();
-                response.particle_types.forEach(type => {
-                    physics.types.push(new ParticleType(
-                        type.name,
-                        type.id,
-                        vec4.fromValues(type.color.r, type.color.g, type.color.b, 1),
-                        type.radius,
-                        type.size,
-                        type.mass
-                    ));
-                    physics.forces.push(
-                        type.related_to.map((val: { force: any; }) => val.force)
-                    );
-                });
-                return physics;
-            }));
+            map((response: PhysicsResponse) => { return mapPhysicsRequest(response); }));
     }
 
     getAiResponse(prompt: string): Observable<Point[]> {
