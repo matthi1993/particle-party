@@ -26,7 +26,6 @@ export class ParticleTypeComponent implements OnInit {
   public onDataChange = output();
 
   ngOnInit(): void {
-    console.log(this.physicsData.types);
   }
 
   getOrbitPosition(index: number): Position {

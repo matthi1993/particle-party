@@ -32,7 +32,7 @@ export class DataService {
 
     private apiUrl = 'http://127.0.0.1:5000';
 
-    private aiGenerateUrl = '/editor/ai-generate';
+    private aiGenerateUrl = '/structure/ai-generate';
 
     private getPhysicsUrl = '/physics-model/get';
     private savePhysics = '/physics-model/get';
@@ -49,7 +49,7 @@ export class DataService {
             map((response: PhysicsResponse) => {
                 let physics = new PhysicsData();
                 response.particle_types.forEach(type => {
-                    physics.addType(new ParticleType(
+                    physics.types.push(new ParticleType(
                         type.name,
                         type.id,
                         vec4.fromValues(type.color.r, type.color.g, type.color.b, 1),
@@ -57,6 +57,9 @@ export class DataService {
                         type.size,
                         type.mass
                     ));
+                    physics.forces.push(
+                        type.related_to.map((val: { force: any; }) => val.force)
+                    );
                 });
                 return physics;
             }));

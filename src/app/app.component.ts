@@ -40,20 +40,8 @@ export class AppComponent implements OnInit {
     this.dataService.getPhysics(1).subscribe(physicsData => {
       this.physicsData = physicsData;
 
-      //TODO get forces from backend
-      this.physicsData.types.forEach((type, rowIndex) => {
-        type.radius = randomRounded(0, 20);
-        type.mass = randomRounded(0, 0.25);
-        type.size = randomRounded(0.25, 3)
-  
-        this.physicsData!.types.forEach((col, colIndex) => {
-          this.physicsData!.forces[rowIndex][colIndex] = randomRounded(-0.4, 0.4);
-        })
-      });
-
       this.points = [];
       this.physicsData.types.forEach(type => {
-        console.log(type);
         this.points!.push(...create(300, type, 100));
       })
       this.dataLoaded = true;
