@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 export class SimulationComponent implements OnInit {
 
   public canvasWidth = 800;
-  public canvasHeight = 800;
+  public canvasHeight = 500;
 
   public pointPerType: number[] = [];
 

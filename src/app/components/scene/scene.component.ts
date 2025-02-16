@@ -149,11 +149,13 @@ export class SceneComponent implements OnInit, OnDestroy {
     });
 
     element.addEventListener('wheel', (event) => {
+      let minDistance = 5;
       event.preventDefault();
-      if (event.deltaY < 0 && this.camera.position[2] <= 5) {
-        this.camera.position[2] = 5;
+      if (event.deltaY < 0 && this.camera.position[2] <= minDistance) {
+        this.camera.position[2] = minDistance;
       } else {
-        this.camera.position[2] += event.deltaY / 30;
+        let distanceFactor = (this.camera.position[2] + minDistance) * 0.025;
+        this.camera.position[2] += event.deltaY / 30 * distanceFactor;
       }
     });
   }
