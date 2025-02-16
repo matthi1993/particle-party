@@ -110,6 +110,44 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   addCameraListeners(element: HTMLElement) {
 
+    let isShiftDown = false;
+    let isMouseDown = false;
+    const moveSpeed = 0.1;
+    let mousePosX = 0;
+    let mousePosY = 0;
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Shift') {
+        isShiftDown = true;
+      }
+    });
+    document.addEventListener('keyup', (event) => {
+      if (event.key === 'Shift') {
+        isShiftDown = false;
+      }
+      if (event.code === 'Space') {
+        this.isPlaying = !this.isPlaying;
+        this.simulationLoop(this.isPlaying);
+      }
+    });
+    document.addEventListener('mousedown', (event) => {
+      isMouseDown = true;
+    });
+    document.addEventListener('mouseup', (event) => {
+      isMouseDown = false;
+    });
+
+    element.addEventListener('mousemove', (event) => {
+      event.preventDefault();
+
+      if (isMouseDown) {
+        this.camera.position[0] -= (event.clientX - mousePosX) * moveSpeed * this.camera.position[2] * 0.01;
+        this.camera.position[1] += (event.clientY - mousePosY) * moveSpeed * this.camera.position[2] * 0.01;
+      }
+      mousePosX = event.clientX;
+      mousePosY = event.clientY;
+    });
+
     element.addEventListener('wheel', (event) => {
       event.preventDefault();
       if (event.deltaY < 0 && this.camera.position[2] <= 5) {

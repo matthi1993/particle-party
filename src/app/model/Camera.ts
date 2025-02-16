@@ -1,5 +1,5 @@
 
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 
 
 export class Camera {
@@ -40,7 +40,15 @@ export class Camera {
     updateCamera() {
         // Create the view matrix (camera looking at the center)
         this.viewMatrix = mat4.create();
-        mat4.lookAt(this.viewMatrix, this.position, this.center, this.up);
+        //mat4.lookAt(this.viewMatrix, this.position, this.center, this.up);
+        
+        // look forward
+        mat4.lookAt(
+            this.viewMatrix, 
+            this.position, 
+            vec3.fromValues(this.position[0], this.position[1], this.position[2] - 1), 
+            this.up
+        );
         mat4.multiply(this.viewProjectionMatrix, this.projectionMatrix, this.viewMatrix);
     }
 }
