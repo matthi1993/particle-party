@@ -48,11 +48,11 @@ export class AppComponent implements OnInit {
       [-0.4, 0.2, -0.1, 1],
     ]
 
-    let size = 400;
+    let size = 300;
     this.dataStore.simulationData.points = [];
-    this.dataStore.simulationData.points.push(...create(2000, PROTON, size));
-    this.dataStore.simulationData.points.push(...create(2000, NEUTRON, size));
-    this.dataStore.simulationData.points.push(...create(2000, ELECTRON, size));
+    this.dataStore.simulationData.points.push(...create(1000, PROTON, size));
+    this.dataStore.simulationData.points.push(...create(1000, NEUTRON, size));
+    this.dataStore.simulationData.points.push(...create(1000, ELECTRON, size));
     //this.dataStore.simulationData.points.push(...create(0, BOSON, size));
 
     this.dataLoaded = true;
