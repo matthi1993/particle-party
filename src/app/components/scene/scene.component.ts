@@ -11,7 +11,7 @@ import { Point } from 'src/app/model/Point';
 import { SceneStorage } from './scene.gpu.storage';
 import { vec4 } from 'gl-matrix';
 import { MatIconModule } from '@angular/material/icon';
-import { ndcToWorld, projectToScenePlane } from './scene.mousevent';
+import { getMouseNDC, ndcToWorld, projectToScenePlane } from './scene.mousevent';
 import { Shape } from './gpu/shapes/shapes';
 import { OCTAGON } from './gpu/shapes/octagon';
 import { SQUARE } from './gpu/shapes/square';
@@ -45,13 +45,16 @@ export class SceneComponent implements OnInit, OnDestroy {
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
 
+  //TODO refactor
+  private selectionPosition = {x: -1, y: -1};
+
   constructor() {
     this.gpuContext.setup().then(() => {
 
       this.gpuContext.canvas!.width = this.canvasWidth;
       this.gpuContext.canvas!.height = this.canvasHeight;
 
-      this.sceneStorage.createCameraBuffer(this.gpuContext, this.camera);
+      this.sceneStorage.createUniformBuffer(this.gpuContext, this.camera);
       this.addCameraListeners(this.gpuContext.canvas!!);
 
       this.createScene(this.points);
@@ -145,9 +148,17 @@ export class SceneComponent implements OnInit, OnDestroy {
       if (isMouseDown) {
         this.camera.position[0] -= (event.clientX - mousePosX) * moveSpeed * this.camera.position[2] * 0.01;
         this.camera.position[1] += (event.clientY - mousePosY) * moveSpeed * this.camera.position[2] * 0.01;
+
       }
       mousePosX = event.clientX;
       mousePosY = event.clientY;
+
+      //TODO refactor
+      const rect = element.getBoundingClientRect();
+      this.selectionPosition = {
+        x:(event.clientX - rect.left) / rect.width * this.canvasWidth, 
+        y: (event.clientY - rect.top) / rect.height * this.canvasHeight
+      }
     });
 
     element.addEventListener('wheel', (event) => {
@@ -179,6 +190,7 @@ export class SceneComponent implements OnInit, OnDestroy {
     this.step = 0;
     this.points = points;
 
+    this.sceneStorage.createReadStorage(this.gpuContext, this.points);
     this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
     this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
     this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
@@ -188,22 +200,44 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.points.length,
       computeShader
     )
-    this.simulationCompute.updateBindGroups(this.gpuContext.device, this.sceneStorage.positionsStorage, this.sceneStorage.typesStorage, this.sceneStorage.forcesStorage);
+    this.simulationCompute.updateBindGroups(
+      this.gpuContext.device,
+      this.sceneStorage.positionsStorage,
+      this.sceneStorage.typesStorage,
+      this.sceneStorage.forcesStorage
+    );
 
     this.simulationRenderer = new Render(
       this.gpuContext,
       new Shape(this.gpuContext.device, "Square Geometry", SQUARE),
       this.points.length
     )
-    this.simulationRenderer.updateBindGroups(this.gpuContext.device, this.sceneStorage.positionsStorage, this.sceneStorage.typesStorage, this.sceneStorage.forcesStorage, this.sceneStorage.viewProjectionBuffer)
+    this.simulationRenderer.updateBindGroups(
+      this.gpuContext.device,
+      this.sceneStorage.positionsStorage,
+      this.sceneStorage.typesStorage,
+      this.sceneStorage.uniformsBuffer,
+      this.sceneStorage.selectionOutBuffer
+    )
   }
 
   render() {
+
+    //TODO refactor
+    this.sceneStorage.updateUniformsBuffer(
+      this.gpuContext, this.camera, vec4.fromValues(this.selectionPosition.x,this.selectionPosition.y, 0,1)
+    );
+
     this.camera.updateCamera();
-    this.sceneStorage.updateCameraBuffer(this.gpuContext, this.camera);
 
     const encoder = this.gpuContext.device.createCommandEncoder();
-    this.simulationRenderer?.execute(encoder, this.step, this.gpuContext.context.getCurrentTexture().createView());
+
+    this.simulationRenderer?.execute(
+      encoder,
+      this.step,
+      this.gpuContext.context.getCurrentTexture().createView()
+    );
+
     this.gpuContext.device.queue.submit([encoder.finish()]);
   }
 
@@ -212,6 +246,24 @@ export class SceneComponent implements OnInit, OnDestroy {
     this.simulationCompute?.execute(encoder, this.step, this.points.length);
     this.step++;
     this.gpuContext.device.queue.submit([encoder.finish()]);
+  }
+
+  public async getSelectedCircles() {
+    const readBuffer = this.gpuContext.device.createBuffer({
+      size: this.points.length * 4,
+      usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+    });
+
+    const commandEncoder = this.gpuContext.device.createCommandEncoder();
+    commandEncoder.copyBufferToBuffer(this.sceneStorage.selectionOutBuffer, 0, readBuffer, 0, this.points.length * 4);
+    const commands = commandEncoder.finish();
+    this.gpuContext.device.queue.submit([commands]);
+
+    // Now, map the buffer to access the data
+    await readBuffer.mapAsync(GPUMapMode.READ);
+    const data = Array.from(new Uint32Array(readBuffer.getMappedRange()));
+    readBuffer.unmap();
+    console.log(data.filter(d => d == 1));
   }
 
   async updatePositionsFromCompute() {

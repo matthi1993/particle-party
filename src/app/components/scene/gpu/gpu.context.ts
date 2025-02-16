@@ -36,4 +36,12 @@ export class GpuContext {
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
       })
   }
+
+  public createReadBuffer(label: string, byteLength: number) {
+    return this.device.createBuffer({
+      label: label,
+      size: byteLength,
+      usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST // ✅ Readable on CPU
+    });
+  }
 }

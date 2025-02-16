@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { PhysicsData } from 'src/app/model/Simulation';
 import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material/slider';
-import { randomRounded } from 'src/app/utils';
+import { randomRounded } from './utils';
 
 
 @Component({

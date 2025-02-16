@@ -1,9 +1,5 @@
-import { ParticleType, Point } from './model/Point'
-import { PhysicsData } from './model/Simulation';
-
-export function randomRounded(from: number, to: number): number {
-    return Math.round((Math.random() * (to - from) + from) * 100) / 100;
-}
+import { ParticleType, Point } from '../../../model/Point'
+import { PhysicsData } from '../../../model/Simulation';
 
 export function createArraysFromPoints(points: Point[], physicsData: PhysicsData) {
     let dimensions = 12;
@@ -12,12 +8,16 @@ export function createArraysFromPoints(points: Point[], physicsData: PhysicsData
     for (let index = 0; index < points.length; index++) {
         const element = points[index];
 
+        // index 0 to 3 for positions
         positionArray[index * dimensions] = element.position[0];
         positionArray[index * dimensions + 1] = element.position[1];
         positionArray[index * dimensions + 2] = element.position[2];
         positionArray[index * dimensions + 3] = element.position[3];
+        
+        // index 4 to 7 are reserved for velocity
 
         positionArray[index * dimensions + 8] = physicsData.types.indexOf(element.particleType);
+        positionArray[index * dimensions + 9] = index; // global index of the Particle
     };
     return positionArray;
 }

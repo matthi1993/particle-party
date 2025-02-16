@@ -6,8 +6,8 @@ interface MouseEvent {
     clientY: number;
 }
 
-export function getMouseNDC(event: MouseEvent, canvas: HTMLElement): { x: number; y: number } {
-    const rect = canvas.getBoundingClientRect();
+export function getMouseNDC(event: MouseEvent, element: HTMLElement): { x: number; y: number } {
+    const rect = element.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     return { x, y };

@@ -18,13 +18,17 @@ export class Render {
             visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
             buffer: { type: "read-only-storage" } // position in buffer
         }, {
-            binding: 2,
+            binding: 1,
             visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
             buffer: { type: "read-only-storage" } // types buffer
         }, {
-            binding: 4,
-            visibility: GPUShaderStage.VERTEX,
+            binding: 2,
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
             buffer: { type: "uniform" } // types buffer
+        }, {
+            binding: 3,
+            visibility: GPUShaderStage.FRAGMENT,
+            buffer: { type: "storage" } // selection buffer
         }
         ]
     }
@@ -88,7 +92,7 @@ export class Render {
 
     }
 
-    updateBindGroups(device: any, positionsStorage: any, typesStorage: any, forcesStorage: any, viewProjectionBuffer: any) {
+    updateBindGroups(device: any, positionsStorage: any, typesStorage: any, uniformsBuffer: any, selectionOutBuffer: any) {
         this.bindGroups = [
             device.createBindGroup({
                 label: "Cell renderer bind group A",
@@ -97,13 +101,14 @@ export class Render {
                     binding: 0,
                     resource: { buffer: positionsStorage[0] }
                 }, {
-                    binding: 2,
+                    binding: 1,
                     resource: { buffer: typesStorage }
                 }, {
-                    binding: 4,
-                    resource: {
-                        buffer: viewProjectionBuffer,
-                    },
+                    binding: 2,
+                    resource: { buffer: uniformsBuffer },
+                }, {
+                    binding: 3,
+                    resource: { buffer: selectionOutBuffer },
                 }],
             }),
             device.createBindGroup({
@@ -113,13 +118,14 @@ export class Render {
                     binding: 0,
                     resource: { buffer: positionsStorage[1] }
                 }, {
-                    binding: 2,
+                    binding: 1,
                     resource: { buffer: typesStorage }
                 }, {
-                    binding: 4,
-                    resource: {
-                        buffer: viewProjectionBuffer,
-                    },
+                    binding: 2,
+                    resource: { buffer: uniformsBuffer },
+                }, {
+                    binding: 3,
+                    resource: { buffer: selectionOutBuffer },
                 }],
             }),
         ];
@@ -143,7 +149,6 @@ export class Render {
             this.shape.vertices.length / 2, // number of vertices
             this.instances, // number of instances
         );
-
         pass.end();
     }
 }
