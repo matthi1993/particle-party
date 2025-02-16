@@ -2,6 +2,7 @@ export const vertexShaderSource = `
     struct VertexOutput {
         @builtin(position) position: vec4f,
         @location(1) color: vec4f,
+        @location(2) uv: vec2<f32>
     };
 
     struct Particle {
@@ -40,6 +41,7 @@ export const vertexShaderSource = `
         let modelViewProjection = uniforms.viewProjectionMatrix;
         output.position = modelViewProjection * dataIn[instance].position + vec4f(position * myType.size, 0, 0) ;
         output.color = myType.color;
+        output.uv = position * 0.5 + 0.5;
 
         return output;
     }

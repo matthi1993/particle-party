@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ndcToWorld, projectToScenePlane } from './scene.mousevent';
 import { Shape } from './gpu/shapes/shapes';
 import { OCTAGON } from './gpu/shapes/octagon';
+import { SQUARE } from './gpu/shapes/square';
 
 @Component({
   selector: 'app-scene',
@@ -191,7 +192,7 @@ export class SceneComponent implements OnInit, OnDestroy {
 
     this.simulationRenderer = new Render(
       this.gpuContext,
-      new Shape(this.gpuContext.device, "Square Geometry", OCTAGON),
+      new Shape(this.gpuContext.device, "Square Geometry", SQUARE),
       this.points.length
     )
     this.simulationRenderer.updateBindGroups(this.gpuContext.device, this.sceneStorage.positionsStorage, this.sceneStorage.typesStorage, this.sceneStorage.forcesStorage, this.sceneStorage.viewProjectionBuffer)
