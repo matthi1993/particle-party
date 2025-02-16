@@ -22,11 +22,17 @@ export const computeShader = `
         force: f32,         // 4 bytes
     }
 
+    struct Uniforms {
+        selectionCoordinates: vec4f
+    }
+
     @group(0) @binding(0) var<storage> particles: array<Particle>;
     @group(0) @binding(1) var<storage, read_write> particlesOut: array<Particle>;
 
     @group(0) @binding(2) var<storage> particleTypes: array<ParticleType>;
     @group(0) @binding(3) var<storage> forces: array<Force>;
+
+    @group(0) @binding(4) var<storage> uniforms: Uniforms;
 
     var<workgroup> sharedParticles: array<Particle, ${WORKGROUP_SIZE}>; // Shared memory for particles in workgroup
 
@@ -52,6 +58,16 @@ export const computeShader = `
         var me = particles[index];
         let myType = particleTypes[i32(me.particleAttributes.x)];
         let numParticles = arrayLength(&particles);
+
+        // Check what circles are in selection
+        let clickDist = length(uniforms.selectionCoordinates - me.position);
+        var selected = f32(0);
+        if (clickDist < 5) {
+            selected = 1;
+        } else {
+            selected = 0;
+        }
+        me.particleAttributes.y = selected;
 
 
         var myForces: array<f32, 16>; // TODO 16 is the max number of types currently
@@ -113,8 +129,6 @@ export const computeShader = `
                     force -= normalizeVector(direction) * gravityMagnitude;
                     
                 }
-
-
             }
 
             workgroupBarrier(); // Synchronize before loading the next chunk

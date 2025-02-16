@@ -20,6 +20,10 @@ export class Compute {
             binding: 3,
             visibility: GPUShaderStage.COMPUTE,
             buffer: { type: "read-only-storage" }
+        }, {
+            binding: 4,
+            visibility: GPUShaderStage.COMPUTE,
+            buffer: { type: "read-only-storage" }
         }
         ]
     };
@@ -56,7 +60,7 @@ export class Compute {
         });
     }
 
-    updateBindGroups(device: any, positionsStorage: any, typesStorage: any, forcesStorage: any) {
+    updateBindGroups(device: any, positionsStorage: any, typesStorage: any, forcesStorage: any, uniformsBuffer: any) {
         const bindGroups = [
             device.createBindGroup({
                 label: "Compute bind group A",
@@ -73,6 +77,9 @@ export class Compute {
                 }, {
                     binding: 3,
                     resource: { buffer: forcesStorage }
+                }, {
+                    binding: 4,
+                    resource: { buffer: uniformsBuffer }
                 }],
             }),
             device.createBindGroup({
@@ -90,6 +97,9 @@ export class Compute {
                 }, {
                     binding: 3,
                     resource: { buffer: forcesStorage }
+                }, {
+                    binding: 4,
+                    resource: { buffer: uniformsBuffer }
                 }],
             }),
         ];

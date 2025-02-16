@@ -3,7 +3,7 @@ export const vertexShaderSource = `
         @builtin(position) position: vec4f,
         @location(1) color: vec4f,
         @location(2) uv: vec2<f32>,
-        @location(3) id: f32
+        @location(3) selected: f32
     };
 
     struct Particle {
@@ -21,8 +21,7 @@ export const vertexShaderSource = `
     }
 
     struct Uniforms {
-        viewProjectionMatrix: mat4x4<f32>,
-        selectionCoordinates: vec4f
+        viewProjectionMatrix: mat4x4<f32>
     }
 
 
@@ -44,7 +43,7 @@ export const vertexShaderSource = `
         output.position = modelViewProjection * dataIn[instance].position + vec4f(position * myType.size, 0, 0) ;
         output.color = myType.color;
         output.uv = position * 0.5 + 0.5;
-        output.id = dataIn[instance].particleAttributes.y;
+        output.selected = dataIn[instance].particleAttributes.y;
 
         return output;
     }

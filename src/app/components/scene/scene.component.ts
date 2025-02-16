@@ -45,15 +45,13 @@ export class SceneComponent implements OnInit, OnDestroy {
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
 
-  //TODO refactor
-  private selectionPosition = {x: -1, y: -1};
-
   constructor() {
     this.gpuContext.setup().then(() => {
 
       this.gpuContext.canvas!.width = this.canvasWidth;
       this.gpuContext.canvas!.height = this.canvasHeight;
 
+      this.sceneStorage.createComputeUniformBuffer(this.gpuContext)
       this.sceneStorage.createUniformBuffer(this.gpuContext, this.camera);
       this.addCameraListeners(this.gpuContext.canvas!!);
 
@@ -131,8 +129,7 @@ export class SceneComponent implements OnInit, OnDestroy {
         isShiftDown = false;
       }
       if (event.code === 'Space') {
-        this.isPlaying = !this.isPlaying;
-        this.simulationLoop(this.isPlaying);
+        this.simulationLoop(!this.isPlaying)
       }
     });
     document.addEventListener('mousedown', (event) => {
@@ -145,6 +142,16 @@ export class SceneComponent implements OnInit, OnDestroy {
     element.addEventListener('mousemove', (event) => {
       event.preventDefault();
 
+      //TODO move somewhere else???
+      const ndc = getMouseNDC(event, element);
+      const worldPoint = ndcToWorld(ndc, this.camera);
+      const scenePoint = projectToScenePlane(worldPoint, this.camera);
+
+      this.sceneStorage.updateComputeUniformsBuffer(
+        this.gpuContext,
+        vec4.fromValues(scenePoint[0], scenePoint[1], scenePoint[2], 1)
+      )
+
       if (isMouseDown) {
         this.camera.position[0] -= (event.clientX - mousePosX) * moveSpeed * this.camera.position[2] * 0.01;
         this.camera.position[1] += (event.clientY - mousePosY) * moveSpeed * this.camera.position[2] * 0.01;
@@ -153,12 +160,6 @@ export class SceneComponent implements OnInit, OnDestroy {
       mousePosX = event.clientX;
       mousePosY = event.clientY;
 
-      //TODO refactor
-      const rect = element.getBoundingClientRect();
-      this.selectionPosition = {
-        x:(event.clientX - rect.left) / rect.width * this.canvasWidth, 
-        y: (event.clientY - rect.top) / rect.height * this.canvasHeight
-      }
     });
 
     element.addEventListener('wheel', (event) => {
@@ -204,7 +205,8 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.gpuContext.device,
       this.sceneStorage.positionsStorage,
       this.sceneStorage.typesStorage,
-      this.sceneStorage.forcesStorage
+      this.sceneStorage.forcesStorage,
+      this.sceneStorage.computeUniformsBuffer
     );
 
     this.simulationRenderer = new Render(
@@ -216,18 +218,14 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.gpuContext.device,
       this.sceneStorage.positionsStorage,
       this.sceneStorage.typesStorage,
-      this.sceneStorage.uniformsBuffer,
+      this.sceneStorage.vertexUniformsBuffer,
       this.sceneStorage.selectionOutBuffer
     )
   }
 
   render() {
 
-    //TODO refactor
-    this.sceneStorage.updateUniformsBuffer(
-      this.gpuContext, this.camera, vec4.fromValues(this.selectionPosition.x,this.selectionPosition.y, 0,1)
-    );
-
+    this.sceneStorage.updateUniformsBuffer(this.gpuContext, this.camera);
     this.camera.updateCamera();
 
     const encoder = this.gpuContext.device.createCommandEncoder();

@@ -14,23 +14,29 @@ export class SceneStorage {
 
   public selectionOutBuffer?: any;
   public positionBuffer?: any;
-  public uniformsBuffer?: any;
+  public vertexUniformsBuffer?: any;
+  public computeUniformsBuffer?: any;
 
   constructor() {
   }
 
+  createComputeUniformBuffer(gpuContext: GpuContext, selectionCoord: vec4 = vec4.fromValues(0,0,0,-1)) {
+    let uniforms = new Float32Array(selectionCoord)
+    this.computeUniformsBuffer = gpuContext.createStorageBuffer("Uniforms Compute", uniforms.byteLength);
+    gpuContext.device.queue.writeBuffer(this.computeUniformsBuffer, 0, uniforms);
+  }
+
   createUniformBuffer(gpuContext: GpuContext, camera: Camera, selectionCoord: vec4 = vec4.fromValues(0,0,0,-1)) {
-    
     let uniforms = new Float32Array([
       ...camera.getViewProjectionMatrix(),
       ...selectionCoord
     ])
-    this.uniformsBuffer = gpuContext.device.createBuffer({
+    this.vertexUniformsBuffer = gpuContext.device.createBuffer({
       size: uniforms.byteLength,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
-    gpuContext.device.queue.writeBuffer(this.uniformsBuffer, 0, uniforms);
+    gpuContext.device.queue.writeBuffer(this.vertexUniformsBuffer, 0, uniforms);
   }
 
   public createForceStorage(gpuContext: GpuContext, physicsData: PhysicsData) {
@@ -39,12 +45,16 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
   }
 
-  public updateUniformsBuffer(gpuContext: GpuContext, camera: Camera, selectionCoord: vec4) {
+  public updateUniformsBuffer(gpuContext: GpuContext, camera: Camera) {
     let uniforms = new Float32Array([
-      ...camera.getViewProjectionMatrix(),
-      ...selectionCoord
+      ...camera.getViewProjectionMatrix()
     ])
-    gpuContext.device.queue.writeBuffer(this.uniformsBuffer, 0, uniforms);
+    gpuContext.device.queue.writeBuffer(this.vertexUniformsBuffer, 0, uniforms);
+  }
+
+  public updateComputeUniformsBuffer(gpuContext: GpuContext, selectionCoord: vec4) {
+    let uniforms = new Float32Array(selectionCoord)
+    gpuContext.device.queue.writeBuffer(this.computeUniformsBuffer, 0, uniforms);
   }
 
   public updateForceValues(gpuContext: GpuContext, physicsData: PhysicsData) {

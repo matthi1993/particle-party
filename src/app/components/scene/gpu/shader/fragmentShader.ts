@@ -3,7 +3,7 @@ export const fragmentShaderSource = `
         @builtin(position) position: vec4f,
         @location(1) color: vec4f,
         @location(2) uv: vec2<f32>,
-        @location(3) id: f32
+        @location(3) selected: f32
     };
 
     struct Uniforms {
@@ -26,23 +26,15 @@ export const fragmentShaderSource = `
         let dist = distance(input.uv, center);
 
         // Apply a smooth step for soft edges
-        let alpha = smoothstep(radius - softness, radius + softness, dist);
+        let alpha = smoothstep(radius - softness, radius, dist);
 
-        let clickDist = length(uniforms.selectionCoordinates - input.position);
-        
 
-        // Check if inside circle
-        var selected = u32(0);
-        if (clickDist < 50) {
-            selected = 1;
-        } else {
-            selected = 0;
-        }
 
-        selectedCircles[u32(input.id)] = selected;
-
-        if(selected == 1) {
-            return vec4f(1, 0, 0, 1.0 - alpha);
+        // Draw a red Border around selected ones
+        if(input.selected == 1) {
+            if(dist > 0.2 && dist < radius) {
+                return vec4f(1,0,0,1);
+            }
         }
         return vec4f(input.color.xyz, 1.0 - alpha);
     }
