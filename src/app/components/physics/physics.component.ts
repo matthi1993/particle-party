@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ControlsComponent } from "../controls/controls.component";
-import { PhysicsData } from 'src/app/model/Simulation';
+import { PhysicsData, SimulationData } from 'src/app/model/Simulation';
 import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-card.component";
 import { ParticleTypeComponent } from "../particle-type/particle-type.component";
 import { ParticleType } from 'src/app/model/Point';
@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveDialog } from '../save-dialog/save-dialog';
+import { DataStore } from 'src/app/store/data.store';
 
 
 
@@ -25,19 +26,9 @@ export class PhysicsComponent implements OnInit {
 
   public selectedType!: ParticleType;
 
-  public physicsDataOptions!: PhysicsData[]
-  @Input() public physicsData!: PhysicsData;
-
-  constructor(private dataService: DataService, private dialog: MatDialog) { }
+  constructor(public dataStore: DataStore, private dataService: DataService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.dataService.listPhysicsModels().subscribe(models => {
-      console.log(models);
-      this.physicsDataOptions = models;
-      this.physicsData = this.physicsDataOptions[0];
-      this.selectedType = this.physicsData.types[0];
-    })
-
   }
 
   selectType(type: ParticleType) {
@@ -45,22 +36,22 @@ export class PhysicsComponent implements OnInit {
   }
 
   addType() {
-    let length = this.physicsData.types.length;
+    let length = this.dataStore.simulationData.physicsData.types.length;
     let newType = new ParticleType(
       "New Type " + length,
       length,
       vec4.fromValues(Math.random(), Math.random(), Math.random(), 1),
-      Math.random() * 100 + 30,
-      Math.random() * 3 + 0.5,
+      Math.random() * 30 + 10,
+      Math.random() * 1 + 0.5,
       Math.random()
     );
-    this.physicsData.addType(newType);
+    this.dataStore.simulationData.physicsData.addType(newType);
     this.selectedType = newType;
   }
 
   removeSelectedType() {
-    this.physicsData.removeType(this.selectedType);
-    this.selectedType = this.physicsData.types[0];
+    this.dataStore.simulationData.physicsData.removeType(this.selectedType);
+    this.selectedType = this.dataStore.simulationData.physicsData.types[0];
   }
 
   saveModel() {
@@ -70,9 +61,9 @@ export class PhysicsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(data => {
       if (data) {
-        this.physicsData.name = data;
-        this.dataService.savePhysics(this.physicsData).subscribe(data => {
-          this.physicsData = data;
+        this.dataStore.simulationData.physicsData.name = data;
+        this.dataService.savePhysics(this.dataStore.simulationData.physicsData).subscribe(data => {
+          this.dataStore.simulationData.physicsData = data;
         });
       }
     })

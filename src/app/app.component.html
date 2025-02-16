@@ -15,13 +15,13 @@
 @if (dataLoaded) {
 <content>
     @if (page === pageEnum.SIMULATION) {
-    <app-simulation class="grid-12" [physicsData]="physicsData!" [points]="points!"></app-simulation>
+    <app-simulation class="grid-12"></app-simulation>
     }
     @if (page === pageEnum.PHYSICS) {
-    <app-physics class="grid-12" [physicsData]="physicsData!"></app-physics>
+    <app-physics class="grid-12"></app-physics>
     }
     @if (page === pageEnum.MOLECULES) {
-    <app-molecules class="grid-12" [physicsData]="physicsData!"></app-molecules>
+    <app-molecules class="grid-12"></app-molecules>
     }
 </content>
 }

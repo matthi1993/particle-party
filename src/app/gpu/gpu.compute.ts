@@ -28,7 +28,6 @@ export class Compute {
     private simulationPipeline?: any;
     private bindGroups?: any;
     private bindGroupLayout?: any;
-    private numWorkgroups?: any;
 
     constructor(
         device: any,
@@ -41,8 +40,6 @@ export class Compute {
             label: "Cell Pipeline Layout",
             bindGroupLayouts: [this.bindGroupLayout],
         });
-
-        this.numWorkgroups = Math.ceil(elementCount / WORKGROUP_SIZE);
 
         // Create the compute shader that will process the game of life simulation.
         const simulationShaderModule = device.createShaderModule({
@@ -101,12 +98,12 @@ export class Compute {
         this.bindGroups = bindGroups;
     }
 
-    execute(encoder: any, step: number) {
+    execute(encoder: any, step: number, elements: number) {
         const computePass = encoder.beginComputePass();
 
         computePass.setPipeline(this.simulationPipeline);
         computePass.setBindGroup(0, this.bindGroups[step % 2]);
-        computePass.dispatchWorkgroups(this.numWorkgroups);
+        computePass.dispatchWorkgroups(Math.ceil(elements / WORKGROUP_SIZE));
 
         computePass.end();
     }

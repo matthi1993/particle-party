@@ -1,8 +1,8 @@
 <div class="col-4">
     <mat-form-field>
         <mat-label>Physics Model</mat-label>
-        <mat-select [(value)]="physicsData" (valueChange)="selectType(physicsData.types[0])">
-            @for (item of physicsDataOptions; track $index) {
+        <mat-select [(value)]="dataStore.simulationData.physicsData" (valueChange)="selectType(dataStore.simulationData.physicsData.types[0])">
+            @for (item of dataStore.physicsDataOptions; track $index) {
             <mat-option [value]="item">{{ item.name }}</mat-option>
             }
         </mat-select>
@@ -10,24 +10,22 @@
     <button (click)="saveModel()" class="primary-button">save physics model</button>
 </div>
 
-@if(physicsData) {
 <div class="col-8">
-    <app-controls [data]="physicsData"></app-controls>
+    <app-controls [data]="dataStore.simulationData.physicsData"></app-controls>
 </div>
 <div class="col-12">
     <button (click)="addType()" class="primary-button">add type</button>
-    <button (click)="removeSelectedType()" [disabled]="this.physicsData.types.length <= 1"
+    <button (click)="removeSelectedType()" [disabled]="dataStore.simulationData.physicsData.types.length <= 1"
         class="secondary-button">delete selected type</button>
 </div>
 <div class="col-6">
-    @for (item of physicsData.types; track item) {
+    @for (item of dataStore.simulationData.physicsData.types; track item) {
     <app-particle-type-card [selected]="item === selectedType" (click)="selectType(item)"
         [particleType]="item"></app-particle-type-card>
     }
 </div>
 <div class="col-6">
     @if(this.selectedType) {
-    <app-particle-type [particleType]="selectedType" [physicsData]="physicsData"></app-particle-type>
+    <app-particle-type [particleType]="selectedType" [physicsData]="dataStore.simulationData.physicsData"></app-particle-type>
     }
 </div>
-}

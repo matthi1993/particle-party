@@ -1,17 +1,17 @@
 <div class="col-3 card">
-    <h1>Simulation View</h1>
-    <p>In this simulation mode, you can create and manipulate particles, explore their interactions, and capture complex
-        structures. Adjust variables in real time to see how the particles behave and gain a hands-on understanding of
-        complex systems.</p>
-</div>
-<div class="col-3 card" style="grid-row-start: 2;">
     <h1>World creator</h1>
     <p>create a new world</p>
+    @for (type of dataStore.simulationData.physicsData.types; track $index) {
+    <mat-form-field>
+        <mat-label>{{type.name}}</mat-label>
+        <input matInput [(ngModel)]="pointPerType[$index]" />
+    </mat-form-field>
+    }
     <button (click)="createRandomWorld()" class="primary-button">create random world</button>
     <button (click)="createEmptyWorld()" class="secondary-button">create empty world</button>
 </div>
-<div class="col-8 card" style="grid-row: span 10;">
-    <app-scene [physicsData]="physicsData" [points]="points"></app-scene>
+<div class="col-8" style="grid-row: span 10;">
+    <app-scene [physicsData]="dataStore.simulationData.physicsData" [points]="dataStore.simulationData.points"></app-scene>
 
 </div>
 <div class="card">

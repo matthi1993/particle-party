@@ -1,47 +1,43 @@
-import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { PhysicsData } from 'src/app/model/Simulation';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SceneComponent } from '../scene/scene.component';
 import { Point, create } from 'src/app/model/Point';
-import { ELECTRON, NEUTRON, PROTON } from 'src/app/model/DefaultSimulationData';
+import { DataStore } from 'src/app/store/data.store';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-simulation',
-  imports: [SceneComponent],
+  imports: [FormsModule, MatInputModule, MatFormFieldModule, SceneComponent],
   templateUrl: './simulation.component.html',
   styleUrls: ['./simulation.component.scss']
 })
-export class SimulationComponent implements OnInit{
+export class SimulationComponent implements OnInit {
 
-  @Input() public points!: Point[];
-  @Input() public physicsData!: PhysicsData;
+  public canvasWidth = 800;
+  public canvasHeight = 800;
 
-  public canvasWidth = 1000;
-  public canvasHeight = 1000;
+  public pointPerType: number[] = [];
 
   @ViewChild(SceneComponent) scene!: SceneComponent;
+
+  constructor(public dataStore: DataStore) {
+  }
 
   ngOnInit(): void {
   }
 
   public createEmptyWorld() {
-    this.points = [];
-    this.scene.createScene(this.points);
+    this.dataStore.simulationData.points = [];
+    this.scene.createScene(this.dataStore.simulationData.points);
   }
 
   public createRandomWorld() {
-    let newPoints:Point[] = [];
-    this.physicsData.types.forEach(type => {
-      newPoints.push(...create(300, type, 100));
+    let newPoints: Point[] = [];
+    this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
+      newPoints.push(...create(this.pointPerType[index], type, 100));
     })
-    this.points = newPoints;
-    this.scene.createScene(this.points);
-  }
-
-  public onDataChange() {
-    this.scene.createScene(this.points);
-  }
-
-  public onForcesChange() {
-    this.scene.updateForcesAndTypes();
+    this.dataStore.simulationData.points = newPoints;
+    this.scene.createScene(this.dataStore.simulationData.points);
   }
 }

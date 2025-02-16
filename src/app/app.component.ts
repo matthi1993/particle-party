@@ -1,11 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { PhysicsData } from './model/Simulation';
+import { PhysicsData, SimulationData } from './model/Simulation';
 import { SimulationComponent } from "./components/simulation/simulation.component";
 import { PhysicsComponent } from "./components/physics/physics.component";
 import { MoleculesComponent } from "./components/molecules/molecules.component";
 import { DataService } from './services/data.service';
 import { create, Point } from './model/Point';
+import { DataStore } from './store/data.store';
+import { BOSON, ELECTRON, NEUTRON, PROTON } from './model/DefaultSimulationData';
 
 
 export enum Page {
@@ -22,28 +24,53 @@ export enum Page {
 })
 export class AppComponent implements OnInit {
   title = 'Simulation';
-
-  public physicsData?: PhysicsData;
-  public points?: Point[];
   public dataLoaded = false;
 
   public page = Page.SIMULATION;
   pageEnum = Page;
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private dataStore: DataStore) {
   }
 
   ngOnInit(): void {
-    // Load initial Physics
-    this.dataService.listPhysicsModels().subscribe(physicsData => {
-      this.physicsData = physicsData[0];
 
-      this.points = [];
-      this.physicsData.types.forEach(type => {
-        this.points!.push(...create(300, type, 100));
+    this.dataStore.physicsDataOptions = [];
+    this.dataStore.simulationData = new SimulationData();
+    this.dataStore.simulationData.physicsData.addType(PROTON);
+    this.dataStore.simulationData.physicsData.addType(NEUTRON);
+    this.dataStore.simulationData.physicsData.addType(ELECTRON);
+    this.dataStore.simulationData.physicsData.addType(BOSON);
+
+    this.dataStore.simulationData.physicsData.forces = [
+      [-0.3, 0.8, 0, 0],
+      [-0.5, -0.2, -0.1, 0],
+      [-0.2, 0.1, -1, -0.3],
+      [-0.4, 0.2, -0.1, 1],
+    ]
+
+    let size = 400;
+    this.dataStore.simulationData.points = [];
+    this.dataStore.simulationData.points.push(...create(2000, PROTON, size));
+    this.dataStore.simulationData.points.push(...create(2000, NEUTRON, size));
+    this.dataStore.simulationData.points.push(...create(2000, ELECTRON, size));
+    //this.dataStore.simulationData.points.push(...create(0, BOSON, size));
+
+    this.dataLoaded = true;
+
+    /*this.dataService.listPhysicsModels().subscribe(physicsData => {
+      let points: Point[] = [];
+
+      this.dataStore.physicsDataOptions = physicsData;
+      this.dataStore.simulationData = new SimulationData();
+      this.dataStore.simulationData.physicsData = physicsData[0];
+      this.dataStore.simulationData.points = points;
+
+      this.dataService.listStructures().subscribe(structures => {
+        this.dataStore.structures = structures;
+
+        this.dataLoaded = true;
       })
-      this.dataLoaded = true;
-    })
+    })*/
   }
 
   switchPage(page: Page) {

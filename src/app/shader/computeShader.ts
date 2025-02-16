@@ -1,4 +1,4 @@
-export const WORKGROUP_SIZE = 64;
+export const WORKGROUP_SIZE = 32;
 
 export const computeShader = `
 
@@ -104,16 +104,15 @@ export const computeShader = `
                     // ##### attraction force #####
                     if (distance > 0.0 && distance <= myType.radius){
                         var attraction = myForces[i32(other.particleAttributes.x)] * attractionFactor;
-                        let forceMagnitude = attraction / (distance + 1e-6);
-                        
+                        let forceMagnitude = attraction * (otherType.mass) / (distance + 1e-6);
                         force += normalizeVector(direction) * forceMagnitude;
                     }
 
                     // ##### gravity force #####
                     let gravityMagnitude = G * otherType.mass / (distanceSquared + 1e-6);
                     force -= normalizeVector(direction) * gravityMagnitude;
+                    
                 }
-                
 
 
             }

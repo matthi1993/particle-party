@@ -1,7 +1,14 @@
 
 import { vec4 } from 'gl-matrix';
 
+export class Structure {
+    public id?: number;
+    public name: string = "";
+    public points: Point[] = []
+}
+
 export class ParticleType {
+    public id: number;
     public name;
     public color;
     public radius;
@@ -14,6 +21,7 @@ export class ParticleType {
         this.radius = radius;
         this.size = size;
         this.mass = mass;
+        this.id = id;
     }
 }
 

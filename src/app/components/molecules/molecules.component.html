@@ -1,22 +1,30 @@
 <div class="col-3 card">
-    <h1>Structures view</h1>
-    <p>What to do in the structre view?</p>
+    <h1>Structure</h1>
+    <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput [(ngModel)]="structure.name">
+    </mat-form-field>
+
+    <button class="secondary-button" (click)="reset()">reset</button>
+    <button class="primary-button" (click)="save()">save</button>
 </div>
 <div class="col-3 card" style="grid-row-start: 2;">
     <h1>AI creator</h1>
     <p>Create shapes using AI by entering a description of what you want and click on generate.</p>
     <textarea [(ngModel)]="aiInput" maxlength="500"
         placeholder="create with AI. Add description of what should be created"></textarea>
-        <button class="primary-button" (click)="createWithAi()">generate</button>
+    <button class="primary-button" (click)="createWithAi()">generate</button>
 </div>
-<div class="col-6 card" style="grid-row: span 8;">
-    <app-scene [physicsData]="physicsData" [points]="points" [camera]="camera"></app-scene>
+<div class="col-6" style="grid-row: span 2;">
+    <app-scene [physicsData]="dataStore.simulationData.physicsData" [points]="this.points"
+        [camera]="camera"></app-scene>
 </div>
-<div class="col-3" style="grid-row: span 8;">
-    @for (item of physicsData.types; track item) {
-    <div class="col-1 card">
-        <app-particle-type-card [selected]="item === selectedType" (click)="selectType(item)"
-            [particleType]="item"></app-particle-type-card>
-    </div>
+<div class="col-3" style="grid-row: span 2;">
+    @for (item of dataStore.simulationData.physicsData.types; track item) {
+    <app-particle-type-card class="col-3" [selected]="item === selectedType" (click)="selectType(item)"
+        [particleType]="item"></app-particle-type-card>
+    }
+    @for (item of dataStore.structures; track $index) {
+    <div class="card" (click)="selectStructure(item)">{{item.name}}</div>
     }
 </div>

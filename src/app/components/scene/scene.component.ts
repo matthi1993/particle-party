@@ -29,7 +29,7 @@ export class SceneComponent implements OnInit, OnDestroy {
   @Input() public camera: Camera = new Camera(
     this.canvasWidth,
     this.canvasHeight,
-    80
+    200
   );
   public gpuContext: GpuContext = new GpuContext();
   private simulationCompute?: Compute;
@@ -38,8 +38,8 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   public step = 0;
   public isPlaying = false;
-  private RENDER_UPDATE_INTERVAL = 50;
-  private SIMULATION_UPDATE_INTERVAL = 25;
+  private RENDER_UPDATE_INTERVAL = 30;
+  private SIMULATION_UPDATE_INTERVAL = 15;
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
 
@@ -167,7 +167,7 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   simulate() {
     const encoder = this.gpuContext.device.createCommandEncoder();
-    this.simulationCompute?.execute(encoder, this.step);
+    this.simulationCompute?.execute(encoder, this.step, this.points.length);
     this.step++;
     this.gpuContext.device.queue.submit([encoder.finish()]);
   }
