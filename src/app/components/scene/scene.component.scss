@@ -18,9 +18,7 @@ canvas {
 }
 
 .action-buttons {
-    position: relative;
-    display: block;
-    top: -4rem;
+    position: absolute;
     z-index: 10000;
     margin: 0.5rem;
 }
