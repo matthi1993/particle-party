@@ -64,17 +64,19 @@ export class SceneComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  public simulationLoop(shouldPlay: boolean) {
+  public async simulationLoop(shouldPlay: boolean) {
     this.isPlaying = shouldPlay;
 
     if (shouldPlay && !this.simulateIntervalId) {
       this.simulateIntervalId = setInterval(() => {
         this.simulate();
       }, this.SIMULATION_UPDATE_INTERVAL);
-    } else if (this.simulateIntervalId) {
-      clearInterval(this.simulateIntervalId);
+    } else {
+      if (this.simulateIntervalId) {
+        clearInterval(this.simulateIntervalId);
+      }
       this.simulateIntervalId = undefined;
-      this.updatePositionsFromCompute();
+      await this.updatePositionsFromCompute();
     }
   }
 

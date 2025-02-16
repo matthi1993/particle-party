@@ -23,7 +23,10 @@ export const computeShader = `
     }
 
     struct Uniforms {
-        selectionCoordinates: vec4f
+        selectionCoordinates: vec4f,
+        G: f32,
+        attractionFactor: f32,
+        _padding: vec2f
     }
 
     @group(0) @binding(0) var<storage> particles: array<Particle>;
@@ -32,7 +35,7 @@ export const computeShader = `
     @group(0) @binding(2) var<storage> particleTypes: array<ParticleType>;
     @group(0) @binding(3) var<storage> forces: array<Force>;
 
-    @group(0) @binding(4) var<storage> uniforms: Uniforms;
+    @group(0) @binding(4) var<uniform> uniforms: Uniforms;
 
     var<workgroup> sharedParticles: array<Particle, ${WORKGROUP_SIZE}>; // Shared memory for particles in workgroup
 
@@ -50,9 +53,6 @@ export const computeShader = `
         @builtin(local_invocation_id) local_id: vec3<u32>, 
         @builtin(workgroup_id) workgroup_id: vec3<u32>
     ) {
-        let G = f32(0.006674);
-        let attractionFactor = 0.05;
-
         let index = global_id.x;
 
         var me = particles[index];
@@ -119,13 +119,13 @@ export const computeShader = `
                     
                     // ##### attraction force #####
                     if (distance > 0.0 && distance <= myType.radius){
-                        var attraction = myForces[i32(other.particleAttributes.x)] * attractionFactor;
+                        var attraction = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
                         let forceMagnitude = attraction * (otherType.mass) / (distance + 1e-6);
                         force += normalizeVector(direction) * forceMagnitude;
                     }
 
                     // ##### gravity force #####
-                    let gravityMagnitude = G * otherType.mass / (distanceSquared + 1e-6);
+                    let gravityMagnitude = uniforms.G * otherType.mass / (distanceSquared + 1e-6);
                     force -= normalizeVector(direction) * gravityMagnitude;
                     
                 }

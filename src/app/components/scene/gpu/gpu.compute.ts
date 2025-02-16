@@ -23,7 +23,7 @@ export class Compute {
         }, {
             binding: 4,
             visibility: GPUShaderStage.COMPUTE,
-            buffer: { type: "read-only-storage" }
+            buffer: { type: "uniform" }
         }
         ]
     };
