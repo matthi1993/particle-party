@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 import { PhysicsData } from '../../model/Simulation';
-import { Square } from '../../utils';
-import { computeShader } from '../../shader/computeShader'
-import { Compute } from '../../gpu/gpu.compute'
-import { Render } from '../../gpu/gpu.render'
-import { GpuContext } from '../../gpu/gpu.context'
+import { computeShader } from './gpu/shader/computeShader'
+import { Compute } from './gpu/gpu.compute'
+import { Render } from './gpu/gpu.render'
+import { GpuContext } from './gpu/gpu.context'
 
 import { Camera } from '../../model/Camera';
 import { Point } from 'src/app/model/Point';
@@ -13,6 +12,8 @@ import { SceneStorage } from './scene.gpu.storage';
 import { vec4 } from 'gl-matrix';
 import { MatIconModule } from '@angular/material/icon';
 import { ndcToWorld, projectToScenePlane } from './scene.mousevent';
+import { Shape } from './gpu/shapes/shapes';
+import { OCTAGON } from './gpu/shapes/octagon';
 
 @Component({
   selector: 'app-scene',
@@ -190,7 +191,7 @@ export class SceneComponent implements OnInit, OnDestroy {
 
     this.simulationRenderer = new Render(
       this.gpuContext,
-      new Square(this.gpuContext.device),
+      new Shape(this.gpuContext.device, "Square Geometry", OCTAGON),
       this.points.length
     )
     this.simulationRenderer.updateBindGroups(this.gpuContext.device, this.sceneStorage.positionsStorage, this.sceneStorage.typesStorage, this.sceneStorage.forcesStorage, this.sceneStorage.viewProjectionBuffer)

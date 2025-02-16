@@ -1,6 +1,6 @@
 import { PhysicsData } from '../../model/Simulation';
 import { createArraysFromPoints, createForcesArray, createTypesArray } from '../../utils';
-import { GpuContext } from '../../gpu/gpu.context'
+import { GpuContext } from './gpu/gpu.context'
 
 import { Camera } from '../../model/Camera';
 import { Point } from 'src/app/model/Point';

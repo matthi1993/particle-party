@@ -1,80 +1,8 @@
 import { ParticleType, Point } from './model/Point'
 import { PhysicsData } from './model/Simulation';
 
-export function randomRounded(from: number, to: number):number {
+export function randomRounded(from: number, to: number): number {
     return Math.round((Math.random() * (to - from) + from) * 100) / 100;
-  }
-
-const SQUARE = new Float32Array([
-    -1, -1,
-    1, -1,
-    1, 1,
-    -1, -1,
-    1, 1,
-    -1, 1,
-]);
-
-const OCTAGON = new Float32Array([
-
-    0, 0,
-    -1, 0,
-    -0.75, 0.75,
-
-    0, 0,
-    -0.75, 0.75,
-    0, 1,
-
-    0, 0,
-    0, 1,
-    0.75, 0.75,
-
-    0, 0,
-    1, 0,
-    0.75, 0.75,
-
-    0, 0,
-    1, 0,
-    0.75, -0.75,
-
-    0, 0,
-    0.75, -0.75,
-    0, -1,
-
-    0, 0,
-    0, -1,
-    -0.75, -0.75,
-
-    0, 0,
-    -0.75, -0.75,
-    -1, 0
-]);
-
-export class Square {
-
-    public vertices: any;
-    public vertexBuffer: any;
-    public vertexBufferLayout;
-
-    constructor(device: any) {
-        this.vertices = OCTAGON;
-
-        this.vertexBuffer = device.createBuffer({
-            label: "Cell vertices",
-            size: this.vertices.byteLength,
-            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-        });
-
-        this.vertexBufferLayout = {
-            arrayStride: 8,
-            attributes: [{
-                format: "float32x2",
-                offset: 0,
-                shaderLocation: 0, // Position. Matches @location(0) in the @vertex shader.
-            }],
-        };
-
-        device.queue.writeBuffer(this.vertexBuffer, 0, this.vertices);
-    }
 }
 
 export function createArraysFromPoints(points: Point[], physicsData: PhysicsData) {

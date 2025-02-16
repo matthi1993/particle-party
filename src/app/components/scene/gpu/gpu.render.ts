@@ -1,11 +1,11 @@
 
 import { GpuContext } from './gpu.context';
-import { vertexShaderSource } from '../shader/vertexShader';
-import { fragmentShaderSource } from '../shader/fragmentShader';
-import { Square } from '../utils'
+import { vertexShaderSource } from './shader/vertexShader';
+import { fragmentShaderSource } from './shader/fragmentShader';
+import { Shape } from './shapes/shapes';
 
 export interface ShapeInstances {
-    shape: Square,
+    shape: Shape,
     instances: number
 }
 
@@ -33,12 +33,12 @@ export class Render {
     private bindGroups?: any;
     private bindGroupLayout?: any;
 
-    private shape: Square; // TODO think of refactoring this
+    private shape: Shape; // TODO think of refactoring this
     private instances: number;
 
     constructor(
         gpuContext: GpuContext,
-        shape: Square,
+        shape: Shape,
         instances: number
     ) {
         this.shape = shape;

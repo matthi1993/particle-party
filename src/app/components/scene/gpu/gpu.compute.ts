@@ -1,5 +1,4 @@
-
-import { WORKGROUP_SIZE } from '../shader/computeShader'
+import { WORKGROUP_SIZE } from './shader/computeShader'
 
 export class Compute {
 
