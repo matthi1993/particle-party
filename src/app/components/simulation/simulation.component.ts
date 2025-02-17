@@ -35,7 +35,7 @@ export class SimulationComponent implements OnInit {
   public createRandomWorld() {
     let newPoints: Point[] = [];
     this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-      newPoints.push(...create(this.pointPerType[index], type, 100));
+      newPoints.push(...create(this.pointPerType[index], type, 400));
     })
     this.dataStore.simulationData.points = newPoints;
     this.scene.createScene(this.dataStore.simulationData.points);

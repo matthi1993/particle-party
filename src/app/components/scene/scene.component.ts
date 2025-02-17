@@ -41,7 +41,7 @@ export class SceneComponent implements OnInit, OnDestroy {
   public step = 0;
   public isPlaying = false;
   private RENDER_UPDATE_INTERVAL = 30;
-  private SIMULATION_UPDATE_INTERVAL = 15;
+  private SIMULATION_UPDATE_INTERVAL = 10;
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
 
