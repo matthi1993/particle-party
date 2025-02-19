@@ -5,10 +5,12 @@ import { DataStore } from 'src/app/store/data.store';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
+import { ControlsComponent } from "../controls/controls.component";
+import { PhysicsComponent } from "../physics/physics.component";
 
 @Component({
   selector: 'app-simulation',
-  imports: [FormsModule, MatInputModule, MatFormFieldModule, SceneComponent],
+  imports: [FormsModule, MatInputModule, MatFormFieldModule, SceneComponent, ControlsComponent, PhysicsComponent],
   templateUrl: './simulation.component.html',
   styleUrls: ['./simulation.component.scss']
 })
@@ -17,7 +19,7 @@ export class SimulationComponent implements OnInit {
   public canvasWidth = 800;
   public canvasHeight = 500;
 
-  public pointPerType: number[] = [];
+  public pointNumber: number = 500;
 
   @ViewChild(SceneComponent) scene!: SceneComponent;
 
@@ -25,9 +27,6 @@ export class SimulationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-      this.pointPerType[index] = 500;
-    })
   }
 
   public createEmptyWorld() {
@@ -38,7 +37,7 @@ export class SimulationComponent implements OnInit {
   public createRandomWorld() {
     let newPoints: Point[] = [];
     this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-      newPoints.push(...create(this.pointPerType[index], type, 200));
+      newPoints.push(...create(this.pointNumber, type, 200));
     })
     this.dataStore.simulationData.points = newPoints;
     this.scene.createScene(this.dataStore.simulationData.points);

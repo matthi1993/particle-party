@@ -1,19 +1,17 @@
 <div class="col-3 card">
     <h1>World creator</h1>
     <p>create a new world</p>
-    @for (type of dataStore.simulationData.physicsData.types; track $index) {
     <mat-form-field>
-        <mat-label>{{type.name}}</mat-label>
-        <input matInput [(ngModel)]="pointPerType[$index]" />
+        <mat-label>Points per type:</mat-label>
+        <input matInput [(ngModel)]="pointNumber" />
     </mat-form-field>
-    }
     <button (click)="createRandomWorld()" class="primary-button">create random world</button>
     <button (click)="createEmptyWorld()" class="secondary-button">create empty world</button>
 </div>
 <div class="col-8" style="grid-row: span 3;">
     <app-scene [physicsData]="dataStore.simulationData.physicsData" [points]="dataStore.simulationData.points"></app-scene>
-
 </div>
 <div class="card">
-    Molecules
+    <app-controls [data]="dataStore.simulationData.physicsData"></app-controls>
 </div>
+<app-physics class="col-12 grid-12"></app-physics>
