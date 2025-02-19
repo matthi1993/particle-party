@@ -113,15 +113,22 @@ export const computeShader = `
 
                 // ##### inner atomar force #####
                 if (distance > 0.0 && distance <= myType.size) {
-                    let diff = myType.size - distance;
-                    force += normalizeVector(direction) * diff;
+                    let smoothness = 0.15; // highest energey at the center, smooth curve transition
+                    let diff = 1 / (pow(myType.size, smoothness)) * (pow(distance, smoothness)) -1;
+                    force -=  diff * normalizeVector(direction);
+                    
                 } else {
                     
                     // ##### attraction force #####
-                    if (distance > 0.0 && distance <= myType.radius){
-                        var attraction = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
-                        let forceMagnitude = attraction * (otherType.mass) / (distance + 1e-6);
-                        force += normalizeVector(direction) * forceMagnitude;
+                    if (distance <= myType.radius){
+                        let relativeDistance = distance - (myType.size);
+                        let relativeRadius = myType.radius - (myType.size);
+                        let halfRadius = relativeRadius / 2;
+
+                        var electricAttraction = 1 - (1 / pow(halfRadius, 2)) * pow(relativeDistance - halfRadius, 2); // smooth
+                        let forceMagnitude = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
+                    
+                        force -= electricAttraction * forceMagnitude * normalizeVector(direction);
                     }
 
                     // ##### gravity force #####
@@ -140,7 +147,7 @@ export const computeShader = `
 
 
 
-        let size = f32(1600);
+        let size = f32(200);
 
         // ##### Update the velocity and position of the particle #####
         me.velocity = (me.velocity + force) * 0.5;

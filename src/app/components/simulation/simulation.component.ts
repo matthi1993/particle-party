@@ -25,6 +25,9 @@ export class SimulationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
+      this.pointPerType[index] = 500;
+    })
   }
 
   public createEmptyWorld() {
@@ -35,7 +38,7 @@ export class SimulationComponent implements OnInit {
   public createRandomWorld() {
     let newPoints: Point[] = [];
     this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-      newPoints.push(...create(this.pointPerType[index], type, 400));
+      newPoints.push(...create(this.pointPerType[index], type, 200));
     })
     this.dataStore.simulationData.points = newPoints;
     this.scene.createScene(this.dataStore.simulationData.points);

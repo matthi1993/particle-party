@@ -42,18 +42,18 @@ export class AppComponent implements OnInit {
     this.dataStore.simulationData.physicsData.addType(BOSON);
 
     this.dataStore.simulationData.physicsData.forces = [
-      [-0.3, 0.8, 0, 0],
-      [-0.5, -0.2, -0.1, 0],
-      [-0.2, 0.1, -1, -0.3],
-      [-0.4, 0.2, -0.1, 1],
+      [0.2, 0.1, 0.0, 0.0],
+      [-0.2, 0.2, 0.1, 0.0],
+      [0.0, 0.0, 0.2, 0.1],
+      [0.1, 0.0, 0.0, -0.2],
     ]
 
-    let size = 300;
+    let size = 200;
     this.dataStore.simulationData.points = [];
     this.dataStore.simulationData.points.push(...create(1000, PROTON, size));
     this.dataStore.simulationData.points.push(...create(1000, NEUTRON, size));
     this.dataStore.simulationData.points.push(...create(1000, ELECTRON, size));
-    //this.dataStore.simulationData.points.push(...create(0, BOSON, size));
+    this.dataStore.simulationData.points.push(...create(1000, BOSON, size));
 
     this.dataLoaded = true;
 

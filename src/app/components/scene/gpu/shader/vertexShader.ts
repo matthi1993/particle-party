@@ -40,7 +40,7 @@ export const vertexShaderSource = `
         var output: VertexOutput;
 
         let modelViewProjection = uniforms.viewProjectionMatrix;
-        output.position = modelViewProjection * dataIn[instance].position + vec4f(position * myType.size, 0, 0) ;
+        output.position = modelViewProjection * dataIn[instance].position + vec4f(position * myType.size * 1.5, 0, 0) ;
         output.color = myType.color;
         output.uv = position * 0.5 + 0.5;
         output.selected = dataIn[instance].particleAttributes.y;
