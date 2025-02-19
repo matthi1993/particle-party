@@ -31,7 +31,7 @@ export class ControlsComponent implements OnInit {
     this.data.types.forEach((type, rowIndex) => {
       type.radius = randomRounded(0, 20);
       type.mass = randomRounded(0, 0.25);
-      type.size = randomRounded(0.25, 3)
+      type.size = randomRounded(0.25, 2)
 
       this.data.types.forEach((col, colIndex) => {
         this.data.forces[rowIndex][colIndex] = randomRounded(-0.4, 0.4);
