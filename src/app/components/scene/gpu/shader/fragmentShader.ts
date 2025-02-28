@@ -19,8 +19,8 @@ export const fragmentShaderSource = `
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
 
         let center = vec2<f32>(0.5, 0.5);
-        let size = 0.04;
-        let softness = 0.001;
+        let size = 0.5;
+        let softness = 0.0;
 
         let dist = distance(input.uv, center);
 
@@ -33,12 +33,11 @@ export const fragmentShaderSource = `
             }
         }
         if(dist < size) {
-            var alpha = smoothstep(size - softness, size, dist);
-            return vec4f(input.color.xyz, 1.0 - alpha);
+            return vec4f(input.color.xyz, 1);
         }
+            
 
         // Glow
-        var alpha = smoothstep(0, 1, dist);
-        return vec4f(input.color.xyz * 10, 0.03 - alpha);
+        return vec4f(0, 0.0, 0.0, 0);
     }
 `;

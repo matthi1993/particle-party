@@ -80,8 +80,8 @@ export class Render {
                                 operation: "add", // Add blended colors
                             },
                             alpha: {
-                                srcFactor: "one", // Keep the alpha channel as is
-                                dstFactor: "zero", // Ignore destination alpha
+                                srcFactor: "one",
+                                dstFactor: "one-minus-src-alpha",
                                 operation: "add",
                             },
                         },
@@ -136,7 +136,7 @@ export class Render {
             colorAttachments: [{
                 view: view,
                 loadOp: "clear",
-                clearValue: { r: 0.141, g: 0.157, b: 0.184, a: 1.0 },
+                clearValue: { r: 0.141, g: 0.157, b: 0.184, a: 0.0 },
                 storeOp: "store",
             }]
         });

@@ -17,13 +17,13 @@
     <button (click)="removeSelectedType()" [disabled]="dataStore.simulationData.physicsData.types.length <= 1"
         class="secondary-button">delete selected type</button>
 </div>
-<div class="col-6">
+<div class="col-2">
     @for (item of dataStore.simulationData.physicsData.types; track item) {
     <app-particle-type-card [selected]="item === selectedType" (click)="selectType(item)"
         [particleType]="item"></app-particle-type-card>
     }
 </div>
-<div class="col-6">
+<div class="col-2">
     @if(this.selectedType) {
     <app-particle-type [particleType]="selectedType" [physicsData]="dataStore.simulationData.physicsData"></app-particle-type>
     }

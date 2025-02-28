@@ -16,8 +16,8 @@ import { PhysicsComponent } from "../physics/physics.component";
 })
 export class SimulationComponent implements OnInit {
 
-  public canvasWidth = 800;
-  public canvasHeight = 500;
+  public canvasWidth = 1500;
+  public canvasHeight = 1500;
 
   public pointNumber: number = 500;
 
@@ -37,7 +37,7 @@ export class SimulationComponent implements OnInit {
   public createRandomWorld() {
     let newPoints: Point[] = [];
     this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-      newPoints.push(...create(this.pointNumber, type, 200));
+      newPoints.push(...create(this.pointNumber, type, 300));
     })
     this.dataStore.simulationData.points = newPoints;
     this.scene.createScene(this.dataStore.simulationData.points);
