@@ -21,7 +21,8 @@ export const vertexShaderSource = `
     }
 
     struct Uniforms {
-        viewProjectionMatrix: mat4x4<f32>
+        viewProjectionMatrix: mat4x4<f32>,
+        selectionCoordinates: vec4f
     }
 
 
@@ -43,7 +44,20 @@ export const vertexShaderSource = `
         output.position = modelViewProjection * dataIn[instance].position + vec4f(position * myType.size * 1, 0, 0) ;
         output.color = myType.color;
         output.uv = position * 0.5 + 0.5;
-        output.selected = dataIn[instance].particleAttributes.y;
+
+
+        // Check what circles are in selection
+        let clickDist = length(uniforms.selectionCoordinates - dataIn[instance].position);
+        var selected = f32(0);
+        if (clickDist < 5) {
+            selected = 1;
+        } else {
+            selected = 0;
+        }
+
+        if(clickDist < 1.1) {
+            output.selected = 1;
+        }
 
         return output;
     }

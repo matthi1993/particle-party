@@ -9,7 +9,7 @@ import { GpuContext } from './gpu/gpu.context'
 import { Camera } from '../../model/Camera';
 import { Point } from 'src/app/model/Point';
 import { SceneStorage } from './scene.gpu.storage';
-import { vec4 } from 'gl-matrix';
+import { vec3, vec4 } from 'gl-matrix';
 import { MatIconModule } from '@angular/material/icon';
 import { getMouseNDC, ndcToWorld, projectToScenePlane } from './scene.mousevent';
 import { Shape } from './gpu/shapes/shapes';
@@ -43,6 +43,8 @@ export class SceneComponent implements OnInit, OnDestroy {
   private SIMULATION_UPDATE_INTERVAL = 20;
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
+
+  private scenePoint = vec3.fromValues(0,0,0);
 
   constructor() {
     this.gpuContext.setup().then(() => {
@@ -149,11 +151,11 @@ export class SceneComponent implements OnInit, OnDestroy {
       //TODO move somewhere else???
       const ndc = getMouseNDC(event, element);
       const worldPoint = ndcToWorld(ndc, this.camera);
-      const scenePoint = projectToScenePlane(worldPoint, this.camera);
+      this.scenePoint = projectToScenePlane(worldPoint, this.camera);
 
-      this.sceneStorage.updateComputeUniformsBuffer(
+      this.sceneStorage.updateComputeUniformsBuffer( //TODO remove???
         this.gpuContext,
-        vec4.fromValues(scenePoint[0], scenePoint[1], scenePoint[2], 1)
+        vec4.fromValues(this.scenePoint[0], this.scenePoint[1], this.scenePoint[2], 1)
       )
 
       if (isMouseDown) {
@@ -229,7 +231,7 @@ export class SceneComponent implements OnInit, OnDestroy {
 
   render() {
 
-    this.sceneStorage.updateUniformsBuffer(this.gpuContext, this.camera);
+    this.sceneStorage.updateUniformsBuffer(this.gpuContext, this.camera, this.scenePoint[0], this.scenePoint[1]);
     this.camera.updateCamera();
 
     const encoder = this.gpuContext.device.createCommandEncoder();

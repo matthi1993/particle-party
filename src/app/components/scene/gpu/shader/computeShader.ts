@@ -59,17 +59,6 @@ export const computeShader = `
         let myType = particleTypes[i32(me.particleAttributes.x)];
         let numParticles = arrayLength(&particles);
 
-        // Check what circles are in selection
-        let clickDist = length(uniforms.selectionCoordinates - me.position);
-        var selected = f32(0);
-        if (clickDist < 5) {
-            selected = 1;
-        } else {
-            selected = 0;
-        }
-        me.particleAttributes.y = selected;
-
-
         var myForces: array<f32, 16>; // TODO 16 is the max number of types currently
         
         

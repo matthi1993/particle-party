@@ -54,18 +54,23 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
   }
 
-  public updateUniformsBuffer(gpuContext: GpuContext, camera: Camera) {
+  public updateUniformsBuffer(gpuContext: GpuContext, camera: Camera, mouseX: number, mouseY: number) {
     let uniforms = new Float32Array([
-      ...camera.getViewProjectionMatrix()
+      ...camera.getViewProjectionMatrix(),
+      mouseX, 
+      mouseY,
+      0,
+      0
     ])
+    console.log(mouseX);
     gpuContext.device.queue.writeBuffer(this.vertexUniformsBuffer, 0, uniforms);
   }
 
   public updateComputeUniformsBuffer(gpuContext: GpuContext, selectionCoord: vec4) {
     let uniforms = new Float32Array([
       ...selectionCoord,
-      0.006674,
-      0.05
+      0.006674, // TODO refactor this somewhere else
+      0.05 // TODO refactor this somewhere else
     ])
     gpuContext.device.queue.writeBuffer(this.computeUniformsBuffer, 0, uniforms);
   }
