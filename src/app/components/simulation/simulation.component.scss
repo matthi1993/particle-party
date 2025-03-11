@@ -3,3 +3,19 @@ app-scene {
     overflow: hidden;
     display: block;
 }
+
+.side-card {
+    position: absolute;
+    bottom: 0;
+    width: 300px;
+    max-height: 80%;
+    overflow: scroll;
+}
+.side-card-right {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    max-height: 80%;
+    overflow: scroll;
+}

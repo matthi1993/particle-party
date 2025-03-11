@@ -11,7 +11,7 @@ $success: #7FD650;
 $error: #ed5a81;
 
 $box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
-$card-color: rgba($color: #384044, $alpha: 0.2);
+$card-color: rgba($color: #384044, $alpha: 0.75);
 $card-hover-color: rgba($color: #7895a3, $alpha: 0.4);
 $card-selected-color: rgba($color: #26611c, $alpha: 0.7);
 
@@ -106,6 +106,5 @@ button {
 // CARDS
 .card {
   background: $card-color;
-  padding: 2rem;
-  box-shadow: $box-shadow;
+  padding: 1.5rem;
 }

@@ -13,7 +13,6 @@ import { vec4 } from 'gl-matrix';
 import { MatIconModule } from '@angular/material/icon';
 import { getMouseNDC, ndcToWorld, projectToScenePlane } from './scene.mousevent';
 import { Shape } from './gpu/shapes/shapes';
-import { OCTAGON } from './gpu/shapes/octagon';
 import { SQUARE } from './gpu/shapes/square';
 
 @Component({
@@ -50,6 +49,9 @@ export class SceneComponent implements OnInit, OnDestroy {
 
       this.gpuContext.canvas!.width = this.canvasWidth;
       this.gpuContext.canvas!.height = this.canvasHeight;
+
+      console.log(this.gpuContext.canvas!.width);
+      console.log(this.gpuContext.canvas!.height);
 
       this.sceneStorage.createComputeUniformBuffer(this.gpuContext)
       this.sceneStorage.createUniformBuffer(this.gpuContext, this.camera);

@@ -1,4 +1,7 @@
-<div class="col-3 card">
+
+
+
+<div class="side-card card">
     <h1>World creator</h1>
     <p>create a new world</p>
     <mat-form-field>
@@ -10,9 +13,7 @@
 
     <app-controls [data]="dataStore.simulationData.physicsData"></app-controls>
 </div>
-<div class="col-8" style="grid-row: span 7;">
-    <app-scene [physicsData]="dataStore.simulationData.physicsData" [points]="dataStore.simulationData.points"></app-scene>
-</div>
-<div class="card">
-    <app-physics></app-physics>
-</div>
+<app-physics class="side-card-right card"></app-physics>
+
+<app-scene [canvasHeight]="canvasHeight" [canvasWidth]="canvasWidth" [physicsData]="dataStore.simulationData.physicsData" [points]="dataStore.simulationData.points"></app-scene>
+    

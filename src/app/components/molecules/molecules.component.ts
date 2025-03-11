@@ -39,12 +39,19 @@ export class MoleculesComponent implements OnInit {
     this.selectType(this.dataStore.simulationData.physicsData.types[0]);
     let element = document.querySelector("canvas")!!;
 
+    let mousePos = [0,0];
     element.addEventListener('mousedown', (event) => {
+      mousePos = [event.clientX, event.clientY];
+    });
+
+    element.addEventListener('mouseup', (event) => {
       event.preventDefault();
       if (this.editingPointStructure) {
-        const ndc = getMouseNDC(event, element);
-        this.scene.addPointsToScene(ndc.x, ndc.y, this.editingPointStructure);
-        this.scene.createScene(this.scene.points);
+        if(mousePos[0] == event.clientX && mousePos[1] == event.clientY) {
+          const ndc = getMouseNDC(event, element);
+          this.scene.addPointsToScene(ndc.x, ndc.y, this.editingPointStructure);
+          this.scene.createScene(this.scene.points);
+        }
       }
     });
   }

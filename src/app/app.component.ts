@@ -56,21 +56,6 @@ export class AppComponent implements OnInit {
     this.dataStore.simulationData.points.push(...create(1000, BOSON, size));
 
     this.dataLoaded = true;
-
-    /*this.dataService.listPhysicsModels().subscribe(physicsData => {
-      let points: Point[] = [];
-
-      this.dataStore.physicsDataOptions = physicsData;
-      this.dataStore.simulationData = new SimulationData();
-      this.dataStore.simulationData.physicsData = physicsData[0];
-      this.dataStore.simulationData.points = points;
-
-      this.dataService.listStructures().subscribe(structures => {
-        this.dataStore.structures = structures;
-
-        this.dataLoaded = true;
-      })
-    })*/
   }
 
   switchPage(page: Page) {
