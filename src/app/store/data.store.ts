@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { PhysicsData, SimulationData } from "../model/Simulation";
-import { Structure } from "../model/Point";
+import { PhysicsData, SimulationData } from "../components/scene/model/Simulation";
+import { Structure } from "../components/scene/model/Point";
 
 @Injectable({ providedIn: 'root' })
 export class DataStore {

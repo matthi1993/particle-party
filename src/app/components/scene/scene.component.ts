@@ -1,13 +1,13 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
-import { PhysicsData } from '../../model/Simulation';
+import { PhysicsData } from './model/Simulation';
 import { computeShader } from './gpu/shader/computeShader'
 import { Compute } from './gpu/gpu.compute'
 import { Render } from './gpu/gpu.render'
 import { GpuContext } from './gpu/gpu.context'
 
-import { Camera } from '../../model/Camera';
-import { Point } from 'src/app/model/Point';
+import { Camera } from './model/Camera';
+import { Point } from 'src/app/components/scene/model/Point';
 import { SceneStorage } from './scene.gpu.storage';
 import { vec3, vec4 } from 'gl-matrix';
 import { MatIconModule } from '@angular/material/icon';

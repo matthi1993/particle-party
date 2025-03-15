@@ -1,5 +1,5 @@
 import { mat4, vec3 } from 'gl-matrix';  // If you're using the gl-matrix library
-import { Camera } from 'src/app/model/Camera';
+import { Camera } from 'src/app/components/scene/model/Camera';
 
 interface MouseEvent {
     clientX: number;

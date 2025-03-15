@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { SceneComponent } from "../scene/scene.component";
-import { ParticleType, Point, Structure, create } from 'src/app/model/Point';
-import { Camera } from 'src/app/model/Camera';
+import { ParticleType, Point, Structure, create } from 'src/app/components/scene/model/Point';
+import { Camera } from 'src/app/components/scene/model/Camera';
 import { vec4 } from 'gl-matrix';
 import { FormsModule } from '@angular/forms';
 import { DataService } from 'src/app/services/data.service';

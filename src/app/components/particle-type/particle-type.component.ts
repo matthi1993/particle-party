@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { ParticleType } from 'src/app/model/Point';
+import { ParticleType } from 'src/app/components/scene/model/Point';
 import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
-import { PhysicsData } from 'src/app/model/Simulation';
+import { PhysicsData } from 'src/app/components/scene/model/Simulation';
 import { MatIcon } from '@angular/material/icon';
 
 interface Position {

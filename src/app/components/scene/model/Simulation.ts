@@ -1,5 +1,5 @@
 
-import { ParticleType, Point } from 'src/app/model/Point';
+import { ParticleType, Point } from 'src/app/components/scene/model/Point';
 
 export class ParticleTypeWithForces {
   public type!: ParticleType;

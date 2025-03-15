@@ -1,5 +1,5 @@
 import { vec4 } from "gl-matrix";
-import { ParticleType } from "./Point";
+import { ParticleType } from "../components/scene/model/Point";
 
 export const PROTON = new ParticleType("Proton", 1, vec4.fromValues(1, 0.75, 0.75, 1), 10, 1.25, 5);
 export const NEUTRON = new ParticleType("Neutron", 2, vec4.fromValues(0, 1, 1, 0.5), 10, 1, 0);

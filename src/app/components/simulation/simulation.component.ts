@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SceneComponent } from '../scene/scene.component';
-import { Point, create } from 'src/app/model/Point';
+import { Point, create } from 'src/app/components/scene/model/Point';
 import { DataStore } from 'src/app/store/data.store';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';

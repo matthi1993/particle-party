@@ -1,5 +1,5 @@
-import { ParticleType, Point } from '../../../model/Point'
-import { PhysicsData } from '../../../model/Simulation';
+import { ParticleType, Point } from '../model/Point'
+import { PhysicsData } from '../model/Simulation';
 
 export function createArraysFromPoints(points: Point[], physicsData: PhysicsData) {
     let dimensions = 12;

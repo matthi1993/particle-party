@@ -1,9 +1,9 @@
-import { PhysicsData } from '../../model/Simulation';
+import { PhysicsData } from './model/Simulation';
 import { createArraysFromPoints, createForcesArray, createTypesArray } from './gpu/scene-utils';
 import { GpuContext } from './gpu/gpu.context'
 
-import { Camera } from '../../model/Camera';
-import { Point } from 'src/app/model/Point';
+import { Camera } from './model/Camera';
+import { Point } from 'src/app/components/scene/model/Point';
 import { vec4 } from 'gl-matrix';
 
 export class SceneStorage {

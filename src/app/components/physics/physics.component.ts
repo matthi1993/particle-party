@@ -1,9 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ControlsComponent } from "../controls/controls.component";
-import { PhysicsData, SimulationData } from 'src/app/model/Simulation';
 import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-card.component";
 import { ParticleTypeComponent } from "../particle-type/particle-type.component";
-import { ParticleType } from 'src/app/model/Point';
+import { ParticleType } from 'src/app/components/scene/model/Point';
 import { vec4 } from 'gl-matrix';
 import { DataService } from 'src/app/services/data.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
