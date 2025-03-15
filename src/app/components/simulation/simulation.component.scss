@@ -1,7 +1,7 @@
-app-scene {
-    max-height: calc(100vh - 5rem);
-    overflow: hidden;
+:host {
     display: block;
+    max-height: calc(100vh - 3.5rem);
+    overflow: hidden;
 }
 
 .side-card {

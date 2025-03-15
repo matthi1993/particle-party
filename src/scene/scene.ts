@@ -11,7 +11,7 @@ import { Shape } from "./gpu/shapes/shapes";
 import { SQUARE } from "./gpu/shapes/square";
 import { ndcToWorld, projectToScenePlane, getMouseNDC } from "./scene.mousevent";
 
-export class Scene {
+export class ParticleSimulation {
   public isPlaying = false; // TODO getter
 
   private physicsData!: PhysicsData;
@@ -59,7 +59,7 @@ export class Scene {
 
   public setScene(physicsData: PhysicsData, points: Point[]) {
     this.step = 0;
-    
+
     this.physicsData = physicsData;
     this.points = points;
 

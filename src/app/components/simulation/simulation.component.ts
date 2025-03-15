@@ -5,7 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { PhysicsComponent } from "../physics/physics.component";
-import { Scene } from 'src/scene/scene';
+import { ParticleSimulation } from 'src/scene/scene';
 import { randomRounded } from '../utils/utils';
 import { vec4 } from 'gl-matrix';
 
@@ -17,7 +17,7 @@ import { vec4 } from 'gl-matrix';
 })
 export class SimulationComponent implements OnInit {
 
-  public scene: Scene = new Scene();
+  public scene: ParticleSimulation = new ParticleSimulation();
   public pointNumber: number = 500;
 
   constructor(public dataStore: DataStore) {
