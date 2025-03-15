@@ -1,12 +1,12 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { SceneComponent } from "../scene/scene.component";
-import { ParticleType, Point, Structure, create } from 'src/app/components/scene/model/Point';
-import { Camera } from 'src/app/components/scene/model/Camera';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { SceneComponent } from "../../../scene/scene.component";
+import { ParticleType, Point, Structure } from 'src/scene/model/Point';
+import { Camera } from 'src/scene/model/Camera';
 import { vec4 } from 'gl-matrix';
 import { FormsModule } from '@angular/forms';
 import { DataService } from 'src/app/services/data.service';
 import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-card.component";
-import { getMouseNDC } from '../scene/scene.mousevent';
+import { getMouseNDC } from '../../../scene/scene.mousevent';
 import { DataStore } from 'src/app/store/data.store';
 import { MatFormField } from '@angular/material/form-field';
 import { MatLabel } from '@angular/material/form-field';

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PhysicsData, SimulationData } from './components/scene/model/Simulation';
+import { SimulationData } from '../scene/model/Simulation';
 import { SimulationComponent } from "./components/simulation/simulation.component";
 import { PhysicsComponent } from "./components/physics/physics.component";
 import { MoleculesComponent } from "./components/molecules/molecules.component";
 import { DataService } from './services/data.service';
-import { create, Point } from './components/scene/model/Point';
+import { create } from '../scene/model/Point';
 import { DataStore } from './store/data.store';
 import { BOSON, ELECTRON, NEUTRON, PROTON } from './model/DefaultSimulationData';
 

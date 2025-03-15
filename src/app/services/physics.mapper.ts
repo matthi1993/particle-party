@@ -1,6 +1,6 @@
 import { vec4 } from "gl-matrix";
-import { ParticleType } from "../components/scene/model/Point";
-import { PhysicsData } from "../components/scene/model/Simulation";
+import { ParticleType } from "../../scene/model/Point";
+import { PhysicsData } from "../../scene/model/Simulation";
 
 
 export interface PhysicsResponse {

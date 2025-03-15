@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, output } from '@angular/core';
-import { ParticleType } from 'src/app/components/scene/model/Point';
+import { ParticleType } from 'src/scene/model/Point';
 @Component({
   selector: 'app-particle-type-card',
   imports: [],

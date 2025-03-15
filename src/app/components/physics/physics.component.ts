@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ControlsComponent } from "../controls/controls.component";
 import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-card.component";
 import { ParticleTypeComponent } from "../particle-type/particle-type.component";
-import { ParticleType } from 'src/app/components/scene/model/Point';
+import { ParticleType } from 'src/scene/model/Point';
 import { vec4 } from 'gl-matrix';
 import { DataService } from 'src/app/services/data.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,7 +15,7 @@ import { DataStore } from 'src/app/store/data.store';
 
 @Component({
   selector: 'app-physics',
-  imports: [MatSelectModule, MatFormFieldModule, ControlsComponent, ParticleTypeCardComponent, ParticleTypeComponent],
+  imports: [MatSelectModule, MatFormFieldModule, ParticleTypeCardComponent, ParticleTypeComponent],
   templateUrl: './physics.component.html',
   styleUrl: './physics.component.scss'
 })

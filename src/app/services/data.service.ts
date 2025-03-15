@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Point, Structure } from '../components/scene/model/Point';
-import { PhysicsData } from '../components/scene/model/Simulation';
+import { Point, Structure } from '../../scene/model/Point';
+import { PhysicsData } from '../../scene/model/Simulation';
 import { DataStore } from '../store/data.store';
 
 

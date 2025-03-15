@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
-import { PhysicsData } from 'src/app/components/scene/model/Simulation';
+import { PhysicsData } from 'src/scene/model/Simulation';
 import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material/slider';
 import { randomRounded } from './utils';
