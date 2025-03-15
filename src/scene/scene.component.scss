@@ -1,0 +1,24 @@
+canvas {
+    width: 100%;
+    height: auto;
+    width: 100%;
+    height: auto;
+}
+
+.play-button, .pause-button {
+    padding: 0;
+    color: white;
+    background: none;
+    
+    .mat-icon {
+        width: 3rem;
+        height: 3rem;
+        font-size: 3rem;
+    }
+}
+
+.action-buttons {
+    position: absolute;
+    z-index: 10000;
+    margin: 0.5rem;
+}
