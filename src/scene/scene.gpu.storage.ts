@@ -62,7 +62,6 @@ export class SceneStorage {
       0,
       0
     ])
-    console.log(mouseX);
     gpuContext.device.queue.writeBuffer(this.vertexUniformsBuffer, 0, uniforms);
   }
 
@@ -91,10 +90,10 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.typesStorage, 0, typesArray);
   }
 
-  public createReadStorage(gpuContext: GpuContext, points: Point[]) {
-    const length = points.length * 4;
-    this.selectionOutBuffer = gpuContext.createStorageBuffer("Selection Out", length);
-    gpuContext.device.queue.writeBuffer(this.selectionOutBuffer, 0, new Uint32Array(length));
+  public createReadStorage(gpuContext: GpuContext, points: Point[], physicsData: PhysicsData) {
+    let positionArray = createArraysFromPoints(points, physicsData);
+    this.selectionOutBuffer = gpuContext.createStorageBuffer("Selection Out", positionArray.byteLength);
+    gpuContext.device.queue.writeBuffer(this.selectionOutBuffer, 0, positionArray);
   }
 
   public createPointStorage(gpuContext: GpuContext, points: Point[], physicsData: PhysicsData) {

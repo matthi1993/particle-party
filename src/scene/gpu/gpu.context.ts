@@ -1,11 +1,13 @@
 export class GpuContext {
-  public canvas?: HTMLCanvasElement;
+  public canvas!: HTMLCanvasElement;
   public context?: any;
   public canvasFormat?: any;
   public device?: any;
 
-  constructor() {
-    this.setup();
+  constructor(canvas: HTMLCanvasElement, width: number, height: number) {
+    this.canvas = canvas;
+    this.canvas.width = width;
+    this.canvas.height = height;
   }
 
   public async setup() {
@@ -18,13 +20,12 @@ export class GpuContext {
       throw new Error("No appropriate GPUAdapter found.");
     }
 
-    this.canvas = document.querySelector("canvas")!!;
     this.device = await adapter.requestDevice();
     this.context = this.canvas.getContext("webgpu");
     this.canvasFormat = navigator.gpu.getPreferredCanvasFormat();
     this.context!!.configure({
       device: this.device,
-      format: this.canvasFormat, // Match the render pipeline and pass
+      format: this.canvasFormat,
       alphaMode: "premultiplied",
     });
   }
@@ -41,7 +42,7 @@ export class GpuContext {
     return this.device.createBuffer({
       label: label,
       size: byteLength,
-      usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST // ✅ Readable on CPU
+      usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST
     });
   }
 }

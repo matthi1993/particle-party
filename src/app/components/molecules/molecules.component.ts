@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SceneComponent } from "../scene/scene.component";
 import { ParticleType, Point, Structure } from 'src/scene/model/Point';
 import { Camera } from 'src/scene/model/Camera';
 import { vec4 } from 'gl-matrix';
@@ -14,13 +13,11 @@ import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'app-molecules',
-  imports: [MatInput, MatFormField, MatLabel, FormsModule, SceneComponent, ParticleTypeCardComponent],
+  imports: [MatInput, MatFormField, MatLabel, FormsModule, ParticleTypeCardComponent],
   templateUrl: './molecules.component.html',
   styleUrl: './molecules.component.scss'
 })
 export class MoleculesComponent implements OnInit {
-
-  @ViewChild(SceneComponent) scene!: SceneComponent;
 
   public structure: Structure = new Structure();
 
@@ -49,27 +46,27 @@ export class MoleculesComponent implements OnInit {
       if (this.editingPointStructure) {
         if(mousePos[0] == event.clientX && mousePos[1] == event.clientY) {
           const ndc = getMouseNDC(event, element);
-          this.scene.addPointsToScene(ndc.x, ndc.y, this.editingPointStructure);
-          this.scene.createScene(this.scene.points);
+          //this.scene.addPointsToScene(ndc.x, ndc.y, this.editingPointStructure);
+          //this.scene.createScene(this.scene.points);
         }
       }
     });
   }
 
   save() {
-    this.structure.points = this.scene.points;
+    /*this.structure.points = this.scene.points;
     this.dataService.saveStructure(this.structure).subscribe(structure => {
       this.structure = structure;
       this.dataStore.structures.push(structure);
-    });;
+    });;*/
   }
   reset() {
-    this.structure = new Structure();
-    this.scene.createScene([]);
+    /*this.structure = new Structure();
+    this.scene.createScene([]);*/
   }
 
   selectStructure(structure: Structure) {
-    this.structure.points = [];
+    /*this.structure.points = [];
     structure.points.forEach(point => {
       this.structure.points.push(
         new Point(
@@ -77,7 +74,7 @@ export class MoleculesComponent implements OnInit {
           point.particleType
         ));
     });
-    this.scene.createScene(this.structure.points);
+    this.scene.createScene(this.structure.points);*/
   }
 
   selectType(type: ParticleType) {
@@ -88,10 +85,10 @@ export class MoleculesComponent implements OnInit {
   }
 
   async createWithAi() {
-    this.dataService.getAiResponse(this.aiInput).subscribe(generatedPoints => {
+    /*this.dataService.getAiResponse(this.aiInput).subscribe(generatedPoints => {
       this.editingPointStructure = generatedPoints;
       this.scene.addPointsToScene(0, 0, generatedPoints);
-    });
+    });*/
   }
 
 }
