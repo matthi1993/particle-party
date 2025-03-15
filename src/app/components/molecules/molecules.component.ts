@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SceneComponent } from "../../../scene/scene.component";
+import { SceneComponent } from "../scene/scene.component";
 import { ParticleType, Point, Structure } from 'src/scene/model/Point';
 import { Camera } from 'src/scene/model/Camera';
 import { vec4 } from 'gl-matrix';

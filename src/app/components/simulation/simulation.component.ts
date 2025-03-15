@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SceneComponent } from '../../../scene/scene.component';
+import { SceneComponent } from '../scene/scene.component';
 import { Point, create } from 'src/scene/model/Point';
 import { DataStore } from 'src/app/store/data.store';
 import { MatInputModule } from '@angular/material/input';

@@ -1,19 +1,19 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
-import { PhysicsData } from './model/Simulation';
-import { computeShader } from './gpu/shader/computeShader'
-import { Compute } from './gpu/gpu.compute'
-import { Render } from './gpu/gpu.render'
-import { GpuContext } from './gpu/gpu.context'
+import { PhysicsData } from '../../../scene/model/Simulation';
+import { computeShader } from '../../../scene/gpu/shader/computeShader'
+import { Compute } from '../../../scene/gpu/gpu.compute'
+import { Render } from '../../../scene/gpu/gpu.render'
+import { GpuContext } from '../../../scene/gpu/gpu.context'
 
-import { Camera } from './model/Camera';
+import { Camera } from '../../../scene/model/Camera';
 import { Point } from 'src/scene/model/Point';
-import { SceneStorage } from './scene.gpu.storage';
+import { SceneStorage } from '../../../scene/scene.gpu.storage';
 import { vec3, vec4 } from 'gl-matrix';
 import { MatIconModule } from '@angular/material/icon';
-import { getMouseNDC, ndcToWorld, projectToScenePlane } from './scene.mousevent';
-import { Shape } from './gpu/shapes/shapes';
-import { SQUARE } from './gpu/shapes/square';
+import { getMouseNDC, ndcToWorld, projectToScenePlane } from '../../../scene/scene.mousevent';
+import { Shape } from '../../../scene/gpu/shapes/shapes';
+import { SQUARE } from '../../../scene/gpu/shapes/square';
 
 @Component({
   selector: 'app-scene',
@@ -21,7 +21,7 @@ import { SQUARE } from './gpu/shapes/square';
   templateUrl: './scene.component.html',
   styleUrls: ['./scene.component.scss'],
 })
-export class SceneComponent implements OnInit, OnDestroy {
+export class SceneComponent implements OnDestroy {
 
   @Input() public physicsData!: PhysicsData;
   @Input() public points!: Point[];
@@ -52,9 +52,6 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.gpuContext.canvas!.width = this.canvasWidth;
       this.gpuContext.canvas!.height = this.canvasHeight;
 
-      console.log(this.gpuContext.canvas!.width);
-      console.log(this.gpuContext.canvas!.height);
-
       this.sceneStorage.createComputeUniformBuffer(this.gpuContext)
       this.sceneStorage.createUniformBuffer(this.gpuContext, this.camera);
       this.addCameraListeners(this.gpuContext.canvas!!);
@@ -63,9 +60,6 @@ export class SceneComponent implements OnInit, OnDestroy {
       this.startRenderLoop();
       this.simulationLoop(true);
     });
-  }
-
-  ngOnInit(): void {
   }
 
   public async simulationLoop(shouldPlay: boolean) {
