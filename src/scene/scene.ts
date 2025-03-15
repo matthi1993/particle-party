@@ -29,7 +29,7 @@ export class Scene {
   private simulateIntervalId: any = undefined;
   private renderIntervalId: any = undefined;
 
-  private scenePoint = vec3.fromValues(0, 0, 0);
+  private mousePos = vec3.fromValues(0, 0, 0);
 
   constructor() {
   }
@@ -42,70 +42,52 @@ export class Scene {
     // set Camera Movement Listeners
     this.addCameraListeners(this.gpuContext.canvas!!);
 
+    // Compute and Render Pipelines
+    this.simulationCompute = new Compute(
+      this.gpuContext.device,
+      computeShader
+    )
+    this.simulationRenderer = new Render(
+      this.gpuContext,
+      new Shape(this.gpuContext.device, "Square Geometry", SQUARE)
+    )
+
     // set all buffers
     this.sceneStorage.createComputeUniformBuffer(this.gpuContext)
     this.sceneStorage.createUniformBuffer(this.gpuContext, this.camera);
   }
 
-  public setPhysics(physicsData: PhysicsData, recreate: boolean) {
-
+  public setScene(physicsData: PhysicsData, points: Point[]) {
+    this.step = 0;
+    
     this.physicsData = physicsData;
+    this.points = points;
 
-    if(recreate) {
-      let shouldPlay = this.isPlaying;
-      this.simulationLoop(false);
-      this.renderLoop(false);
+    this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
+    this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
 
-      this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
-      this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
+    this.sceneStorage.createReadStorage(this.gpuContext, this.points, this.physicsData);
+    this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
 
-      this.simulationLoop(shouldPlay);
-      this.renderLoop(shouldPlay);
+    this.updateBindGroups();
+  }
 
-      this.updateBindGroups();
-    }
-
+  public updatePhysics(physicsData: PhysicsData, recreate: boolean) {
+    this.physicsData = physicsData;
     this.sceneStorage.updateForceValues(this.gpuContext, this.physicsData);
     this.sceneStorage.updateTypeValues(this.gpuContext, this.physicsData);
   }
 
-  public async setPoints(points: Point[], recreate: boolean) {
-    let shouldPlay = this.isPlaying;
-    this.simulationLoop(false);
-    this.renderLoop(false);
-
+  public async updatePoints(points: Point[], recreate: boolean) {
     this.points = points;
-
-    if(recreate) {
-
-      this.sceneStorage.createReadStorage(this.gpuContext, this.points, this.physicsData);
-      this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
-
-      this.simulationCompute = new Compute(
-        this.gpuContext.device,
-        this.points.length,
-        computeShader
-      )
-      this.simulationRenderer = new Render(
-        this.gpuContext,
-        new Shape(this.gpuContext.device, "Square Geometry", SQUARE),
-        this.points.length
-      )
-
-      this.updateBindGroups();
-    }
-
     this.sceneStorage.updatePointValues(this.gpuContext, this.points, this.physicsData);
-
-    this.simulationLoop(shouldPlay);
-    this.renderLoop(shouldPlay);
   }
 
   public setUniforms() {
 
   }
 
-  public updateBindGroups() {
+  private updateBindGroups() {
     if(this.simulationCompute) {
       this.simulationCompute.updateBindGroups(
         this.gpuContext.device,
@@ -203,11 +185,11 @@ export class Scene {
       //TODO move somewhere else???
       const ndc = getMouseNDC(event, element);
       const worldPoint = ndcToWorld(ndc, this.camera);
-      this.scenePoint = projectToScenePlane(worldPoint, this.camera);
+      this.mousePos = projectToScenePlane(worldPoint, this.camera);
 
       this.sceneStorage.updateComputeUniformsBuffer( //TODO remove???
         this.gpuContext,
-        vec4.fromValues(this.scenePoint[0], this.scenePoint[1], this.scenePoint[2], 1)
+        vec4.fromValues(this.mousePos[0], this.mousePos[1], this.mousePos[2], 1)
       )
 
       if (isMouseDown) {
@@ -235,7 +217,7 @@ export class Scene {
   render() {
     if(!this.renderIntervalId) return;
 
-    this.sceneStorage.updateUniformsBuffer(this.gpuContext, this.camera, this.scenePoint[0], this.scenePoint[1]);
+    this.sceneStorage.updateUniformsBuffer(this.gpuContext, this.camera, this.mousePos[0], this.mousePos[1]);
     this.camera.updateCamera();
 
     const encoder = this.gpuContext.device.createCommandEncoder();
@@ -243,7 +225,8 @@ export class Scene {
     this.simulationRenderer?.execute(
       encoder,
       this.step,
-      this.gpuContext.context.getCurrentTexture().createView()
+      this.gpuContext.context.getCurrentTexture().createView(),
+      this.points.length
     );
 
     this.gpuContext.device.queue.submit([encoder.finish()]);

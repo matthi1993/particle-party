@@ -34,7 +34,6 @@ export class Compute {
 
     constructor(
         device: any,
-        elementCount: number,
         computeShader: any
     ) {
 

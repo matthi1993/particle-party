@@ -37,16 +37,13 @@ export class Render {
     private bindGroups?: any;
     private bindGroupLayout?: any;
 
-    private shape: Shape; // TODO think of refactoring this
-    private instances: number;
+    private shape: Shape;
 
     constructor(
         gpuContext: GpuContext,
-        shape: Shape,
-        instances: number
+        shape: Shape
     ) {
         this.shape = shape;
-        this.instances = instances;
 
         this.bindGroupLayout = gpuContext.device.createBindGroupLayout(this.BIND_GROUP_LAYOUT);
         const pipelineLayout = gpuContext.device.createPipelineLayout({
@@ -131,7 +128,7 @@ export class Render {
         ];
     }
 
-    execute(encoder: any, step: number, view: any) {
+    execute(encoder: any, step: number, view: any, instances: number) {
         const pass = encoder.beginRenderPass({
             colorAttachments: [{
                 view: view,
@@ -147,7 +144,7 @@ export class Render {
         pass.setVertexBuffer(0, this.shape.vertexBuffer);
         pass.draw(
             this.shape.vertices.length / 2, // number of vertices
-            this.instances, // number of instances
+            instances, // number of instances
         );
         pass.end();
     }

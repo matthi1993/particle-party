@@ -29,8 +29,10 @@ export class SimulationComponent implements OnInit {
       1200,
       1200
     );
-    this.scene.setPhysics(this.dataStore.simulationData.physicsData, true);
-    this.scene.setPoints(this.dataStore.simulationData.points, true);
+    this.scene.setScene(
+      this.dataStore.simulationData.physicsData,
+      this.dataStore.simulationData.points
+    );
 
     this.scene.simulationLoop(true);
     this.scene.renderLoop(true);
@@ -38,10 +40,10 @@ export class SimulationComponent implements OnInit {
 
   public createEmptyWorld() {
     this.dataStore.simulationData.points = [];
-
-    // update scene values
-    this.scene.setPhysics(this.dataStore.simulationData.physicsData, true);
-    this.scene.setPoints([], true);
+    this.scene.setScene(
+      this.dataStore.simulationData.physicsData,
+      this.dataStore.simulationData.points
+    );
   }
 
   public createRandomWorld() {
@@ -51,9 +53,10 @@ export class SimulationComponent implements OnInit {
     })
     this.dataStore.simulationData.points = newPoints;
 
-    // update scene values
-    this.scene.setPhysics(this.dataStore.simulationData.physicsData, true);
-    this.scene.setPoints(newPoints, true);
+    this.scene.setScene(
+      this.dataStore.simulationData.physicsData,
+      this.dataStore.simulationData.points
+    );
   }
 
   randomForces() {
@@ -74,7 +77,7 @@ export class SimulationComponent implements OnInit {
     });
 
     // update scene values
-    this.scene.setPhysics(this.dataStore.simulationData.physicsData, false);
+    this.scene.updatePhysics(this.dataStore.simulationData.physicsData, false);
   }
 
   multiplyForces(factor: number) {
@@ -85,6 +88,6 @@ export class SimulationComponent implements OnInit {
     })
 
     // update scene values
-    this.scene.setPhysics(this.dataStore.simulationData.physicsData, false);
+    this.scene.updatePhysics(this.dataStore.simulationData.physicsData, false);
   }
 }
