@@ -72,13 +72,13 @@ export class ParticleSimulation {
     this.updateBindGroups();
   }
 
-  public updatePhysics(physicsData: PhysicsData, recreate: boolean) {
+  public updatePhysics(physicsData: PhysicsData) {
     this.physicsData = physicsData;
     this.sceneStorage.updateForceValues(this.gpuContext, this.physicsData);
     this.sceneStorage.updateTypeValues(this.gpuContext, this.physicsData);
   }
 
-  public async updatePoints(points: Point[], recreate: boolean) {
+  public async updatePoints(points: Point[]) {
     this.points = points;
     this.sceneStorage.updatePointValues(this.gpuContext, this.points, this.physicsData);
   }
@@ -143,7 +143,7 @@ export class ParticleSimulation {
       vec4.add(newPosition, point.position, vec4.fromValues(scenePoint[0], scenePoint[1], scenePoint[2], 1));
       pointsToAdd.push(new Point(
         newPosition,
-        point.particleType
+        point.particleTypeId
       ));
     })
 
@@ -242,11 +242,11 @@ export class ParticleSimulation {
   }
 
   // TODO 
-  async getPositions() {
+  async getCurrentPoints(): Promise<Point[]> {
     let bufferIndex = this.step % 2;
 
     if (!this.points || this.points.length === 0) {
-      return;
+      return [];
     }
 
     const readBuffer = this.gpuContext.device.createBuffer({
@@ -267,9 +267,17 @@ export class ParticleSimulation {
         data[index * 12 + 0],
         data[index * 12 + 1],
         data[index * 12 + 2],
-        data[index * 12 + 3]
+        data[index * 12 + 3],
+      );
+      point.velocity = vec4.fromValues(
+        data[index * 12 + 4],
+        data[index * 12 + 5],
+        data[index * 12 + 6],
+        data[index * 12 + 7],
       );
     })
     readBuffer.unmap();
+
+    return this.points;
   }
 }

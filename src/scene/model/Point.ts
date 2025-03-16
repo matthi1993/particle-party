@@ -29,11 +29,11 @@ export class ParticleType {
 export class Point {
     public position: vec4;
     public velocity: vec4 = vec4.fromValues(0,0,0,0);
-    public particleType: ParticleType;
+    public particleTypeId: number;
     
-    constructor(position: vec4, type: ParticleType) {
+    constructor(position: vec4, typeId: number) {
         this.position = position;
-        this.particleType = type;
+        this.particleTypeId = typeId;
     }
 }
 
@@ -48,7 +48,7 @@ export function create(count: number, type: ParticleType, size: number) {
                     0,//Math.random() * size - size / 2,
                     1
                 ),
-                type
+                type.id
             ));
     }
     return list;

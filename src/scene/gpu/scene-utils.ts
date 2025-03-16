@@ -16,7 +16,7 @@ export function createArraysFromPoints(points: Point[], physicsData: PhysicsData
         
         // index 4 to 7 are reserved for velocity
 
-        positionArray[index * dimensions + 8] = physicsData.types.indexOf(element.particleType);
+        positionArray[index * dimensions + 8] = element.particleTypeId;
         positionArray[index * dimensions + 9] = index; // global index of the Particle
     };
     return positionArray;

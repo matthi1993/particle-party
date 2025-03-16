@@ -43,12 +43,24 @@ export class PhysicsComponent implements OnInit {
       Math.random() * 1 + 0.5,
       Math.random()
     );
-    this.dataStore.simulationData.physicsData.addType(newType);
+    
+    this.dataStore.simulationData.physicsData.types.push(newType);
+    this.dataStore.simulationData.physicsData.forces.push(
+      Array(this.dataStore.simulationData.physicsData.types.length).fill(0) //TODO, update all forces of all particles and set init value
+    );
+
     this.selectedType = newType;
   }
 
   removeSelectedType() {
-    this.dataStore.simulationData.physicsData.removeType(this.selectedType);
+    let index = this.dataStore.simulationData.physicsData.types.indexOf(this.selectedType);
+    if (this.dataStore.simulationData.physicsData.types.length > 1) {
+      this.dataStore.simulationData.physicsData.types.splice(index, 1)
+      this.dataStore.simulationData.physicsData.forces.splice(index, 1);
+      this.dataStore.simulationData.physicsData.forces.forEach(row => {
+        row.splice(index, 1);
+      })
+    }
     this.selectedType = this.dataStore.simulationData.physicsData.types[0];
   }
 
@@ -60,7 +72,7 @@ export class PhysicsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(data => {
       if (data) {
         this.dataStore.simulationData.physicsData.name = data;
-        this.dataService.savePhysics(this.dataStore.simulationData.physicsData).subscribe(data => {
+        this.dataService.savePhysics(this.dataStore.simulationData.physicsData).then(data => {
           this.dataStore.simulationData.physicsData = data;
         });
       }

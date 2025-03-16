@@ -8,6 +8,7 @@ import { PhysicsComponent } from "../physics/physics.component";
 import { ParticleSimulation } from 'src/scene/scene';
 import { randomRounded } from '../utils/utils';
 import { vec4 } from 'gl-matrix';
+import { DataService } from 'src/app/services/data.service';
 
 @Component({
   selector: 'app-simulation',
@@ -20,22 +21,32 @@ export class SimulationComponent implements OnInit {
   public scene: ParticleSimulation = new ParticleSimulation();
   public pointNumber: number = 500;
 
-  constructor(public dataStore: DataStore) {
+  constructor(public dataStore: DataStore, public dataService: DataService) {
   }
 
   async ngOnInit() {
-    await this.scene.setup(
-      document.querySelector("canvas")!!,
-      1200,
-      1200
-    );
-    this.scene.setScene(
-      this.dataStore.simulationData.physicsData,
-      this.dataStore.simulationData.points
-    );
+    this.dataService.listPhysicsModels().subscribe(physics => {
+      this.dataStore.physicsDataOptions = physics;
+    });
+    this.dataService.listSimulationModels().subscribe(simulations => {
+      this.dataStore.simulationData = simulations[0];
+      
+      this.scene.setup(
+        document.querySelector("canvas")!!,
+        1200,
+        1200
+      ).then(() => {
+        this.scene.setScene(
+          this.dataStore.simulationData.physicsData,
+          this.dataStore.simulationData.points
+        );
 
-    this.scene.simulationLoop(true);
-    this.scene.renderLoop(true);
+        this.scene.simulationLoop(true);
+        this.scene.renderLoop(true);
+      });
+    })
+
+
   }
 
   public createEmptyWorld() {
@@ -77,7 +88,7 @@ export class SimulationComponent implements OnInit {
     });
 
     // update scene values
-    this.scene.updatePhysics(this.dataStore.simulationData.physicsData, false);
+    this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
   }
 
   multiplyForces(factor: number) {
@@ -88,6 +99,12 @@ export class SimulationComponent implements OnInit {
     })
 
     // update scene values
-    this.scene.updatePhysics(this.dataStore.simulationData.physicsData, false);
+    this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+  }
+
+  async saveSimulation() {
+    const sim = this.dataStore.simulationData;
+    sim.points = await this.scene.getCurrentPoints();
+    await this.dataService.saveSimulation(sim);
   }
 }

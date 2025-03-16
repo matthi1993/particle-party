@@ -22,41 +22,11 @@ export enum Page {
   styleUrls: ['./app.component.scss'],
   imports: [SimulationComponent, PhysicsComponent, MoleculesComponent]
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'Simulation';
-  public dataLoaded = false;
 
   public page = Page.SIMULATION;
   pageEnum = Page;
-
-  constructor(private dataService: DataService, private dataStore: DataStore) {
-  }
-
-  ngOnInit(): void {
-
-    this.dataStore.physicsDataOptions = [];
-    this.dataStore.simulationData = new SimulationData();
-    this.dataStore.simulationData.physicsData.addType(PROTON);
-    this.dataStore.simulationData.physicsData.addType(NEUTRON);
-    this.dataStore.simulationData.physicsData.addType(ELECTRON);
-    this.dataStore.simulationData.physicsData.addType(BOSON);
-
-    this.dataStore.simulationData.physicsData.forces = [
-      [0.2, 0.1, 0.0, 0.0],
-      [-0.2, 0.2, 0.1, 0.0],
-      [0.0, 0.0, 0.2, 0.1],
-      [0.1, 0.0, 0.0, -0.2],
-    ]
-
-    let size = 200;
-    this.dataStore.simulationData.points = [];
-    this.dataStore.simulationData.points.push(...create(1000, PROTON, size));
-    this.dataStore.simulationData.points.push(...create(1000, NEUTRON, size));
-    this.dataStore.simulationData.points.push(...create(1000, ELECTRON, size));
-    this.dataStore.simulationData.points.push(...create(1000, BOSON, size));
-
-    this.dataLoaded = true;
-  }
 
   switchPage(page: Page) {
     this.page = page;

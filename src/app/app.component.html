@@ -5,7 +5,6 @@
         <button class="main-menu-button" (click)="switchPage(pageEnum.MOLECULES)">Molecules</button>
     </nav>
 </header>
-@if (dataLoaded) {
 <content>
     @if (page === pageEnum.SIMULATION) {
     <app-simulation></app-simulation>
@@ -17,4 +16,3 @@
     <app-molecules class="grid-12"></app-molecules>
     }
 </content>
-}
