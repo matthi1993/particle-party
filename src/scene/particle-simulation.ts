@@ -52,7 +52,7 @@ export class ParticleSimulation {
       new Shape(this.gpuContext.device, "Square Geometry", SQUARE)
     )
 
-    // set all buffers
+    // set buffers
     this.sceneStorage.createComputeUniformBuffer(this.gpuContext)
     this.sceneStorage.createUniformBuffer(this.gpuContext, this.camera);
   }
@@ -188,8 +188,7 @@ export class ParticleSimulation {
       this.mousePos = projectToScenePlane(worldPoint, this.camera);
 
       this.sceneStorage.updateComputeUniformsBuffer( //TODO remove???
-        this.gpuContext,
-        vec4.fromValues(this.mousePos[0], this.mousePos[1], this.mousePos[2], 1)
+        this.gpuContext
       )
 
       if (isMouseDown) {
@@ -215,8 +214,6 @@ export class ParticleSimulation {
   }
 
   render() {
-    if(!this.renderIntervalId) return;
-
     this.sceneStorage.updateUniformsBuffer(this.gpuContext, this.camera, this.mousePos[0], this.mousePos[1]);
     this.camera.updateCamera();
 
@@ -233,15 +230,12 @@ export class ParticleSimulation {
   }
 
   simulate() {
-    if(!this.simulateIntervalId) return;
-
     const encoder = this.gpuContext.device.createCommandEncoder();
     this.simulationCompute?.execute(encoder, this.step, this.points.length);
     this.step++;
     this.gpuContext.device.queue.submit([encoder.finish()]);
   }
 
-  // TODO 
   async getCurrentPoints(): Promise<Point[]> {
     let bufferIndex = this.step % 2;
 

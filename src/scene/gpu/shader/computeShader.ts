@@ -23,10 +23,8 @@ export const computeShader = `
     }
 
     struct Uniforms {
-        selectionCoordinates: vec4f,
         G: f32,
         attractionFactor: f32,
-        _padding: vec2f
     }
 
     @group(0) @binding(0) var<storage> particles: array<Particle>;
@@ -143,21 +141,15 @@ export const computeShader = `
         me.position += me.velocity;
 
 
-        // ##### Bounding Box #####
-        if(me.position.x > size || me.position.x < -1 * size) {
+        // ##### Bounding Sphere #####
+        if(length(me.position) > 200) {
             me.velocity.x = me.velocity.x * -1;
             me.position.x += me.velocity.x;
-        }
-        if(me.position.y > size || me.position.y < -1 * size) {
+
             me.velocity.y = me.velocity.y * -1;
             me.position.y += me.velocity.y;
         }
-        if(me.position.z > size || me.position.z < -1 * size) {
-            me.velocity.z = me.velocity.z * -1;
-            me.position.z += me.velocity.z;
-        }
 
         particlesOut[index] = me;
-        
     }
 `

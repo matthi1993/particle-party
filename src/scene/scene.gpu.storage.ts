@@ -20,13 +20,10 @@ export class SceneStorage {
   constructor() {
   }
 
-  createComputeUniformBuffer(gpuContext: GpuContext, selectionCoord: vec4 = vec4.fromValues(0,0,0,-1)) {
-    let uniforms = new Float32Array([ //TODO refactor these magic numbers
-      ...selectionCoord,
+  createComputeUniformBuffer(gpuContext: GpuContext) {
+    let uniforms = new Float32Array([
       0.006674,
-      0.05,
-      0, // padding
-      0 // padding
+      0.05
     ])
     this.computeUniformsBuffer = gpuContext.device.createBuffer({
       size: uniforms.byteLength,
@@ -65,9 +62,8 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.vertexUniformsBuffer, 0, uniforms);
   }
 
-  public updateComputeUniformsBuffer(gpuContext: GpuContext, selectionCoord: vec4) {
+  public updateComputeUniformsBuffer(gpuContext: GpuContext) {
     let uniforms = new Float32Array([
-      ...selectionCoord,
       0.006674, // TODO refactor this somewhere else
       0.05 // TODO refactor this somewhere else
     ])
