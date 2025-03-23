@@ -5,7 +5,8 @@ export const fragmentShaderSource = `
         @location(2) uv: vec2<f32>,
         @location(3) selected: f32,
         @location(4) hovered: f32,
-        @location(5) size: f32
+        @location(5) size: f32,
+        @location(6) velocity: vec4f
     };
 
     struct Uniforms {
@@ -47,5 +48,19 @@ export const fragmentShaderSource = `
         let fade = smoothstep(-2, 0.5, dist);
         // Glow
         return vec4f(input.color.xyz * 2, 1 - fade);
+        
+        
+        
+        
+        /*let lineThickness = 0.01;
+        let toFragment = input.uv - center;
+       
+        let distanceToLine = abs(dot(toFragment, input.velocity.xy));
+        
+        if (distanceToLine < lineThickness) {
+            return vec4(1.0, 0.0, 0.0, 1.0); // Red line
+        } else {
+            return vec4(0.0, 0.0, 0.0, 0.0); // Red line
+        }*/
     }
 `;

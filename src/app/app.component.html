@@ -1,18 +1,8 @@
 <header>
     <nav class="sub-header">
-        <button class="main-menu-button" (click)="switchPage(pageEnum.SIMULATION)">Simulation</button>
-        <button class="main-menu-button" (click)="switchPage(pageEnum.PHYSICS)">Physics</button>
-        <button class="main-menu-button" (click)="switchPage(pageEnum.MOLECULES)">Molecules</button>
+        <button class="main-menu-button">Simulation</button>
     </nav>
 </header>
 <content>
-    @if (page === pageEnum.SIMULATION) {
     <app-simulation></app-simulation>
-    }
-    @if (page === pageEnum.PHYSICS) {
-    <app-physics class="grid-12"></app-physics>
-    }
-    @if (page === pageEnum.MOLECULES) {
-    <app-molecules class="grid-12"></app-molecules>
-    }
 </content>

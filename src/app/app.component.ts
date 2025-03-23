@@ -24,12 +24,5 @@ export enum Page {
 })
 export class AppComponent {
   title = 'Simulation';
-
-  public page = Page.SIMULATION;
-  pageEnum = Page;
-
-  switchPage(page: Page) {
-    this.page = page;
-  }
 }
 

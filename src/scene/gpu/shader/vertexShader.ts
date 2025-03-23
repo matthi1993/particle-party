@@ -5,7 +5,8 @@ export const vertexShaderSource = `
         @location(2) uv: vec2<f32>,
         @location(3) selected: f32,
         @location(4) hovered: f32,
-        @location(5) size: f32
+        @location(5) size: f32,
+        @location(6) velocity: vec4f
     };
 
     struct Particle {
@@ -44,6 +45,7 @@ export const vertexShaderSource = `
 
         let modelViewProjection = uniforms.viewProjectionMatrix;
         output.position = modelViewProjection * dataIn[instance].position + vec4f(position * 4, 0, 0) ;
+        output.velocity = modelViewProjection * dataIn[instance].velocity;
         output.color = myType.color;
         output.uv = position * 0.5 + 0.5;
         output.size = 0.5 * myType.size;
