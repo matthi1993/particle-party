@@ -26,7 +26,7 @@ export class GpuContext {
     this.context!!.configure({
       device: this.device,
       format: this.canvasFormat,
-      alphaMode: "premultiplied",
+      alphaMode: "opaque",
     });
   }
 

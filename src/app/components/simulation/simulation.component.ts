@@ -33,8 +33,8 @@ export class SimulationComponent implements OnInit {
       
       this.scene.setup(
         document.querySelector("canvas")!!,
-        1200,
-        1200
+        3000,
+        3000
       ).then(() => {
         this.scene.setScene(
           this.dataStore.simulationData.physicsData,
@@ -60,7 +60,7 @@ export class SimulationComponent implements OnInit {
   public createRandomWorld() {
     let newPoints: Point[] = [];
     this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-      newPoints.push(...create(this.pointNumber, type, 300));
+      newPoints.push(...create(this.pointNumber, type, 200));
     })
     this.dataStore.simulationData.points = newPoints;
 
@@ -72,9 +72,9 @@ export class SimulationComponent implements OnInit {
 
   randomForces() {
     this.dataStore.simulationData.physicsData.types.forEach((type, rowIndex) => {
-      type.radius = randomRounded(0, 20);
+      type.radius = randomRounded(0, 50);
       type.mass = randomRounded(0, 0.25);
-      type.size = randomRounded(0.25, 2)
+      type.size = randomRounded(0.5, 1)
       type.color = vec4.fromValues(
         randomRounded(0, 1),
         randomRounded(0, 1),
@@ -83,7 +83,7 @@ export class SimulationComponent implements OnInit {
       )
 
       this.dataStore.simulationData.physicsData.types.forEach((col, colIndex) => {
-        this.dataStore.simulationData.physicsData.forces[rowIndex][colIndex] = randomRounded(-0.4, 0.4);
+        this.dataStore.simulationData.physicsData.forces[rowIndex][colIndex] = randomRounded(-0.5, 0.5);
       })
     });
 

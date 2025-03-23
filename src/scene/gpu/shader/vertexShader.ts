@@ -3,7 +3,9 @@ export const vertexShaderSource = `
         @builtin(position) position: vec4f,
         @location(1) color: vec4f,
         @location(2) uv: vec2<f32>,
-        @location(3) selected: f32
+        @location(3) selected: f32,
+        @location(4) hovered: f32,
+        @location(5) size: f32
     };
 
     struct Particle {
@@ -41,22 +43,16 @@ export const vertexShaderSource = `
         var output: VertexOutput;
 
         let modelViewProjection = uniforms.viewProjectionMatrix;
-        output.position = modelViewProjection * dataIn[instance].position + vec4f(position * myType.size * 1, 0, 0) ;
+        output.position = modelViewProjection * dataIn[instance].position + vec4f(position * 4, 0, 0) ;
         output.color = myType.color;
         output.uv = position * 0.5 + 0.5;
+        output.size = 0.5 * myType.size;
 
 
         // Check what circles are in selection
         let clickDist = length(uniforms.selectionCoordinates - dataIn[instance].position);
-        var selected = f32(0);
-        if (clickDist < 5) {
-            selected = 1;
-        } else {
-            selected = 0;
-        }
-
-        if(clickDist < 1.1) {
-            output.selected = 1;
+        if(clickDist < 5) {
+            output.hovered = 1;
         }
 
         return output;

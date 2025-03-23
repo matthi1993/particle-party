@@ -83,10 +83,6 @@ export class ParticleSimulation {
     this.sceneStorage.updatePointValues(this.gpuContext, this.points, this.physicsData);
   }
 
-  public setUniforms() {
-
-  }
-
   private updateBindGroups() {
     if(this.simulationCompute) {
       this.simulationCompute.updateBindGroups(

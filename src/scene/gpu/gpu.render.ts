@@ -133,7 +133,7 @@ export class Render {
             colorAttachments: [{
                 view: view,
                 loadOp: "clear",
-                clearValue: { r: 0.141, g: 0.157, b: 0.184, a: 0.0 },
+                clearValue: { r: 0.041, g: 0.057, b: 0.084, a: 0.0 },
                 storeOp: "store",
             }]
         });
