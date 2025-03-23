@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-card.component";
 import { ParticleTypeComponent } from "../particle-type/particle-type.component";
-import { ParticleType } from 'src/scene/model/Point';
+import {create, ParticleType} from 'src/scene/model/Point';
 import { vec4 } from 'gl-matrix';
 import { DataService } from 'src/app/services/data.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -61,6 +61,11 @@ export class PhysicsComponent implements OnInit {
         row.splice(index, 1);
       })
     }
+
+    // regenerate indices
+    this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
+      type.id = index;
+    })
     this.selectedType = this.dataStore.simulationData.physicsData.types[0];
   }
 
