@@ -55,7 +55,7 @@ export class ParticleSimulation {
 
         // set buffers
         this.sceneStorage.createComputeUniformBuffer(this.gpuContext)
-        this.sceneStorage.createUniformBuffer(this.gpuContext, this.camera);
+        this.sceneStorage.createRenderUniformBuffer(this.gpuContext, this.camera);
     }
 
     public setScene(physicsData: PhysicsData, points: Point[]) {
@@ -99,7 +99,7 @@ export class ParticleSimulation {
                 this.gpuContext.device,
                 this.sceneStorage.positionsStorage,
                 this.sceneStorage.typesStorage,
-                this.sceneStorage.vertexUniformsBuffer,
+                this.sceneStorage.renderUniformsBuffer,
                 this.sceneStorage.selectionOutBuffer
             )
         }
@@ -150,21 +150,12 @@ export class ParticleSimulation {
     // TODO refactor somewhere else
     addCameraListeners(element: HTMLElement) {
 
-        let isShiftDown = false;
         let isMouseDown = false;
         const moveSpeed = 0.1;
         let mousePosX = 0;
         let mousePosY = 0;
 
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Shift') {
-                isShiftDown = true;
-            }
-        });
         document.addEventListener('keyup', (event) => {
-            if (event.key === 'Shift') {
-                isShiftDown = false;
-            }
             if (event.code === 'Space') {
                 this.simulationLoop(!this.isPlaying)
             }
@@ -183,10 +174,6 @@ export class ParticleSimulation {
             const ndc = getMouseNDC(event, element);
             const worldPoint = ndcToWorld(ndc, this.camera);
             this.mousePos = projectToScenePlane(worldPoint, this.camera);
-
-            this.sceneStorage.updateComputeUniformsBuffer( //TODO remove???
-                this.gpuContext
-            )
 
             if (isMouseDown) {
                 this.camera.position[0] -= (event.clientX - mousePosX) * moveSpeed * this.camera.position[2] * 0.01;
@@ -213,7 +200,7 @@ export class ParticleSimulation {
     render() {
         // update buffers
         this.camera.updateCamera();
-        this.sceneStorage.updateUniformsBuffer(this.gpuContext, this.camera, this.mousePos[0], this.mousePos[1]);
+        this.sceneStorage.updateRenderUniformsBuffer(this.gpuContext, this.camera, this.mousePos[0], this.mousePos[1]);
 
         // setup render pipelines
         const encoder = this.gpuContext.device.createCommandEncoder();

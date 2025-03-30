@@ -5,6 +5,7 @@ import { GpuContext } from './gpu/gpu.context'
 import { Camera } from './model/Camera';
 import { Point } from 'src/scene/model/Point';
 import { vec4 } from 'gl-matrix';
+import {ATTRACTION_CONSTANT, GRAVITY_CONSTANT} from "./scene-constants";
 
 export class SceneStorage {
 
@@ -13,8 +14,7 @@ export class SceneStorage {
   public positionsStorage?: any;
 
   public selectionOutBuffer?: any;
-  public positionBuffer?: any;
-  public vertexUniformsBuffer?: any;
+  public renderUniformsBuffer?: any;
   public computeUniformsBuffer?: any;
 
   constructor() {
@@ -22,8 +22,8 @@ export class SceneStorage {
 
   createComputeUniformBuffer(gpuContext: GpuContext) {
     let uniforms = new Float32Array([
-      0.006674,
-      0.05
+      GRAVITY_CONSTANT,
+      ATTRACTION_CONSTANT
     ])
     this.computeUniformsBuffer = gpuContext.device.createBuffer({
       size: uniforms.byteLength,
@@ -32,17 +32,17 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.computeUniformsBuffer, 0, uniforms);
   }
 
-  createUniformBuffer(gpuContext: GpuContext, camera: Camera, selectionCoord: vec4 = vec4.fromValues(0,0,0,-1)) {
+  createRenderUniformBuffer(gpuContext: GpuContext, camera: Camera, selectionCoord: vec4 = vec4.fromValues(0,0,0,-1)) {
     let uniforms = new Float32Array([
       ...camera.getViewProjectionMatrix(),
       ...selectionCoord
     ])
-    this.vertexUniformsBuffer = gpuContext.device.createBuffer({
+    this.renderUniformsBuffer = gpuContext.device.createBuffer({
       size: uniforms.byteLength,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
-    gpuContext.device.queue.writeBuffer(this.vertexUniformsBuffer, 0, uniforms);
+    gpuContext.device.queue.writeBuffer(this.renderUniformsBuffer, 0, uniforms);
   }
 
   public createForceStorage(gpuContext: GpuContext, physicsData: PhysicsData) {
@@ -51,7 +51,7 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
   }
 
-  public updateUniformsBuffer(gpuContext: GpuContext, camera: Camera, mouseX: number, mouseY: number) {
+  public updateRenderUniformsBuffer(gpuContext: GpuContext, camera: Camera, mouseX: number, mouseY: number) {
     let uniforms = new Float32Array([
       ...camera.getViewProjectionMatrix(),
       mouseX, 
@@ -59,13 +59,13 @@ export class SceneStorage {
       0,
       0
     ])
-    gpuContext.device.queue.writeBuffer(this.vertexUniformsBuffer, 0, uniforms);
+    gpuContext.device.queue.writeBuffer(this.renderUniformsBuffer, 0, uniforms);
   }
 
   public updateComputeUniformsBuffer(gpuContext: GpuContext) {
     let uniforms = new Float32Array([
-      0.006674, // TODO refactor this somewhere else
-      0.05 // TODO refactor this somewhere else
+      GRAVITY_CONSTANT,
+      ATTRACTION_CONSTANT
     ])
     gpuContext.device.queue.writeBuffer(this.computeUniformsBuffer, 0, uniforms);
   }

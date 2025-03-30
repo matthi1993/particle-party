@@ -1,0 +1,2 @@
+export const GRAVITY_CONSTANT = 0.006674;
+export const ATTRACTION_CONSTANT = 0.05;
