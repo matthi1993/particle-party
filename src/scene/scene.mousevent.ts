@@ -8,9 +8,9 @@ export function getMouseNDC(event: MouseEvent, element: HTMLElement): { x: numbe
     return { x, y };
 }
 
-export function ndcToWorld(ndc: { x: number; y: number }, camera: Camera, z: number = 0): vec3 {
+export function ndcToWorld(x: number, y: number, camera: Camera, z: number = 0): vec3 {
     // Create a 4D point with NDC x, y, and z
-    const ndcPoint = vec3.fromValues(ndc.x, ndc.y, z);
+    const ndcPoint = vec3.fromValues(x, y, z);
 
     // Initialize the inverse matrices
     let inverseProjection = mat4.create();

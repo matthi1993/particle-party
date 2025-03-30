@@ -1,11 +1,11 @@
-import { PhysicsData } from './model/Simulation';
-import { createArraysFromPoints, createForcesArray, createTypesArray } from './gpu/scene-utils';
-import { GpuContext } from './gpu/gpu.context'
+import { PhysicsData } from '../model/Simulation';
+import { createArraysFromPoints, createForcesArray, createTypesArray } from './scene-utils';
+import { GpuContext } from './gpu.context'
 
-import { Camera } from './model/Camera';
+import { Camera } from '../model/Camera';
 import { Point } from 'src/scene/model/Point';
 import { vec4 } from 'gl-matrix';
-import {ATTRACTION_CONSTANT, GRAVITY_CONSTANT} from "./scene-constants";
+import {ATTRACTION_CONSTANT, GRAVITY_CONSTANT} from "../scene-constants";
 
 export class SceneStorage {
 

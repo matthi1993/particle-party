@@ -6,6 +6,10 @@ export class Camera {
 
     viewProjectionMatrix = mat4.create();
 
+    minZoom = 50;
+    maxZoom = 1000;
+    moveSpeed = 1000;
+
     position = vec3.fromValues(0, 0, 10);    // Camera position
     center = vec3.fromValues(0, 0, 0); // Look-at point
     up = vec3.fromValues(0, 1, 0);     // Up vector

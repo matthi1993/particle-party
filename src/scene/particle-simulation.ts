@@ -5,15 +5,16 @@ import {Render} from "./gpu/gpu.render";
 import {Camera} from "./model/Camera";
 import {Point} from "./model/Point";
 import {PhysicsData} from "./model/Simulation";
-import {SceneStorage} from "./scene.gpu.storage";
+import {SceneStorage} from "./gpu/gpu.storage";
 import {sceneComputeShader} from "./gpu/shader/sceneComputeShader";
 import {Shape} from "./gpu/shapes/shapes";
 import {SQUARE} from "./gpu/shapes/square";
-import {ndcToWorld, projectToScenePlane, getMouseNDC} from "./scene.mousevent";
+import {ndcToWorld, projectToScenePlane} from "./scene.mousevent";
 import {BACKGROUND_COLOR} from "./gpu/gpu-render-constants";
+import {CameraMovementListeners} from "./mouse-listeners";
 
 export class ParticleSimulation {
-    public isPlaying = false; // TODO getter
+    private isPlaying = false;
 
     private physicsData!: PhysicsData;
     private points!: Point[];
@@ -32,16 +33,27 @@ export class ParticleSimulation {
 
     private mousePos = vec3.fromValues(0, 0, 0);
 
-    constructor() {
-    }
-
     public async setup(canvas: HTMLCanvasElement, width: number, height: number) {
         this.gpuContext = new GpuContext(canvas, width, height);
         this.camera = new Camera(width, height, 200);
         await this.gpuContext.setup();
 
         // set Camera Movement Listeners
-        this.addCameraListeners(this.gpuContext.canvas!!);
+        new CameraMovementListeners(
+            this.gpuContext.canvas!!,
+            () => this.simulationLoop(!this.isPlaying),
+            (x: number, y: number, z:number) => {
+                this.camera.position[0] += x * this.camera.position[2] / this.camera.moveSpeed;
+                this.camera.position[1] += y * this.camera.position[2] / this.camera.moveSpeed;
+                this.camera.position[2] += z * this.camera.position[2] / this.camera.moveSpeed;
+
+                this.camera.position[2] = Math.min(Math.max(this.camera.position[2], this.camera.minZoom), this.camera.maxZoom);
+            },
+            (x: number, y: number) => {
+                const worldPoint = ndcToWorld(x, y, this.camera);
+                this.mousePos = projectToScenePlane(worldPoint, this.camera);
+            }
+        );
 
         // Compute and Render Pipelines
         this.simulationCompute = new Compute(
@@ -131,7 +143,7 @@ export class ParticleSimulation {
 
     // TODO make work
     addPointsToScene(originX: number, originY: number, points: Point[]) {
-        const worldPoint = ndcToWorld({x: originX, y: originY}, this.camera);
+        const worldPoint = ndcToWorld(originX, originY, this.camera);
         const scenePoint = projectToScenePlane(worldPoint, this.camera);
 
         let pointsToAdd: Point[] = [];
@@ -145,56 +157,6 @@ export class ParticleSimulation {
         })
 
         this.points.push(...pointsToAdd);
-    }
-
-    // TODO refactor somewhere else
-    addCameraListeners(element: HTMLElement) {
-
-        let isMouseDown = false;
-        const moveSpeed = 0.1;
-        let mousePosX = 0;
-        let mousePosY = 0;
-
-        document.addEventListener('keyup', (event) => {
-            if (event.code === 'Space') {
-                this.simulationLoop(!this.isPlaying)
-            }
-        });
-        document.addEventListener('mousedown', (event) => {
-            isMouseDown = true;
-        });
-        document.addEventListener('mouseup', (event) => {
-            isMouseDown = false;
-        });
-
-        element.addEventListener('mousemove', (event) => {
-            event.preventDefault();
-
-            //TODO move somewhere else???
-            const ndc = getMouseNDC(event, element);
-            const worldPoint = ndcToWorld(ndc, this.camera);
-            this.mousePos = projectToScenePlane(worldPoint, this.camera);
-
-            if (isMouseDown) {
-                this.camera.position[0] -= (event.clientX - mousePosX) * moveSpeed * this.camera.position[2] * 0.01;
-                this.camera.position[1] += (event.clientY - mousePosY) * moveSpeed * this.camera.position[2] * 0.01;
-
-            }
-            mousePosX = event.clientX;
-            mousePosY = event.clientY;
-
-        });
-
-        element.addEventListener('wheel', (event) => {
-            let minDistance = 5;
-            event.preventDefault();
-            if (event.deltaY < 0 && this.camera.position[2] <= minDistance) {
-                this.camera.position[2] = minDistance;
-            } else {
-                let distanceFactor = (this.camera.position[2] + minDistance) * 0.025;
-                this.camera.position[2] += event.deltaY / 30 * distanceFactor;
-            }
-        });
     }
 
     render() {
