@@ -1,6 +1,6 @@
 export const WORKGROUP_SIZE = 32;
 
-export const computeShader = `
+export const sceneComputeShader = `
 
     struct Particle {
         position: vec4f,

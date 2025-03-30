@@ -1,11 +1,6 @@
 import { mat4, vec3 } from 'gl-matrix';  // If you're using the gl-matrix library
 import { Camera } from 'src/scene/model/Camera';
 
-interface MouseEvent {
-    clientX: number;
-    clientY: number;
-}
-
 export function getMouseNDC(event: MouseEvent, element: HTMLElement): { x: number; y: number } {
     const rect = element.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;

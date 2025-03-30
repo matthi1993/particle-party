@@ -1,8 +1,8 @@
 
 import { GpuContext } from './gpu.context';
-import { vertexShaderSource } from './shader/vertexShader';
-import { fragmentShaderSource } from './shader/fragmentShader';
+import { sceneRenderShader } from './shader/sceneRenderShader';
 import { Shape } from './shapes/shapes';
+import {BIND_GROUP_LAYOUT, FORMAT_SHADER_LAYOUT} from "./gpu-render-constants";
 
 export interface ShapeInstances {
     shape: Shape,
@@ -10,28 +10,6 @@ export interface ShapeInstances {
 }
 
 export class Render {
-
-    BIND_GROUP_LAYOUT = {
-        label: "Cell Bind Group Layout",
-        entries: [{
-            binding: 0,
-            visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
-            buffer: { type: "read-only-storage" } // position in buffer
-        }, {
-            binding: 1,
-            visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
-            buffer: { type: "read-only-storage" } // types buffer
-        }, {
-            binding: 2,
-            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
-            buffer: { type: "uniform" } // types buffer
-        }, {
-            binding: 3,
-            visibility: GPUShaderStage.FRAGMENT,
-            buffer: { type: "storage" } // selection buffer
-        }
-        ]
-    }
 
     private renderPipeline?: any;
     private bindGroups?: any;
@@ -45,45 +23,26 @@ export class Render {
     ) {
         this.shape = shape;
 
-        this.bindGroupLayout = gpuContext.device.createBindGroupLayout(this.BIND_GROUP_LAYOUT);
+        this.bindGroupLayout = gpuContext.device.createBindGroupLayout(BIND_GROUP_LAYOUT);
         const pipelineLayout = gpuContext.device.createPipelineLayout({
             label: "Cell Pipeline Layout",
             bindGroupLayouts: [this.bindGroupLayout],
         });
-
-        // Create a pipeline that renders the cell.
+        let shaderModule = gpuContext.device.createShaderModule({
+            code: sceneRenderShader,
+        });
         this.renderPipeline = gpuContext.device.createRenderPipeline({
             label: "Cell pipeline",
             layout: pipelineLayout,
             vertex: {
-                module: gpuContext.device.createShaderModule({
-                    code: vertexShaderSource,
-                }),
+                module: shaderModule,
                 entryPoint: "vertexMain",
                 buffers: [this.shape.vertexBufferLayout]
             },
             fragment: {
-                module: gpuContext.device.createShaderModule({
-                    code: fragmentShaderSource,
-                }),
+                module: shaderModule,
                 entryPoint: "fragmentMain",
-                targets: [
-                    {
-                        format: "bgra8unorm", // Color format
-                        blend: {
-                            color: {
-                                srcFactor: "src-alpha", // Use source alpha
-                                dstFactor: "one-minus-src-alpha", // Destination based on source alpha
-                                operation: "add", // Add blended colors
-                            },
-                            alpha: {
-                                srcFactor: "one",
-                                dstFactor: "one-minus-src-alpha",
-                                operation: "add",
-                            },
-                        },
-                    },
-                ]
+                targets: [FORMAT_SHADER_LAYOUT]
             }
         });
 
@@ -128,24 +87,14 @@ export class Render {
         ];
     }
 
-    execute(encoder: any, step: number, view: any, instances: number) {
-        const pass = encoder.beginRenderPass({
-            colorAttachments: [{
-                view: view,
-                loadOp: "clear",
-                clearValue: { r: 0.041, g: 0.057, b: 0.084, a: 0.0 },
-                storeOp: "store",
-            }]
-        });
+    execute(renderPass: any, step: number, instances: number) {
+        renderPass.setPipeline(this.renderPipeline);
+        renderPass.setBindGroup(0, this.bindGroups[step % 2]);
 
-        pass.setPipeline(this.renderPipeline);
-        pass.setBindGroup(0, this.bindGroups[step % 2]);
-
-        pass.setVertexBuffer(0, this.shape.vertexBuffer);
-        pass.draw(
+        renderPass.setVertexBuffer(0, this.shape.vertexBuffer);
+        renderPass.draw(
             this.shape.vertices.length / 2, // number of vertices
             instances, // number of instances
         );
-        pass.end();
     }
 }
