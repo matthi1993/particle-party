@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-card.component";
 import { ParticleType} from 'src/scene/model/Point';
 import { vec4 } from 'gl-matrix';
@@ -20,6 +20,7 @@ import { DataStore } from 'src/app/store/data.store';
 })
 export class PhysicsComponent implements OnInit {
 
+  @Output() typeChanged = new EventEmitter<ParticleType>();
 
   public selectedType!: ParticleType;
 
@@ -30,6 +31,7 @@ export class PhysicsComponent implements OnInit {
 
   selectType(type: ParticleType) {
     this.selectedType = type;
+    this.typeChanged.emit(this.selectedType);
   }
 
   addType() {
@@ -48,7 +50,7 @@ export class PhysicsComponent implements OnInit {
       Array(this.dataStore.simulationData.physicsData.types.length).fill(0) //TODO, update all forces of all particles and set init value
     );
 
-    this.selectedType = newType;
+    this.selectType(newType);
   }
 
   removeSelectedType() {

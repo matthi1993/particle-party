@@ -25,7 +25,9 @@ export const sceneRenderShader = `
 
     struct Uniforms {
         viewProjectionMatrix: mat4x4<f32>,
-        selectionCoordinates: vec4f
+        selectionCoordinates: vec2f,
+        selectionRadius: f32,
+        _padding: f32,
     }
 
 
@@ -52,8 +54,8 @@ export const sceneRenderShader = `
 
 
         // Check what circles are in selection
-        let clickDist = length(uniforms.selectionCoordinates - dataIn[instance].position);
-        if(clickDist < 5) {
+        let clickDist = length(uniforms.selectionCoordinates - dataIn[instance].position.xy);
+        if(clickDist < uniforms.selectionRadius) {
             output.hovered = 1;
         }
 

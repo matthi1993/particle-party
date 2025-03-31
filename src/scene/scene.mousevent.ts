@@ -2,9 +2,13 @@ import { mat4, vec3 } from 'gl-matrix';  // If you're using the gl-matrix librar
 import { Camera } from 'src/scene/model/Camera';
 
 export function getMouseNDC(event: MouseEvent, element: HTMLElement): { x: number; y: number } {
+    return getPointNDC(event.clientX, event.clientY, element);
+}
+
+export function getPointNDC(inX: number, inY: number, element: HTMLElement): { x: number; y: number } {
     const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const x = ((inX - rect.left) / rect.width) * 2 - 1;
+    const y = -((inY - rect.top) / rect.height) * 2 + 1;
     return { x, y };
 }
 

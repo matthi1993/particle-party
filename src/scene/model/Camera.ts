@@ -6,7 +6,7 @@ export class Camera {
 
     viewProjectionMatrix = mat4.create();
 
-    minZoom = 50;
+    minZoom = 30;
     maxZoom = 1000;
     moveSpeed = 1000;
 

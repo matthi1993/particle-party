@@ -1,0 +1,17 @@
+<div class="brush-circle"
+     [style.width.px]="brush.radius"
+     [style.height.px]="brush.radius"
+     [style.left.px]="brush.x - brush.radius / 2"
+     [style.top.px]="brush.y - brush.radius / 2"
+     style="{'left:': brush.x}"
+>
+</div>
+<div class="brush-menu">
+    <h2>Brush settings</h2>
+    <div>
+        <label>brush size: </label><input (change)="onRadiusChanged()" [(ngModel)]="brush.radius">
+    </div>
+    <div>
+        <label>element count: </label><input [(ngModel)]="brush.count">
+    </div>
+</div>

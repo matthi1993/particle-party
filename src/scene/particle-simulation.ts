@@ -32,17 +32,18 @@ export class ParticleSimulation {
     private renderIntervalId: any = undefined;
 
     private mousePos = vec3.fromValues(0, 0, 0);
+    private selectionRadius = 0;
 
     public async setup(canvas: HTMLCanvasElement, width: number, height: number) {
         this.gpuContext = new GpuContext(canvas, width, height);
-        this.camera = new Camera(width, height, 200);
+        this.camera = new Camera(width, height, 50);
         await this.gpuContext.setup();
 
         // set Camera Movement Listeners
         new CameraMovementListeners(
             this.gpuContext.canvas!!,
             () => this.simulationLoop(!this.isPlaying),
-            (x: number, y: number, z:number) => {
+            (x: number, y: number, z: number) => {
                 this.camera.position[0] += x * this.camera.position[2] / this.camera.moveSpeed;
                 this.camera.position[1] += y * this.camera.position[2] / this.camera.moveSpeed;
                 this.camera.position[2] += z * this.camera.position[2] / this.camera.moveSpeed;
@@ -68,6 +69,10 @@ export class ParticleSimulation {
         // set buffers
         this.sceneStorage.createComputeUniformBuffer(this.gpuContext)
         this.sceneStorage.createRenderUniformBuffer(this.gpuContext, this.camera);
+    }
+
+    public updateSelectinoRadius(radius: number) {
+        // todo
     }
 
     public setScene(physicsData: PhysicsData, points: Point[]) {
@@ -141,28 +146,48 @@ export class ParticleSimulation {
         }
     }
 
-    // TODO make work
-    addPointsToScene(originX: number, originY: number, points: Point[]) {
-        const worldPoint = ndcToWorld(originX, originY, this.camera);
-        const scenePoint = projectToScenePlane(worldPoint, this.camera);
+    async addPointsToScene(originX: number, originY: number, points: Point[]) {
+        let shouldPlay = this.isPlaying;
+        this.simulationLoop(false);
+        this.renderLoop(false)
 
-        let pointsToAdd: Point[] = [];
-        points.forEach(point => {
-            let newPosition = vec4.fromValues(0, 0, 0, 0);
-            vec4.add(newPosition, point.position, vec4.fromValues(scenePoint[0], scenePoint[1], scenePoint[2], 1));
-            pointsToAdd.push(new Point(
-                newPosition,
-                point.particleTypeId
-            ));
-        })
+        // adding a timeout to make sure no simulation loop is called in between
+        setTimeout(async () => {
+            this.points = await this.getCurrentPoints();
+            const worldPoint = ndcToWorld(originX, originY, this.camera);
+            const scenePoint = projectToScenePlane(worldPoint, this.camera);
 
-        this.points.push(...pointsToAdd);
+            let pointsToAdd: Point[] = [];
+            points.forEach(point => {
+                pointsToAdd.push(new Point(
+                    vec4.fromValues(
+                        scenePoint[0] + point.position[0],
+                        scenePoint[1] + point.position[1],
+                        0,
+                        1
+                    ),
+                    point.particleTypeId
+                ));
+            })
+
+            this.points.push(...pointsToAdd);
+            this.setScene(this.physicsData, this.points);
+
+            this.simulationLoop(shouldPlay);
+            this.renderLoop(true);
+        }, this.SIMULATION_UPDATE_INTERVAL)
     }
 
     render() {
         // update buffers
         this.camera.updateCamera();
-        this.sceneStorage.updateRenderUniformsBuffer(this.gpuContext, this.camera, this.mousePos[0], this.mousePos[1]);
+        this.sceneStorage.updateRenderUniformsBuffer(
+            this.gpuContext,
+            this.camera,
+            this.mousePos[0],
+            this.mousePos[1],
+            this.selectionRadius
+        );
 
         // setup render pipelines
         const encoder = this.gpuContext.device.createCommandEncoder();

@@ -18,6 +18,7 @@
     <button class="secondary-button" (click)="saveSimulation()"> save simulation </button>
     
 </div>
-<app-physics class="side-card-right card"></app-physics>
+<app-physics (typeChanged)="typeChanged($event)" class="side-card-right card"></app-physics>
 
-<canvas id="gpuCanvas"></canvas>    
+<canvas id="gpuCanvas"></canvas>
+<app-brush [brush]="brush" (radiusChanged)="brushChanged()"></app-brush>
