@@ -46,29 +46,20 @@ export class SimulationComponent implements OnInit {
                     this.dataStore.simulationData.physicsData,
                     this.dataStore.simulationData.points
                 );
-
-                document.addEventListener("mousemove", (e) => {
+                let mouseDownX = 0;
+                let mouseDownY = 0;
+                canvas.addEventListener("mousemove", (e) => {
                     this.brush.x = e.clientX;
                     this.brush.y = e.clientY;
                 })
-                let downX = 0;
-                let downY = 0;
                 canvas.addEventListener("mousedown", (e) => {
-                    downX = e.clientX;
-                    downY = e.clientY;
+                    mouseDownX = e.clientX;
+                    mouseDownY = e.clientY;
                 });
                 canvas.addEventListener("mouseup", (e) => {
-                    if(e.clientX === downX && e.clientY === downY) {
+                    if (e.clientX === mouseDownX && e.clientY === mouseDownY) {
                         let pos = getMouseNDC(e, canvas);
-                        let type = this.dataStore.simulationData.physicsData.types[0];
-                        if (this.selectedType) {
-                            type = this.selectedType;
-                        }
-                        this.scene.addPointsToScene(
-                            pos.x,
-                            pos.y,
-                            create(this.brush.count, type, this.brush.radius / 10)
-                        )
+                        this.brushClicked(pos.x, pos.y);
                     }
                 });
                 this.scene.simulationLoop(true);
@@ -77,9 +68,16 @@ export class SimulationComponent implements OnInit {
         })
     }
 
+    public async brushClicked(x: number, y: number) {
+        let type = this.dataStore.simulationData.physicsData.types[0];
+        if (this.selectedType) {
+            type = this.selectedType;
+        }
+        await this.scene.addPointsToScene(x, y, create(this.brush.count, type, this.brush.radius / 10));
+    }
+
     public brushChanged() {
         this.scene.updateSelectinoRadius(this.brush.radius);
-        console.log(this.brush.radius);
     }
 
     public createEmptyWorld() {
