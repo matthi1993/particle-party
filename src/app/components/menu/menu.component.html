@@ -24,6 +24,16 @@
             <button class="primary-button" (click)="randomForces()"> random particle parameters </button>
             <button class="secondary-button" (click)="multiplyForces(2)"> multiply forces </button>
             <button class="secondary-button" (click)="multiplyForces(0.5)"> devide forces </button>
+
+            <button (click)="addType()" class="primary-button">add type</button>
+            <button (click)="removeSelectedType()" [disabled]="dataStore.simulationData.physicsData.types.length <= 1"
+                    class="secondary-button">delete selected type</button>
+
+            <div class="col-2">
+                @for (item of dataStore.simulationData.physicsData.types; track item) {
+                    <p-chip [label]="item.name" (click)="selectType(item)" [class.selected]="item === selectedType"> </p-chip>
+                }
+            </div>
         </p-tabpanel>
         <p-tabpanel value="2">
             <h1>Edit</h1>
