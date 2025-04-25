@@ -6,12 +6,19 @@ import { bootstrapApplication, provideProtractorTestingSupport } from '@angular/
 import { AppComponent } from './app/app.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient } from '@angular/common/http';
+import {providePrimeNG} from "primeng/config";
+import Aura from "@primeng/themes/aura";
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideProtractorTestingSupport(),
     provideAnimationsAsync(),
-    provideHttpClient()
+    provideHttpClient(),
+    providePrimeNG({
+      theme: {
+        preset: Aura
+      }
+    })
   ]
 }).catch((err) =>
   console.error(err),

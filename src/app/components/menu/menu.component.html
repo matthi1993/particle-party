@@ -1,0 +1,32 @@
+<p-tabs value="0">
+    <p-tablist>
+        <p-tab value="0">Scene</p-tab>
+        <p-tab value="1">Physcis</p-tab>
+        <p-tab value="2">Edit</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+        <p-tabpanel value="0">
+            <h1>Scene</h1>
+
+            <p-floatlabel variant="in">
+                <p-inputnumber inputId="points" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
+                <p-slider [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
+                <label for="points">Points</label>
+            </p-floatlabel>
+            <button (click)="createRandomWorld()" class="primary-button">create random world</button>
+            <button (click)="createEmptyWorld()" class="secondary-button">create empty world</button>
+
+            <button class="secondary-button" (click)="saveSimulation()"> save simulation </button>
+        </p-tabpanel>
+        <p-tabpanel value="1">
+            <h1>Physics</h1>
+
+            <button class="primary-button" (click)="randomForces()"> random particle parameters </button>
+            <button class="secondary-button" (click)="multiplyForces(2)"> multiply forces </button>
+            <button class="secondary-button" (click)="multiplyForces(0.5)"> devide forces </button>
+        </p-tabpanel>
+        <p-tabpanel value="2">
+            <h1>Edit</h1>
+        </p-tabpanel>
+    </p-tabpanels>
+</p-tabs>
