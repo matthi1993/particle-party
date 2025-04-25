@@ -15,10 +15,11 @@
     "@angular/compiler": "^19.0.0",
     "@angular/core": "^19.0.0",
     "@angular/forms": "^19.0.0",
-    "@angular/material": "^19.0.5",
     "@angular/platform-browser": "^19.0.0",
     "@angular/router": "^19.0.0",
+    "@primeng/themes": "^19.1.0",
     "gl-matrix": "^3.4.3",
+    "primeng": "^19.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

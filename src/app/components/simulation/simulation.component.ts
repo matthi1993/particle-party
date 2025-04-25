@@ -1,8 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Point, create, ParticleType} from 'src/scene/model/Point';
 import {DataStore} from 'src/app/store/data.store';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import {PhysicsComponent} from "../physics/physics.component";
 import {ParticleSimulation} from 'src/scene/particle-simulation';
@@ -14,7 +12,7 @@ import {Brush} from "../../model/Brush";
 
 @Component({
     selector: 'app-simulation',
-    imports: [FormsModule, MatInputModule, MatFormFieldModule, PhysicsComponent],
+    imports: [FormsModule, PhysicsComponent],
     templateUrl: './simulation.component.html',
     styleUrls: ['./simulation.component.scss']
 })

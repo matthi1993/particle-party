@@ -1,12 +1,4 @@
 <div class="col-4">
-    <mat-form-field>
-        <mat-label>Physics Model</mat-label>
-        <mat-select [(value)]="dataStore.simulationData.physicsData" (valueChange)="selectType(dataStore.simulationData.physicsData.types[0])">
-            @for (item of dataStore.physicsDataOptions; track $index) {
-            <mat-option [value]="item">{{ item.name }}</mat-option>
-            }
-        </mat-select>
-    </mat-form-field>
     <button (click)="saveModel()" class="primary-button">save physics model</button>
 </div>
 

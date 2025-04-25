@@ -1,6 +1,4 @@
-@use '@angular/material' as mat;
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-
 
 $dark-grey: #171b21;
 $primary: #7FD650;
@@ -18,9 +16,6 @@ $card-selected-color: rgba($color: #26611c, $alpha: 0.7);
 
 html {
   color-scheme: dark;
-  @include mat.theme((color: mat.$violet-palette,
-      typography: Roboto,
-      density: 0));
 }
 
 body {

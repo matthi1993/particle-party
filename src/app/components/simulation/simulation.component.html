@@ -1,10 +1,7 @@
 <div class="side-card card">
     <h1>World creator</h1>
     <p>create a new world</p>
-    <mat-form-field>
-        <mat-label>Points per type:</mat-label>
-        <input matInput [(ngModel)]="pointNumber" />
-    </mat-form-field>
+        <input [(ngModel)]="pointNumber" />
     <button (click)="createRandomWorld()" class="primary-button">create random world</button>
     <button (click)="createEmptyWorld()" class="secondary-button">create empty world</button>
 
@@ -13,7 +10,6 @@
     <button class="secondary-button" (click)="multiplyForces(0.5)"> devide forces </button>
 
     <button class="secondary-button" (click)="saveSimulation()"> save simulation </button>
-    
 </div>
 <app-physics (typeChanged)="typeChanged($event)" class="side-card-right card"></app-physics>
 

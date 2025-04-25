@@ -3,18 +3,11 @@ import { ParticleTypeCardComponent } from "../particle-type-card/particle-type-c
 import { ParticleType} from 'src/scene/model/Point';
 import { vec4 } from 'gl-matrix';
 import { DataService } from 'src/app/services/data.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDialog } from '@angular/material/dialog';
-import { SaveDialog } from '../save-dialog/save-dialog';
 import { DataStore } from 'src/app/store/data.store';
-
-
-
 
 @Component({
   selector: 'app-physics',
-  imports: [MatSelectModule, MatFormFieldModule, ParticleTypeCardComponent],
+  imports: [ParticleTypeCardComponent],
   templateUrl: './physics.component.html',
   styleUrl: './physics.component.scss'
 })
@@ -24,7 +17,7 @@ export class PhysicsComponent implements OnInit {
 
   public selectedType!: ParticleType;
 
-  constructor(public dataStore: DataStore, private dataService: DataService, private dialog: MatDialog) { }
+  constructor(public dataStore: DataStore, private dataService: DataService) { }
 
   ngOnInit(): void {
   }
@@ -71,7 +64,7 @@ export class PhysicsComponent implements OnInit {
   }
 
   saveModel() {
-    const dialogRef = this.dialog.open(SaveDialog, {
+    /*const dialogRef = this.dialog.open(SaveDialog, {
       data: { name: "" },
     });
 
@@ -82,7 +75,7 @@ export class PhysicsComponent implements OnInit {
           this.dataStore.simulationData.physicsData = data;
         });
       }
-    })
+    })*/
   }
 
 }
