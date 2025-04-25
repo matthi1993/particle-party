@@ -9,12 +9,12 @@ import {ParticleSimulation} from 'src/scene/particle-simulation';
 import {randomRounded} from '../utils/utils';
 import {vec4} from 'gl-matrix';
 import {DataService} from 'src/app/services/data.service';
-import {Brush, BrushComponent} from "../brush/brush.component";
 import {getMouseNDC} from "../../../scene/scene.mousevent";
+import {Brush} from "../../model/Brush";
 
 @Component({
     selector: 'app-simulation',
-    imports: [FormsModule, MatInputModule, MatFormFieldModule, PhysicsComponent, BrushComponent],
+    imports: [FormsModule, MatInputModule, MatFormFieldModule, PhysicsComponent],
     templateUrl: './simulation.component.html',
     styleUrls: ['./simulation.component.scss']
 })
@@ -74,10 +74,6 @@ export class SimulationComponent implements OnInit {
             type = this.selectedType;
         }
         await this.scene.addPointsToScene(x, y, create(this.brush.count, type, this.brush.radius / 10));
-    }
-
-    public brushChanged() {
-        this.scene.updateSelectinoRadius(this.brush.radius);
     }
 
     public createEmptyWorld() {

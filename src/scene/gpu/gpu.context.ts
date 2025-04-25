@@ -12,13 +12,15 @@ export class GpuContext {
 
   public async setup() {
     if (!window.navigator.gpu) {
+      alert("WebGPU is not supported");
       throw new Error("WebGPU not supported on this browser.");
     }
-
     const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) {
+      alert("No appropriate GPUAdapter found.");
       throw new Error("No appropriate GPUAdapter found.");
     }
+    console.log("GPU connection works");
 
     this.device = await adapter.requestDevice();
     this.context = this.canvas.getContext("webgpu");
