@@ -138,5 +138,6 @@ export class SimulationComponent implements OnInit {
 
     public typeChanged(type: ParticleType) {
         this.selectedType = type;
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
     }
 }

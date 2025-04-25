@@ -1,5 +1,9 @@
 @use '../../../themes/main-theme' as theme;
 
+:host {
+    display: grid;
+}
+
 app-particle-type-card {
     cursor: pointer;
 }
