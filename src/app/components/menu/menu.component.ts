@@ -19,18 +19,23 @@ import {FieldsetModule} from 'primeng/fieldset';
 import {ColorPickerModule} from 'primeng/colorpicker';
 import {KnobModule} from 'primeng/knob';
 import {TableModule} from 'primeng/table';
+import {Brush} from "../../model/Brush";
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 
 @Component({
     selector: 'app-menu',
-    imports: [TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule],
+    imports: [ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule],
     templateUrl: './menu.component.html',
     styleUrl: './menu.component.scss'
 })
 export class MenuComponent {
 
-    @Input() public scene: ParticleSimulation = new ParticleSimulation();
+    @Input() public scene!: ParticleSimulation;
+    @Input() public brush!: Brush;
+
     public pointNumber: number = 500;
+
     public LIMITS = {
         MIN_FORCE: -1,
         MAX_FORCE: 1,

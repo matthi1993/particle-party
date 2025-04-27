@@ -19,8 +19,6 @@ export class SimulationComponent implements OnInit {
     public scene: ParticleSimulation = new ParticleSimulation();
     public brush: Brush = new Brush();
 
-    public selectedType: ParticleType | undefined = undefined;
-
     constructor(public dataStore: DataStore, public dataService: DataService) {
     }
 
@@ -64,15 +62,9 @@ export class SimulationComponent implements OnInit {
     }
 
     public async brushClicked(x: number, y: number) {
-        let type = this.dataStore.simulationData.physicsData.types[0];
-        if (this.selectedType) {
-            type = this.selectedType;
-        }
-        await this.scene.addPointsToScene(x, y, create(this.brush.count, type, this.brush.radius / 10));
-    }
+        if (!this.brush.active) return;
 
-    public typeChanged(type: ParticleType) {
-        this.selectedType = type;
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
+        await this.scene.addPointsToScene(x, y, create(this.brush.count, type, this.brush.radius / 10));
     }
 }

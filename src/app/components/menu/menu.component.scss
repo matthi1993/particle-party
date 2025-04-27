@@ -14,3 +14,7 @@
   height: 0.75rem;
   border-radius: 1rem;
 }
+
+p-chip.selected {
+  background-color: var(--p-emerald-200);
+}
