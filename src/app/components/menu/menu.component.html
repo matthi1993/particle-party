@@ -77,16 +77,20 @@
             }
         </p-tabpanel>
         <p-tabpanel value="2">
-
-            <p-button severity="info" (click)="resetForces()" class="mr-2">reset forces</p-button>
-            <button pButton (click)="randomForces()" severity="info" class="mr-2">
-                <i class="pi pi-question-circle"></i>
-                randomize
-            </button>
-            <p-button (click)="multiplyForces(2)" class="mr-2">forces * 2</p-button>
-            <p-button (click)="multiplyForces(0.5)" class="mr-2">forces / 2</p-button>
+            <div class="flex gap-2">
+                <p-button severity="info" (click)="resetForces()">reset forces</p-button>
+                <button pButton (click)="randomForces()" severity="info">
+                    <i class="pi pi-question-circle"></i>
+                    randomize
+                </button>
+            </div>
+            <div class="flex gap-2 mt-2">
+                <p-button (click)="multiplyForces(2)">forces * 2</p-button>
+                <p-button (click)="multiplyForces(0.5)">forces / 2</p-button>
+            </div>
 
             <p-table [scrollable]="true" [columns]="dataStore.simulationData.physicsData.types"
+                     size="small"
                      [value]="dataStore.simulationData.physicsData.types" class="mt-8">
                 <ng-template #header let-columns>
                     <tr>
@@ -107,6 +111,7 @@
                             <div class="flex align-items-center align-center">
                                 <div class="particle-circle mr-2"
                                      [style]="'background-color: rgb(' + itemA.color.r +  ',' + itemA.color.g + ', ' + itemA.color.b + ');'"></div>
+                                {{ itemA.name }}
                             </div>
                         </td>
                         @for (itemB of dataStore.simulationData.physicsData.types; track itemB; let innerIndex = $index) {
@@ -115,14 +120,14 @@
                                         [valueColor]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] < 0 ? 'var(--p-red-600)' : 'var(--p-focus-ring-color)'"
                                         (dblclick)="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] = 0"
                                         [title]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] + ' (' + itemA.name + '/' + itemB.name +')'"
-                                        valueTemplate=""
+                                        valueTemplate="O"
                                         (onChange)="updatePhysics()"
                                         [(ngModel)]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex]"
                                         [step]="0.001"
                                         [size]="50"
                                         [min]="-LIMITS.MAX_FORCE"
                                         [max]="LIMITS.MAX_FORCE"/>
-                                <div class="flex align-items-center">
+                                <div class="flex" [style]="'position: relative; top: -0.4rem;'">
                                     <div class="particle-circle"
                                          [title]="itemB.name"
                                          [style]="'margin: auto; background-color: rgb(' + itemB.color.r +  ',' + itemB.color.g + ', ' + itemB.color.b + ');'">
