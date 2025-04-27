@@ -6,15 +6,19 @@ import {randomRounded} from "../utils/utils";
 import {vec4} from "gl-matrix";
 import {DataStore} from "../../store/data.store";
 import {DataService} from "../../services/data.service";
-import { SliderModule } from 'primeng/slider';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { FloatLabelModule } from 'primeng/floatlabel';
+import {SliderModule} from 'primeng/slider';
+import {InputNumberModule} from 'primeng/inputnumber';
+import {FloatLabelModule} from 'primeng/floatlabel';
 import {ParticleSimulation} from "../../../scene/particle-simulation";
-import { ChipModule } from 'primeng/chip';
+import {ChipModule} from 'primeng/chip';
+import {FileSelectEvent, FileUploadModule} from 'primeng/fileupload';
+import {SimulationData} from "../../../scene/model/Simulation";
+import {readFile} from "../utils/file-utils";
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-menu',
-  imports: [ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule],
+  imports: [ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
@@ -25,14 +29,6 @@ export class MenuComponent {
   public selectedType!: ParticleType;
 
   constructor(public dataStore: DataStore, public dataService: DataService) {
-  }
-
-  public createEmptyWorld() {
-    this.dataStore.simulationData.points = [];
-    this.scene.setScene(
-        this.dataStore.simulationData.physicsData,
-        this.dataStore.simulationData.points
-    );
   }
 
   public createRandomWorld() {
@@ -85,6 +81,14 @@ export class MenuComponent {
     const sim = this.dataStore.simulationData;
     sim.points = await this.scene.getCurrentPoints();
     await this.dataService.saveSimulation(sim);
+  }
+
+  async selectScene(event: FileSelectEvent) {
+    this.dataStore.simulationData = await readFile<SimulationData>(event);
+    this.scene.setScene(
+        this.dataStore.simulationData.physicsData,
+        this.dataStore.simulationData.points
+    )
   }
 
   addType() {

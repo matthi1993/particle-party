@@ -50,7 +50,8 @@
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
               "src/themes/main-theme.scss",
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/primeflex/primeflex.css"
             ],
             "scripts": []
           },

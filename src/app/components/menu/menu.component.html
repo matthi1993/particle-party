@@ -8,30 +8,45 @@
         <p-tabpanel value="0">
             <h1>Scene</h1>
 
-            <p-floatlabel variant="in">
+            <p-button (click)="createRandomWorld()">create random world</p-button>
+            <p-floatlabel variant="in" class="mb-4 mt-2">
                 <p-inputnumber inputId="points" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
-                <p-slider [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
-                <label for="points">Points</label>
+                <label>Points</label>
             </p-floatlabel>
-            <button (click)="createRandomWorld()" class="primary-button">create random world</button>
-            <button (click)="createEmptyWorld()" class="secondary-button">create empty world</button>
+            <p-slider [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
 
-            <button class="secondary-button" (click)="saveSimulation()"> save simulation </button>
+
+            <div class="mt-4 flex align-items-center">
+                <p-button (click)="saveSimulation()" class="mr-2"> save simulation</p-button>
+                <p-fileUpload
+                        mode="basic"
+                        name="file"
+                        accept=".json"
+                        chooseIcon="pi pi-upload"
+                        chooseLabel="load simulation"
+                        auto="true"
+                        (onSelect)="selectScene($event)">
+                </p-fileUpload>
+            </div>
+
         </p-tabpanel>
         <p-tabpanel value="1">
             <h1>Physics</h1>
 
-            <button class="primary-button" (click)="randomForces()"> random particle parameters </button>
-            <button class="secondary-button" (click)="multiplyForces(2)"> multiply forces </button>
-            <button class="secondary-button" (click)="multiplyForces(0.5)"> devide forces </button>
+            <p-button (click)="randomForces()">randomize</p-button>
+            <p-button (click)="multiplyForces(2)"> multiply forces</p-button>
+            <p-button (click)="multiplyForces(0.5)"> devide forces</p-button>
 
-            <button (click)="addType()" class="primary-button">add type</button>
-            <button (click)="removeSelectedType()" [disabled]="dataStore.simulationData.physicsData.types.length <= 1"
-                    class="secondary-button">delete selected type</button>
+            <p-button (click)="addType()">add type</p-button>
+            <p-button (click)="removeSelectedType()"
+                      [disabled]="dataStore.simulationData.physicsData.types.length <= 1">
+                delete selected type
+            </p-button>
 
-            <div class="col-2">
+            <div>
                 @for (item of dataStore.simulationData.physicsData.types; track item) {
-                    <p-chip [label]="item.name" (click)="selectType(item)" [class.selected]="item === selectedType"> </p-chip>
+                    <p-chip [label]="item.name" (click)="selectType(item)"
+                            [class.selected]="item === selectedType"></p-chip>
                 }
             </div>
         </p-tabpanel>

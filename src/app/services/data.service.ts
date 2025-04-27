@@ -58,11 +58,6 @@ export class DataService {
         return combineLatest(requests);
     }
 
-    async getAiResponse(prompt: string): Promise<Point[]> {
-        alert("not implemented");
-        return [];
-    }
-
     async saveAsJson(obj: any, name: string) {
         const json = JSON.stringify(obj)
         try {

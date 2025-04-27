@@ -1,19 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
-$dark-grey: #171b21;
-$primary: #7FD650;
-$primary-highlight: #a0d981;
-$secondary: #4b74f2;
-$secondary-highlight: #8da6f2;
-$success: #7FD650;
-$error: #ed5a81;
-
-$box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
-$card-color: rgba($color: #08090a, $alpha: 0.95);
-$card-hover-color: rgba($color: #7895a3, $alpha: 0.4);
-$card-selected-color: rgba($color: #26611c, $alpha: 0.7);
-
-
 html {
   color-scheme: dark;
 }
@@ -23,83 +9,4 @@ body {
   background: linear-gradient(to right, #040C10, #0D181D, #0A0D0F);
   margin: 0;
   padding: 0;
-}
-
-// GRID
-.grid-12 {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 10px;
-}
-.grid-6 {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 10px;
-}
-.grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-.col-12 {
-  grid-column: span 12;
-}
-.col-10 {
-  grid-column: span 10;
-}
-.col-8 {
-  grid-column: span 8;
-}
-.col-6 {
-  grid-column: span 6;
-}
-.col-4 {
-  grid-column: span 4;
-}
-.col-3 {
-  grid-column: span 3;
-}
-.col-2 {
-  grid-column: span 2;
-}
-
-// BUTTONS
-button {
-  padding: 0.5rem 1.5rem;
-  margin-top: 0.5rem;
-  margin-right: 0.5rem;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
-.primary-button {
-  background-color: $primary;
-  color: black;
-}
-.primary-button[disabled]{
-  background-color: $primary-highlight;
-}
-.primary-button:hover {
-  background-color: $primary-highlight;
-}
-.secondary-button {
-  background-color: $secondary;
-  color: black;
-}
-.secondary-button[disabled]{
-  background-color: $secondary-highlight;
-}
-.secondary-button:hover {
-  background-color: $secondary-highlight;
-}
-
-// CARDS
-.card {
-  background: $card-color;
-  padding: 1.5rem;
 }
