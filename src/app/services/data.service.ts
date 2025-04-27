@@ -10,13 +10,13 @@ import { combineLatest} from 'rxjs';
 export class DataService {
 
     public physics = [
-        "/assets/presets/physics-base.json",
-        "/assets/presets/orange.json",
+        "assets/presets/physics-base.json",
+        "assets/presets/orange.json",
     ]
     public structures = [
     ]
     public simulations = [
-        "/assets/presets/simulation.json",
+        "assets/presets/simulation.json",
     ]
 
     constructor(private http: HttpClient, private dataStore: DataStore) {
