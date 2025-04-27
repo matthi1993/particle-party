@@ -10,12 +10,11 @@ import { SliderModule } from 'primeng/slider';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import {ParticleSimulation} from "../../../scene/particle-simulation";
-import {ParticleTypeCardComponent} from "../particle-type-card/particle-type-card.component";
 import { ChipModule } from 'primeng/chip';
 
 @Component({
   selector: 'app-menu',
-  imports: [ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule, ParticleTypeCardComponent],
+  imports: [ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
