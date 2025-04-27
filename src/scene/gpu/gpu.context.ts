@@ -20,7 +20,6 @@ export class GpuContext {
       alert("No appropriate GPUAdapter found.");
       throw new Error("No appropriate GPUAdapter found.");
     }
-    console.log("GPU connection works");
 
     this.device = await adapter.requestDevice();
     this.context = this.canvas.getContext("webgpu");

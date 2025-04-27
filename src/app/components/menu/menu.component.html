@@ -1,19 +1,22 @@
 <p-tabs value="0">
     <p-tablist>
         <p-tab value="0">Scene</p-tab>
-        <p-tab value="1">Physcis</p-tab>
-        <p-tab value="2">Edit</p-tab>
+        <p-tab value="1">Particles</p-tab>
+        <p-tab value="2">Physcis</p-tab>
+        <p-tab value="3">Edit</p-tab>
     </p-tablist>
     <p-tabpanels>
         <p-tabpanel value="0">
             <h1>Scene</h1>
 
-            <p-button (click)="createRandomWorld()">create random world</p-button>
-            <p-floatlabel variant="in" class="mb-4 mt-2">
-                <p-inputnumber inputId="points" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
-                <label>Points</label>
-            </p-floatlabel>
-            <p-slider [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
+            <div class="flex align-content-center align-items-center mb-2 gap-2">
+                <p-button (click)="createRandomWorld()">create random world</p-button>
+                <p-floatlabel variant="in">
+                    <p-inputnumber inputId="points" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
+                    <label>Points</label>
+                </p-floatlabel>
+            </div>
+            <p-slider [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="2000"/>
 
 
             <div class="mt-4 flex align-items-center">
@@ -31,26 +34,59 @@
 
         </p-tabpanel>
         <p-tabpanel value="1">
-            <h1>Physics</h1>
+            <h1>Particles</h1>
 
-            <p-button (click)="randomForces()">randomize</p-button>
-            <p-button (click)="multiplyForces(2)"> multiply forces</p-button>
-            <p-button (click)="multiplyForces(0.5)"> devide forces</p-button>
+            <button pButton (click)="randomParticleValues()" class="mr-2">
+                <i class="pi pi-question-circle"></i>
+                randomize
+            </button>
+            <button pButton (click)="addType()">
+                <i class="pi pi-plus-circle"></i>
+                add type
+            </button>
 
-            <p-button (click)="addType()">add type</p-button>
-            <p-button (click)="removeSelectedType()"
-                      [disabled]="dataStore.simulationData.physicsData.types.length <= 1">
-                delete selected type
-            </p-button>
-
-            <div>
-                @for (item of dataStore.simulationData.physicsData.types; track item) {
-                    <p-chip [label]="item.name" (click)="selectType(item)"
-                            [class.selected]="item === selectedType"></p-chip>
-                }
-            </div>
+            @for (item of dataStore.simulationData.physicsData.types; track item) {
+                <p-fieldset [toggleable]="true" [collapsed]="true" class="flex mt-2">
+                    <ng-template #header>
+                        <div class="flex items-center gap-2 px-2">
+                            <div class="particle-circle" [style]="'background-color: rgb(' + item.color.r +  ',' + item.color.g + ', ' + item.color.b + ');'"></div>
+                            <span class="font-bold">{{ item.name }}</span>
+                        </div>
+                    </ng-template>
+                    <p-colorpicker (onChange)="updatePhysics()" [(ngModel)]="item.color" format="rgb" class="mr-2"/>
+                    <input class="mr-2" type="text" pInputText [(ngModel)]="item.name" placeholder="name"/>
+                    <button pButton severity="danger" (click)="deleteType($index)">
+                        <i class="pi pi-times"></i>
+                    </button>
+                    <div class="flex items-center align-items-center gap-2 px-2 mt-2">
+                        <label [style.width]="'70px'" for="sizeSlider" class="mr-2">size:</label>
+                        <p-slider (onChange)="updatePhysics()" [style.width]="'200px'" id="sizeSlider"
+                                  [(ngModel)]="item.size" class="w-full" [step]="0.01" [min]="0.25" [max]="1"/>
+                    </div>
+                    <div class="flex items-center align-items-center gap-2 px-2 mt-2">
+                        <label [style.width]="'70px'" for="radiusSlider" class="mr-2">radius:</label>
+                        <p-slider [style.width]="'200px'" id="radiusSlider" [(ngModel)]="item.radius" class="w-full"
+                                  [step]="0.1" [min]="0" [max]="50"/>
+                    </div>
+                    <div class="flex items-center align-items-center gap-2 px-2 mt-2">
+                        <label [style.width]="'70px'" for="massSlider" class="mr-2">mass:</label>
+                        <p-slider [style.width]="'200px'" id="massSlider" [(ngModel)]="item.mass" class="w-full"
+                                  [step]="0.001" [min]="0" [max]="0.25"/>
+                    </div>
+                </p-fieldset>
+            }
         </p-tabpanel>
         <p-tabpanel value="2">
+            <h1>Physics</h1>
+
+            <button pButton (click)="randomForces()" class="mr-2">
+                <i class="pi pi-question-circle"></i>
+                randomize
+            </button>
+            <p-button (click)="multiplyForces(2)" class="mr-2"> multiply forces</p-button>
+            <p-button (click)="multiplyForces(0.5)" class="mr-2"> devide forces</p-button>
+        </p-tabpanel>
+        <p-tabpanel value="3">
             <h1>Edit</h1>
         </p-tabpanel>
     </p-tabpanels>

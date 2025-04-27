@@ -1,6 +1,18 @@
 
 import { vec4 } from 'gl-matrix';
 
+export class Color {
+    public r: number = 255;
+    public g: number = 255;
+    public b: number = 255
+
+    constructor(r: number, g: number, b: number) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+}
+
 export class Structure {
     public id?: number;
     public name: string = "";
@@ -10,12 +22,12 @@ export class Structure {
 export class ParticleType {
     public id: number;
     public name;
-    public color;
+    public color: Color;
     public radius;
     public size;
     public mass;
 
-    constructor(name: string, id: number, color: vec4, radius: number, size: number, mass: number) {
+    constructor(name: string, id: number, color: Color, radius: number, size: number, mass: number) {
         this.name = name;
         this.color = color;
         this.radius = radius;

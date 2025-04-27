@@ -28,10 +28,10 @@ export function createTypesArray(types: ParticleType[]) {
 
     let index = 0;
     types.forEach((key) => {
-        typesArray[index * dimensions + 0] = key.color[0];
-        typesArray[index * dimensions + 1] = key.color[1];
-        typesArray[index * dimensions + 2] = key.color[2];
-        typesArray[index * dimensions + 3] = key.color[3];
+        typesArray[index * dimensions + 0] = key.color.r / 255;
+        typesArray[index * dimensions + 1] = key.color.g / 255;
+        typesArray[index * dimensions + 2] = key.color.b / 255;
+        typesArray[index * dimensions + 3] = 1; // Alpha channel is always 1
 
         typesArray[index * dimensions + 4] = index;
         typesArray[index * dimensions + 5] = key.radius;
