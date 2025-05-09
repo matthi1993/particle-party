@@ -46,7 +46,7 @@ export const sceneRenderShader = `
         var output: VertexOutput;
 
         let modelViewProjection = uniforms.viewProjectionMatrix;
-        output.position = modelViewProjection * dataIn[instance].position + vec4f(position * 4, 0, 0) ;
+        output.position = modelViewProjection * dataIn[instance].position + vec4f(position * myType.size, 0, 0) ;
         output.velocity = modelViewProjection * dataIn[instance].velocity;
         output.color = myType.color;
         output.uv = position * 0.5 + 0.5;
@@ -66,8 +66,10 @@ export const sceneRenderShader = `
     @fragment
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
 
-        let center = vec2<f32>(0.5, 0.5);
-        let size = 0.25 * input.size;
+        return vec4f(input.color.xyz, 1);
+
+        /*let center = vec2<f32>(0.5, 0.5);
+        let size = 0.5 * input.size;
         let softness = 0.01;
 
         let dist = distance(input.uv, center);
@@ -92,6 +94,6 @@ export const sceneRenderShader = `
 
         let fade = smoothstep(-2, 0.5, dist);
         // Glow
-        return vec4f(input.color.xyz * 2, 1 - fade);
+        return vec4f(input.color.xyz * 2, 1 - fade);*/
     }
 `;

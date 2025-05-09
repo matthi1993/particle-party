@@ -55,7 +55,7 @@ export function create(count: number, type: ParticleType, radius: number) {
                 vec4.fromValues(
                     point.x,
                     point.y,
-                    0,//point.z,
+                    point.z,
                     1
                 ),
                 type.id

@@ -142,12 +142,15 @@ export const sceneComputeShader = `
 
 
         // ##### Bounding Sphere #####
-        if(length(me.position) > 200) {
+        if(length(me.position) > size) {
             me.velocity.x = me.velocity.x * -1;
             me.position.x += me.velocity.x;
 
             me.velocity.y = me.velocity.y * -1;
             me.position.y += me.velocity.y;
+
+            me.velocity.z = me.velocity.z * -1;
+            me.position.z += me.velocity.z;
         }
 
         particlesOut[index] = me;

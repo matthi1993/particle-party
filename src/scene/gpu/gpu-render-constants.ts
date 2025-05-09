@@ -31,7 +31,7 @@ export const FORMAT_SHADER_LAYOUT = {
             operation: "add",
         },
         alpha: {
-            srcFactor: "one",
+            srcFactor: "src-alpha",
             dstFactor: "one-minus-src-alpha",
             operation: "add",
         },

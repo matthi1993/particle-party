@@ -43,7 +43,12 @@ export class Render {
                 module: shaderModule,
                 entryPoint: "fragmentMain",
                 targets: [FORMAT_SHADER_LAYOUT]
-            }
+            },
+            depthStencil: {
+                depthWriteEnabled: true,
+                depthCompare: 'less',
+                format: 'depth24plus',
+            },
         });
 
     }

@@ -34,10 +34,18 @@ export class ParticleSimulation {
     private mousePos = vec3.fromValues(0, 0, 0);
     private selectionRadius = 0;
 
+    private depthTexture: any = undefined;
+
     public async setup(canvas: HTMLCanvasElement, width: number, height: number) {
         this.gpuContext = new GpuContext(canvas, width, height);
         this.camera = new Camera(width, height, 50);
         await this.gpuContext.setup();
+
+        this.depthTexture = this.gpuContext.device.createTexture({
+            size: [this.gpuContext.canvas.width, this.gpuContext.canvas.height],
+            format: 'depth24plus',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT,
+        });
 
         // set Camera Movement Listeners
         new CameraMovementListeners(
@@ -193,13 +201,21 @@ export class ParticleSimulation {
 
         // setup render pipelines
         const encoder = this.gpuContext.device.createCommandEncoder();
+
+
         const renderPass = encoder.beginRenderPass({
             colorAttachments: [{
                 view: this.gpuContext.context.getCurrentTexture().createView(),
                 loadOp: "clear",
                 clearValue: BACKGROUND_COLOR,
                 storeOp: "store",
-            }]
+            }],
+            depthStencilAttachment: {
+                view: this.depthTexture.createView(),
+                depthLoadOp: 'clear',
+                depthClearValue: 1.0,
+                depthStoreOp: 'store',
+            }
         });
 
         this.simulationRenderer?.execute(
