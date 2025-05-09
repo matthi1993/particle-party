@@ -38,7 +38,7 @@ export class ParticleSimulation {
 
     public async setup(canvas: HTMLCanvasElement, width: number, height: number) {
         this.gpuContext = new GpuContext(canvas, width, height);
-        this.camera = new Camera(width, height, 50);
+        this.camera = new Camera(width, height, 250);
         await this.gpuContext.setup();
 
         this.depthTexture = this.gpuContext.device.createTexture({
@@ -52,11 +52,11 @@ export class ParticleSimulation {
             this.gpuContext.canvas!!,
             () => this.simulationLoop(!this.isPlaying),
             (x: number, y: number, z: number) => {
-                this.camera.position[0] += x * this.camera.position[2] / this.camera.moveSpeed;
-                this.camera.position[1] += y * this.camera.position[2] / this.camera.moveSpeed;
-                this.camera.position[2] += z * this.camera.position[2] / this.camera.moveSpeed;
-
-                this.camera.position[2] = Math.min(Math.max(this.camera.position[2], this.camera.minZoom), this.camera.maxZoom);
+                this.camera.translate(x, y, -z);
+            },
+            (x: number, y: number) => {
+                console.log("Orbit: " + x + ", " + y);
+                this.camera.orbit(x, y);
             },
             (x: number, y: number) => {
                 const worldPoint = ndcToWorld(x, y, this.camera);
