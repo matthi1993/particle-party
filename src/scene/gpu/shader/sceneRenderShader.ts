@@ -66,9 +66,7 @@ export const sceneRenderShader = `
     @fragment
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
 
-        return vec4f(input.color.xyz, 1);
-
-        /*let center = vec2<f32>(0.5, 0.5);
+        let center = vec2<f32>(0.5, 0.5);
         let size = 0.5 * input.size;
         let softness = 0.01;
 
@@ -90,10 +88,11 @@ export const sceneRenderShader = `
         if(dist < size) {
             return vec4f(input.color.xyz, 1 - circle);
         }
+        
             
 
         let fade = smoothstep(-2, 0.5, dist);
         // Glow
-        return vec4f(input.color.xyz * 2, 1 - fade);*/
+        return vec4f((input.color.xyz * 2) * (1 - fade), 1 - fade);
     }
 `;

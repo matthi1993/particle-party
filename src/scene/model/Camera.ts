@@ -10,7 +10,7 @@ export class Camera {
     maxZoom = 1000;
     moveSpeed = 0.25;
 
-    position = vec3.fromValues(0, 0, 10);    // Camera position
+    position = vec3.fromValues(0, 0, 200);    // Camera position
     center = vec3.fromValues(0, 0, 0); // Look-at point
     up = vec3.fromValues(0, 1, 0);     // Up vector
 

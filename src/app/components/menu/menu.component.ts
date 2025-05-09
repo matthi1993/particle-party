@@ -43,12 +43,12 @@ export class MenuComponent {
     public structureName = '';
 
     public LIMITS = {
-        MIN_FORCE: -3,
-        MAX_FORCE: 3,
+        MIN_FORCE: -1,
+        MAX_FORCE: 1,
         MAX_RADIUS: 100,
         MAX_MASS: 0.25,
         MIN_SIZE: 0.25,
-        MAX_SIZE: 2
+        MAX_SIZE: 1.5
     }
 
     constructor(public dataStore: DataStore, public dataService: DataService) {
