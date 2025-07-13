@@ -22,10 +22,13 @@ import {TableModule} from 'primeng/table';
 import {Brush, BrushState} from "../../model/Brush";
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SimulationEditComponent } from '../simulation-edit/simulation-edit.component';
+import { DialogModule } from 'primeng/dialog';
+import { Structure } from '../../../scene/model/Structure';
+import { vec4 } from 'gl-matrix';
 
 @Component({
     selector: 'app-menu',
-    imports: [SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule],
+    imports: [SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule, DialogModule],
     templateUrl: './menu.component.html',
     styleUrl: './menu.component.scss'
 })
@@ -36,6 +39,8 @@ export class MenuComponent {
 
     public pointNumber: number = 500;
     public BrushState = BrushState; // Make enum available in template
+    public showSaveDialog = false;
+    public structureName = '';
 
     public LIMITS = {
         MIN_FORCE: -1,
@@ -171,5 +176,74 @@ export class MenuComponent {
         this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
             type.id = index;
         })
+    }
+
+    deleteStructure(index: number) {
+        this.dataStore.simulationData.structures.splice(index, 1);
+    }
+
+    public async openSaveStructureDialog() {
+        // Get current points from the scene
+        const currentPoints = await this.scene.getCurrentPoints();
+        
+        // Filter only selected points
+        const selectedPoints = currentPoints.filter(point => point.selected === 1);
+        
+        if (selectedPoints.length === 0) {
+            alert('No points are selected. Please select some points first.');
+            return;
+        }
+        
+        // Set default name and show dialog
+        this.structureName = `Structure ${this.dataStore.simulationData.structures.length + 1}`;
+        this.showSaveDialog = true;
+    }
+
+    public async saveSelectedPointsAsStructure() {
+        if (!this.structureName.trim()) {
+            alert('Please enter a name for the structure.');
+            return;
+        }
+
+        // Get current points from the scene
+        const currentPoints = await this.scene.getCurrentPoints();
+        
+        // Filter only selected points
+        const selectedPoints = currentPoints.filter(point => point.selected === 1);
+        
+        // Create a new structure
+        const newStructure = new Structure();
+        newStructure.name = this.structureName.trim();
+        
+        // Convert selected points to relative positions (centered around origin)
+        const centerX = selectedPoints.reduce((sum, point) => sum + point.position[0], 0) / selectedPoints.length;
+        const centerY = selectedPoints.reduce((sum, point) => sum + point.position[1], 0) / selectedPoints.length;
+        
+        newStructure.points = selectedPoints.map(point => {
+            return new Point(
+                vec4.fromValues(
+                    point.position[0] - centerX,
+                    point.position[1] - centerY,
+                    point.position[2],
+                    point.position[3]
+                ),
+                point.particleTypeId
+            );
+        });
+        
+        // Add the new structure to the simulation data
+        this.dataStore.simulationData.structures.push(newStructure);
+        
+        // Reset point selection
+        await this.scene.resetPointSelection();
+        
+        // Close dialog
+        this.showSaveDialog = false;
+        this.structureName = '';
+    }
+
+    public cancelSaveStructure() {
+        this.showSaveDialog = false;
+        this.structureName = '';
     }
 }
