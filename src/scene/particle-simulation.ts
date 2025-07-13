@@ -154,15 +154,13 @@ export class ParticleSimulation {
         // adding a timeout to make sure no simulation loop is called in between
         setTimeout(async () => {
             this.points = await this.getCurrentPoints();
-            const worldPoint = ndcToWorld(originX, originY, this.camera);
-            const scenePoint = projectToScenePlane(worldPoint, this.camera);
 
             let pointsToAdd: Point[] = [];
             points.forEach(point => {
                 pointsToAdd.push(new Point(
                     vec4.fromValues(
-                        scenePoint[0] + point.position[0],
-                        scenePoint[1] + point.position[1],
+                        originX + point.position[0],
+                        originY + point.position[1],
                         0,
                         1
                     ),

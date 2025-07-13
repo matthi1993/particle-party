@@ -15,20 +15,12 @@ export class BrushComponent implements OnInit, OnDestroy {
   @Input() canvas!: ElementRef<HTMLCanvasElement>;
   
   tempRadius: number = 10;
-  showDialog: boolean = false;
   isMouseOnCanvas: boolean = false;
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent) {
     this.brush.x = event.clientX;
     this.brush.y = event.clientY;
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscapeKey() {
-    if (this.showDialog) {
-      this.closeDialog();
-    }
   }
 
   ngOnInit() {
@@ -57,22 +49,5 @@ export class BrushComponent implements OnInit, OnDestroy {
         this.isMouseOnCanvas = false;
       });
     }
-  }
-
-  openRadiusDialog(event: MouseEvent) {
-    event.preventDefault();
-    this.tempRadius = this.brush.radius;
-    this.showDialog = true;
-  }
-
-  closeDialog() {
-    this.showDialog = false;
-  }
-
-  applyRadius() {
-    if (this.tempRadius >= 1 && this.tempRadius <= 200) {
-      this.brush.radius = this.tempRadius;
-    }
-    this.closeDialog();
   }
 }

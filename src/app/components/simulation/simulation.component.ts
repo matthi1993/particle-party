@@ -1,10 +1,10 @@
-import {Component, OnInit, ViewChild, ElementRef} from '@angular/core';
-import {create, ParticleType} from 'src/scene/model/Point';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {create} from 'src/scene/model/Point';
 import {DataStore} from 'src/app/store/data.store';
 import {FormsModule} from '@angular/forms';
 import {ParticleSimulation} from 'src/scene/particle-simulation';
 import {DataService} from 'src/app/services/data.service';
-import {getMouseNDC, ndcToWorld, projectToScenePlane} from "../../../scene/scene.mousevent";
+import {getMouseNDC, getPointNDC, ndcToWorld, projectToScenePlane} from "../../../scene/scene.mousevent";
 import {Brush} from "../../model/Brush";
 import {MenuComponent} from "../menu/menu.component";
 import {BrushComponent} from "../brush/brush.component";
@@ -17,8 +17,8 @@ import {BrushComponent} from "../brush/brush.component";
 })
 export class SimulationComponent implements OnInit {
 
-    @ViewChild('gpuCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
-    
+    @ViewChild('gpuCanvas', {static: true}) canvasRef!: ElementRef<HTMLCanvasElement>;
+
     public scene: ParticleSimulation = new ParticleSimulation();
     public brush: Brush = new Brush();
 
@@ -64,10 +64,20 @@ export class SimulationComponent implements OnInit {
         if (!this.brush.active) return;
 
         let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
-        // TODO why 400?
-        let worldPoint = ndcToWorld(this.brush.radius / 400, 0, this.scene.getCamera())
-        let newRadius = projectToScenePlane(worldPoint, this.scene.getCamera())[0]
 
-        await this.scene.addPointsToScene(x, y, create(this.brush.count, type, newRadius));
+        const camera = this.scene.getCamera()
+
+        let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
+
+        const originWorldPoint = ndcToWorld(x, y, camera);
+        const originPoint = projectToScenePlane(originWorldPoint, camera);
+
+        let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
+
+        await this.scene.addPointsToScene(
+            originPoint[0],
+            originPoint[1],
+            create(this.brush.count, type, radius)
+        );
     }
 }
