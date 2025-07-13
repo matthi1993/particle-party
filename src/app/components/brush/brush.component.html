@@ -1,6 +1,8 @@
-<div class="brush-container" *ngIf="isMouseOnCanvas">
+<div class="brush-container" *ngIf="isMouseOnCanvas && (brush.state === BrushState.Paint || brush.state === BrushState.Select)">
   <div 
     class="brush-circle" 
+    [class.brush-paint]="brush.state === BrushState.Paint"
+    [class.brush-select]="brush.state === BrushState.Select"
     [style.left.px]="brush.x" 
     [style.top.px]="brush.y"
     [style.width.px]="brush.radius * 2"

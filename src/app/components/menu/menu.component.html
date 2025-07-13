@@ -146,9 +146,30 @@
         </p-tabpanel>
         <p-tabpanel value="3">
             <div class="flex align-items-center">
-                <label for="brush-toggle" class="mr-2">paint particles:</label>
-                <p-toggleswitch id="brush-toggle" [(ngModel)]="brush.active" onLabel="On" offLabel="Off"
-                                onIcon="pi pi-check" offIcon="pi pi-times"/>
+                <label class="mr-2">brush mode:</label>
+                <div class="flex gap-2">
+                    <p-button 
+                        [icon]="'pi pi-times'" 
+                        [severity]="brush.state === BrushState.None ? 'primary' : 'secondary'"
+                        (click)="brush.state = BrushState.None"
+                        [title]="'None'"
+                        size="small">
+                    </p-button>
+                    <p-button 
+                        [icon]="'pi pi-pencil'" 
+                        [severity]="brush.state === BrushState.Paint ? 'primary' : 'secondary'"
+                        (click)="brush.state = BrushState.Paint"
+                        [title]="'Paint'"
+                        size="small">
+                    </p-button>
+                    <p-button 
+                        [icon]="'pi pi-search'" 
+                        [severity]="brush.state === BrushState.Select ? 'primary' : 'secondary'"
+                        (click)="brush.state = BrushState.Select"
+                        [title]="'Select'"
+                        size="small">
+                    </p-button>
+                </div>
             </div>
             <div class="flex align-items-center mt-2">
                 <label [style.width]="'150px'" for="brush-radius" class="mr-2">radius ({{ brush.radius }}):</label>

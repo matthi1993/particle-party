@@ -17,6 +17,16 @@
   transition: width 0.2s ease, height 0.2s ease;
 }
 
+.brush-paint {
+  border: 2px dashed #4caf50;
+  background-color: rgba(76, 175, 80, 0.3);
+}
+
+.brush-select {
+  border: 2px dashed #2196f3;
+  background-color: rgba(33, 150, 243, 0.3);
+}
+
 .brush-click-area {
   position: absolute;
   border-radius: 50%;

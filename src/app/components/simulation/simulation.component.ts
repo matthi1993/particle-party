@@ -5,7 +5,7 @@ import {FormsModule} from '@angular/forms';
 import {ParticleSimulation} from 'src/scene/particle-simulation';
 import {DataService} from 'src/app/services/data.service';
 import {getMouseNDC, getPointNDC, ndcToWorld, projectToScenePlane} from "../../../scene/scene.mousevent";
-import {Brush} from "../../model/Brush";
+import {Brush, BrushState} from "../../model/Brush";
 import {MenuComponent} from "../menu/menu.component";
 import {BrushComponent} from "../brush/brush.component";
 
@@ -61,7 +61,7 @@ export class SimulationComponent implements OnInit {
     }
 
     public async brushClicked(x: number, y: number) {
-        if (!this.brush.active) return;
+        if (this.brush.state !== BrushState.Paint) return;
 
         let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
 
@@ -72,6 +72,7 @@ export class SimulationComponent implements OnInit {
         const originWorldPoint = ndcToWorld(x, y, camera);
         const originPoint = projectToScenePlane(originWorldPoint, camera);
 
+        // TODO: This is not correct, radius needs to be in world space
         let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
 
         await this.scene.addPointsToScene(

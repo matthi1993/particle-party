@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener, Input, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Brush } from '../../model/Brush';
+import { Brush, BrushState } from '../../model/Brush';
 
 @Component({
   selector: 'app-brush',
@@ -16,6 +16,7 @@ export class BrushComponent implements OnInit, OnDestroy {
   
   tempRadius: number = 10;
   isMouseOnCanvas: boolean = false;
+  BrushState = BrushState; // Make enum available in template
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent) {

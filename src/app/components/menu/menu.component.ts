@@ -19,7 +19,7 @@ import {FieldsetModule} from 'primeng/fieldset';
 import {ColorPickerModule} from 'primeng/colorpicker';
 import {KnobModule} from 'primeng/knob';
 import {TableModule} from 'primeng/table';
-import {Brush} from "../../model/Brush";
+import {Brush, BrushState} from "../../model/Brush";
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 
@@ -35,6 +35,7 @@ export class MenuComponent {
     @Input() public brush!: Brush;
 
     public pointNumber: number = 500;
+    public BrushState = BrushState; // Make enum available in template
 
     public LIMITS = {
         MIN_FORCE: -1,
