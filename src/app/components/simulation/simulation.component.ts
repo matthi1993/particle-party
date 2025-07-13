@@ -8,6 +8,8 @@ import {getMouseNDC, getPointNDC, ndcToWorld, projectToScenePlane} from "../../.
 import {Brush, BrushState} from "../../model/Brush";
 import {MenuComponent} from "../menu/menu.component";
 import {BrushComponent} from "../brush/brush.component";
+import {Point} from 'src/scene/model/Point';
+import {vec4} from 'gl-matrix';
 
 @Component({
     selector: 'app-simulation',
@@ -62,23 +64,41 @@ export class SimulationComponent implements OnInit {
 
     public async brushClicked(x: number, y: number) {
         if (this.brush.state === BrushState.Paint) {
-            let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
+            // Check if we have structures and if a structure is selected
+            if (this.dataStore.simulationData.structures.length > 0 && this.brush.structureId >= 0 && this.brush.structureId < this.dataStore.simulationData.structures.length) {
+                // Paint structure
+                let structure = this.dataStore.simulationData.structures[this.brush.structureId];
+                
+                const camera = this.scene.getCamera()
+                const originWorldPoint = ndcToWorld(x, y, camera);
+                const originPoint = projectToScenePlane(originWorldPoint, camera);
 
-            const camera = this.scene.getCamera()
+                await this.scene.addPointsToScene(
+                    originPoint[0],
+                    originPoint[1],
+                    structure.points
+                );
+            } else if (this.brush.particleId >= 0 && this.brush.particleId < this.dataStore.simulationData.physicsData.types.length) {
+                // Paint particles (existing logic)
+                let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
 
-            let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
+                const camera = this.scene.getCamera()
 
-            const originWorldPoint = ndcToWorld(x, y, camera);
-            const originPoint = projectToScenePlane(originWorldPoint, camera);
+                let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
 
-            // TODO: This is not correct, radius needs to be in world space
-            let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
+                const originWorldPoint = ndcToWorld(x, y, camera);
+                const originPoint = projectToScenePlane(originWorldPoint, camera);
 
-            await this.scene.addPointsToScene(
-                originPoint[0],
-                originPoint[1],
-                create(this.brush.count, type, radius)
-            );
+                // TODO: This is not correct, radius needs to be in world space
+                let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
+
+                await this.scene.addPointsToScene(
+                    originPoint[0],
+                    originPoint[1],
+                    create(this.brush.count, type, radius)
+                );
+            }
+            // If neither particle nor structure is selected, do nothing
         } else if (this.brush.state === BrushState.Select) {
 
             //TODO performance is bad for selection, needs to be done in shader, same for deselect

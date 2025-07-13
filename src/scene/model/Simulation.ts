@@ -1,5 +1,6 @@
 
 import { ParticleType, Point } from 'src/scene/model/Point';
+import { Structure } from 'src/scene/model/Structure';
 
 export class ParticleTypeWithForces {
   public type!: ParticleType;
@@ -13,6 +14,7 @@ export class ParticleTypeWithForces {
 export class SimulationData {
   public physicsData: PhysicsData = new PhysicsData(0, "none");
   public points: Point[] = [];
+  public structures: Structure[] = [];
 }
 
 export class PhysicsData {

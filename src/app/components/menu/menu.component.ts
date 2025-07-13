@@ -21,11 +21,11 @@ import {KnobModule} from 'primeng/knob';
 import {TableModule} from 'primeng/table';
 import {Brush, BrushState} from "../../model/Brush";
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-
+import { SimulationEditComponent } from '../simulation-edit/simulation-edit.component';
 
 @Component({
     selector: 'app-menu',
-    imports: [ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule],
+    imports: [SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule],
     templateUrl: './menu.component.html',
     styleUrl: './menu.component.scss'
 })
@@ -171,13 +171,5 @@ export class MenuComponent {
         this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
             type.id = index;
         })
-    }
-
-    public setBrushState(state: BrushState) {
-        this.brush.state = state;
-        if (state === BrushState.None) {
-            // Reset all point selections when switching to None state
-            this.scene.resetPointSelection();
-        }
     }
 }
