@@ -61,24 +61,62 @@ export class SimulationComponent implements OnInit {
     }
 
     public async brushClicked(x: number, y: number) {
-        if (this.brush.state !== BrushState.Paint) return;
+        if (this.brush.state === BrushState.Paint) {
+            let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
 
-        let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
+            const camera = this.scene.getCamera()
 
-        const camera = this.scene.getCamera()
+            let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
 
-        let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
+            const originWorldPoint = ndcToWorld(x, y, camera);
+            const originPoint = projectToScenePlane(originWorldPoint, camera);
 
-        const originWorldPoint = ndcToWorld(x, y, camera);
-        const originPoint = projectToScenePlane(originWorldPoint, camera);
+            // TODO: This is not correct, radius needs to be in world space
+            let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
 
-        // TODO: This is not correct, radius needs to be in world space
-        let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
+            await this.scene.addPointsToScene(
+                originPoint[0],
+                originPoint[1],
+                create(this.brush.count, type, radius)
+            );
+        } else if (this.brush.state === BrushState.Select) {
 
-        await this.scene.addPointsToScene(
-            originPoint[0],
-            originPoint[1],
-            create(this.brush.count, type, radius)
-        );
+            //TODO performance is bad for selection, needs to be done in shader, same for deselect
+            const camera = this.scene.getCamera();
+            
+            // Convert brush radius to world space
+            let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
+            let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
+            
+            // Get click position in world space
+            const originWorldPoint = ndcToWorld(x, y, camera);
+            const originPoint = projectToScenePlane(originWorldPoint, camera);
+            
+            // Get current points from the scene
+            const currentPoints = await this.scene.getCurrentPoints();
+            
+            // Check which points are within the brush radius and set their selected flag
+            currentPoints.forEach(point => {
+                const distance = Math.sqrt(
+                    Math.pow(point.position[0] - originPoint[0], 2) + 
+                    Math.pow(point.position[1] - originPoint[1], 2)
+                );
+                
+                if (distance <= radius) {
+                    point.selected = 1;
+                }
+            });
+            
+            // Update the points in the scene
+            await this.scene.updatePoints(currentPoints);
+        }
+    }
+
+    public async resetPointSelection() {
+        const currentPoints = await this.scene.getCurrentPoints();
+        currentPoints.forEach(point => {
+            point.selected = 0;
+        });
+        await this.scene.updatePoints(currentPoints);
     }
 }

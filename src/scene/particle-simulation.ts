@@ -97,6 +97,14 @@ export class ParticleSimulation {
         this.sceneStorage.updatePointValues(this.gpuContext, this.points, this.physicsData);
     }
 
+    public async resetPointSelection() {
+        const currentPoints = await this.getCurrentPoints();
+        currentPoints.forEach(point => {
+            point.selected = 0;
+        });
+        await this.updatePoints(currentPoints);
+    }
+
     private updateBindGroups() {
         if (this.simulationCompute) {
             this.simulationCompute.updateBindGroups(

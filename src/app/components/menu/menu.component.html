@@ -151,21 +151,21 @@
                     <p-button 
                         [icon]="'pi pi-times'" 
                         [severity]="brush.state === BrushState.None ? 'primary' : 'secondary'"
-                        (click)="brush.state = BrushState.None"
+                        (click)="setBrushState(BrushState.None)"
                         [title]="'None'"
                         size="small">
                     </p-button>
                     <p-button 
                         [icon]="'pi pi-pencil'" 
                         [severity]="brush.state === BrushState.Paint ? 'primary' : 'secondary'"
-                        (click)="brush.state = BrushState.Paint"
+                        (click)="setBrushState(BrushState.Paint)"
                         [title]="'Paint'"
                         size="small">
                     </p-button>
                     <p-button 
                         [icon]="'pi pi-search'" 
                         [severity]="brush.state === BrushState.Select ? 'primary' : 'secondary'"
-                        (click)="brush.state = BrushState.Select"
+                        (click)="setBrushState(BrushState.Select)"
                         [title]="'Select'"
                         size="small">
                     </p-button>

@@ -172,4 +172,12 @@ export class MenuComponent {
             type.id = index;
         })
     }
+
+    public setBrushState(state: BrushState) {
+        this.brush.state = state;
+        if (state === BrushState.None) {
+            // Reset all point selections when switching to None state
+            this.scene.resetPointSelection();
+        }
+    }
 }
