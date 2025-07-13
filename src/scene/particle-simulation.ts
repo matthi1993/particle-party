@@ -71,10 +71,6 @@ export class ParticleSimulation {
         this.sceneStorage.createRenderUniformBuffer(this.gpuContext, this.camera);
     }
 
-    public updateSelectinoRadius(radius: number) {
-        // todo
-    }
-
     public setScene(physicsData: PhysicsData, points: Point[]) {
         this.step = 0;
 

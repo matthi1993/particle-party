@@ -43,10 +43,12 @@ export class Point {
     public position: vec4;
     public velocity: vec4 = vec4.fromValues(0,0,0,0);
     public particleTypeId: number;
+    public selected: number = 0;
     
-    constructor(position: vec4, typeId: number) {
+    constructor(position: vec4, typeId: number, selected: number = 0) {
         this.position = position;
         this.particleTypeId = typeId;
+        this.selected = selected;
     }
 }
 

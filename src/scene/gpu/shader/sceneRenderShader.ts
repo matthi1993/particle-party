@@ -58,6 +58,7 @@ export const sceneRenderShader = `
         if(clickDist < uniforms.selectionRadius) {
             output.hovered = 1;
         }
+        output.selected = dataIn[instance].particleAttributes.z;
 
         return output;
     }
