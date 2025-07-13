@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {create, ParticleType} from 'src/scene/model/Point';
 import {DataStore} from 'src/app/store/data.store';
 import {FormsModule} from '@angular/forms';
@@ -7,15 +7,18 @@ import {DataService} from 'src/app/services/data.service';
 import {getMouseNDC} from "../../../scene/scene.mousevent";
 import {Brush} from "../../model/Brush";
 import {MenuComponent} from "../menu/menu.component";
+import {BrushComponent} from "../brush/brush.component";
 
 @Component({
     selector: 'app-simulation',
-    imports: [FormsModule, MenuComponent],
+    imports: [FormsModule, MenuComponent, BrushComponent],
     templateUrl: './simulation.component.html',
     styleUrls: ['./simulation.component.scss']
 })
 export class SimulationComponent implements OnInit {
 
+    @ViewChild('gpuCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
+    
     public scene: ParticleSimulation = new ParticleSimulation();
     public brush: Brush = new Brush();
 
@@ -41,10 +44,6 @@ export class SimulationComponent implements OnInit {
                 );
                 let mouseDownX = 0;
                 let mouseDownY = 0;
-                canvas.addEventListener("mousemove", (e) => {
-                    this.brush.x = e.clientX;
-                    this.brush.y = e.clientY;
-                })
                 canvas.addEventListener("mousedown", (e) => {
                     mouseDownX = e.clientX;
                     mouseDownY = e.clientY;

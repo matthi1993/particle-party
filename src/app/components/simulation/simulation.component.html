@@ -1,3 +1,5 @@
 <app-menu [scene]="this.scene" [brush]="this.brush"></app-menu>
 
-<canvas id="gpuCanvas"></canvas>
+<canvas #gpuCanvas id="gpuCanvas"></canvas>
+
+<app-brush [brush]="this.brush" [canvas]="this.canvasRef"></app-brush>
