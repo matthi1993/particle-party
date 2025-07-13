@@ -217,6 +217,10 @@ export class ParticleSimulation {
         this.gpuContext.device.queue.submit([encoder.finish()]);
     }
 
+    getCamera() {
+        return this.camera;
+    }
+
     async getCurrentPoints(): Promise<Point[]> {
         let bufferIndex = this.step % 2;
 

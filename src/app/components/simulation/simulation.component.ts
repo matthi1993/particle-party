@@ -4,7 +4,7 @@ import {DataStore} from 'src/app/store/data.store';
 import {FormsModule} from '@angular/forms';
 import {ParticleSimulation} from 'src/scene/particle-simulation';
 import {DataService} from 'src/app/services/data.service';
-import {getMouseNDC} from "../../../scene/scene.mousevent";
+import {getMouseNDC, ndcToWorld, projectToScenePlane} from "../../../scene/scene.mousevent";
 import {Brush} from "../../model/Brush";
 import {MenuComponent} from "../menu/menu.component";
 import {BrushComponent} from "../brush/brush.component";
@@ -64,6 +64,10 @@ export class SimulationComponent implements OnInit {
         if (!this.brush.active) return;
 
         let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
-        await this.scene.addPointsToScene(x, y, create(this.brush.count, type, this.brush.radius / 10));
+        // TODO why 400?
+        let worldPoint = ndcToWorld(this.brush.radius / 400, 0, this.scene.getCamera())
+        let newRadius = projectToScenePlane(worldPoint, this.scene.getCamera())[0]
+
+        await this.scene.addPointsToScene(x, y, create(this.brush.count, type, newRadius));
     }
 }

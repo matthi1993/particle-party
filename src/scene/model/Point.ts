@@ -13,6 +13,7 @@ export class Color {
     }
 }
 
+// TODO refactor out of scene module
 export class Structure {
     public id?: number;
     public name: string = "";
@@ -49,10 +50,10 @@ export class Point {
     }
 }
 
-export function create(count: number, type: ParticleType, size: number) {
+export function create(count: number, type: ParticleType, radius: number) {
     let list = [];
     for (let i = 0; i < count; i++) {
-        let point = randomPointInSphere(size);
+        let point = randomPointInSphere(radius);
         list.push(
             new Point(
                 vec4.fromValues(
