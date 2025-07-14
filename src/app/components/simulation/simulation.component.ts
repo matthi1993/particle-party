@@ -8,6 +8,8 @@ import {getMouseNDC, getPointNDC, ndcToWorld, projectToScenePlane} from "../../.
 import {Brush, BrushState} from "../../model/Brush";
 import {MenuComponent} from "../menu/menu.component";
 import {BrushComponent} from "../brush/brush.component";
+import {Point} from 'src/scene/model/Point';
+import {vec4} from 'gl-matrix';
 
 @Component({
     selector: 'app-simulation',
@@ -61,24 +63,80 @@ export class SimulationComponent implements OnInit {
     }
 
     public async brushClicked(x: number, y: number) {
-        if (this.brush.state !== BrushState.Paint) return;
+        if (this.brush.state === BrushState.Paint) {
+            // Check if we have structures and if a structure is selected
+            if (this.dataStore.simulationData.structures.length > 0 && this.brush.structureId >= 0 && this.brush.structureId < this.dataStore.simulationData.structures.length) {
+                // Paint structure
+                let structure = this.dataStore.simulationData.structures[this.brush.structureId];
+                
+                const camera = this.scene.getCamera()
+                const originWorldPoint = ndcToWorld(x, y, camera);
+                const originPoint = projectToScenePlane(originWorldPoint, camera);
 
-        let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
+                await this.scene.addPointsToScene(
+                    originPoint[0],
+                    originPoint[1],
+                    structure.points
+                );
+            } else if (this.brush.particleId >= 0 && this.brush.particleId < this.dataStore.simulationData.physicsData.types.length) {
+                // Paint particles (existing logic)
+                let type = this.dataStore.simulationData.physicsData.types[this.brush.particleId];
 
-        const camera = this.scene.getCamera()
+                const camera = this.scene.getCamera()
 
-        let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
+                let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
 
-        const originWorldPoint = ndcToWorld(x, y, camera);
-        const originPoint = projectToScenePlane(originWorldPoint, camera);
+                const originWorldPoint = ndcToWorld(x, y, camera);
+                const originPoint = projectToScenePlane(originWorldPoint, camera);
 
-        // TODO: This is not correct, radius needs to be in world space
-        let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
+                // TODO: This is not correct, radius needs to be in world space
+                let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
 
-        await this.scene.addPointsToScene(
-            originPoint[0],
-            originPoint[1],
-            create(this.brush.count, type, radius)
-        );
+                await this.scene.addPointsToScene(
+                    originPoint[0],
+                    originPoint[1],
+                    create(this.brush.count, type, radius)
+                );
+            }
+            // If neither particle nor structure is selected, do nothing
+        } else if (this.brush.state === BrushState.Select) {
+
+            //TODO performance is bad for selection, needs to be done in shader, same for deselect
+            const camera = this.scene.getCamera();
+            
+            // Convert brush radius to world space
+            let radiusNDC = getPointNDC(this.brush.radius, 0, this.canvasRef.nativeElement);
+            let radius = (radiusNDC.x + 1) * (camera.position[2]) / 2;
+            
+            // Get click position in world space
+            const originWorldPoint = ndcToWorld(x, y, camera);
+            const originPoint = projectToScenePlane(originWorldPoint, camera);
+            
+            // Get current points from the scene
+            const currentPoints = await this.scene.getCurrentPoints();
+            
+            // Check which points are within the brush radius and set their selected flag
+            currentPoints.forEach(point => {
+                const distance = Math.sqrt(
+                    Math.pow(point.position[0] - originPoint[0], 2) + 
+                    Math.pow(point.position[1] - originPoint[1], 2)
+                );
+                
+                if (distance <= radius) {
+                    point.selected = 1;
+                }
+            });
+            
+            // Update the points in the scene
+            await this.scene.updatePoints(currentPoints);
+        }
+    }
+
+    public async resetPointSelection() {
+        const currentPoints = await this.scene.getCurrentPoints();
+        currentPoints.forEach(point => {
+            point.selected = 0;
+        });
+        await this.scene.updatePoints(currentPoints);
     }
 }

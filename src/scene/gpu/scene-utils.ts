@@ -1,7 +1,6 @@
 import { ParticleType, Point } from '../model/Point'
-import { PhysicsData } from '../model/Simulation';
 
-export function createArraysFromPoints(points: Point[], physicsData: PhysicsData) {
+export function createArraysFromPoints(points: Point[]) {
     let dimensions = 12;
     let positionArray = new Float32Array(points.length * dimensions);
 
@@ -18,6 +17,7 @@ export function createArraysFromPoints(points: Point[], physicsData: PhysicsData
 
         positionArray[index * dimensions + 8] = element.particleTypeId;
         positionArray[index * dimensions + 9] = index; // global index of the Particle
+        positionArray[index * dimensions + 10] = element.selected; // selected
     };
     return positionArray;
 }

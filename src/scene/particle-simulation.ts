@@ -71,10 +71,6 @@ export class ParticleSimulation {
         this.sceneStorage.createRenderUniformBuffer(this.gpuContext, this.camera);
     }
 
-    public updateSelectinoRadius(radius: number) {
-        // todo
-    }
-
     public setScene(physicsData: PhysicsData, points: Point[]) {
         this.step = 0;
 
@@ -99,6 +95,14 @@ export class ParticleSimulation {
     public async updatePoints(points: Point[]) {
         this.points = points;
         this.sceneStorage.updatePointValues(this.gpuContext, this.points, this.physicsData);
+    }
+
+    public async resetPointSelection() {
+        const currentPoints = await this.getCurrentPoints();
+        currentPoints.forEach(point => {
+            point.selected = 0;
+        });
+        await this.updatePoints(currentPoints);
     }
 
     private updateBindGroups() {

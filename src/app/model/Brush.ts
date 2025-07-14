@@ -13,5 +13,6 @@ export class Brush {
 
     public state: BrushState = BrushState.None;
 
-    public particleId: number = 0;
+    public particleId: number = -1;
+    public structureId: number = -1;
 }

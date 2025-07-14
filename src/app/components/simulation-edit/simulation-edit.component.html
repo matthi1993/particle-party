@@ -1,0 +1,66 @@
+<div class="flex align-items-center">
+    <label class="mr-2">brush mode:</label>
+    <div class="flex gap-2">
+        <p-button 
+            [icon]="'pi pi-times'" 
+            [severity]="brush.state === BrushState.None ? 'primary' : 'secondary'"
+            (click)="setBrushState(BrushState.None)"
+            [title]="'None'"
+            size="small">
+        </p-button>
+        <p-button 
+            [icon]="'pi pi-pencil'" 
+            [severity]="brush.state === BrushState.Paint ? 'primary' : 'secondary'"
+            (click)="setBrushState(BrushState.Paint)"
+            [title]="'Paint'"
+            size="small">
+        </p-button>
+        <p-button 
+            [icon]="'pi pi-search'" 
+            [severity]="brush.state === BrushState.Select ? 'primary' : 'secondary'"
+            (click)="setBrushState(BrushState.Select)"
+            [title]="'Select'"
+            size="small">
+        </p-button>
+    </div>
+</div>
+<div class="flex align-items-center mt-2">
+    <label [style.width]="'150px'" for="brush-radius" class="mr-2">radius ({{ brush.radius }}):</label>
+    <p-slider [style.width]="'150px'"
+              id="brush-radius" [(ngModel)]="brush.radius"
+              class="w-full"
+              [step]="1" [min]="1" [max]="100"/>
+</div>
+<div class="flex align-items-center mt-2">
+    <label [style.width]="'150px'" for="brush-radius" class="mr-2">amount ({{ brush.count }})::</label>
+    <p-slider [style.width]="'150px'"
+              id="brush-amount" [(ngModel)]="brush.count"
+              class="w-full"
+              [step]="1" [min]="1" [max]="100"/>
+</div>
+<div class="mt-2" *ngIf="brush.particleId === -1 && brush.structureId === -1">
+    <small class="text-gray-500">Select a particle type or structure to paint</small>
+</div>
+
+<p-fieldset legend="particles" [toggleable]="true" [collapsed]="false" class="flex mt-2">
+    @for (item of dataStore.simulationData.physicsData.types; track item) {
+        <p-chip class="mr-2 mt-2" (click)="selectParticle($index)" [class.selected]="brush.particleId == $index && brush.structureId == -1">
+            <div class="particle-circle"
+                 [title]="item.name"
+                 [style]="'margin: auto; background-color: rgb(' + item.color.r +  ',' + item.color.g + ', ' + item.color.b + ');'">
+            </div>
+            {{ item.name }}
+        </p-chip>
+    }
+</p-fieldset>
+<p-fieldset legend="structures" [toggleable]="true" [collapsed]="false" class="flex mt-2">
+    @for (item of dataStore.simulationData.structures; track item) {
+        <p-chip class="mr-2 mt-2" (click)="selectStructure($index)" [class.selected]="brush.structureId == $index && brush.particleId == -1">
+            <div class="structure-icon"
+                 [title]="item.name">
+                <i class="pi pi-sitemap"></i>
+            </div>
+            {{ item.name }}
+        </p-chip>
+    }
+</p-fieldset> 

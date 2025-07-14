@@ -58,6 +58,7 @@ export const sceneRenderShader = `
         if(clickDist < uniforms.selectionRadius) {
             output.hovered = 1;
         }
+        output.selected = dataIn[instance].particleAttributes.z;
 
         return output;
     }
@@ -75,7 +76,7 @@ export const sceneRenderShader = `
 
         // Draw a red Border around selected ones
         
-        if(dist > (size - 0.3) && dist < size) {
+        if(dist > (size - 0.1) && dist < size) {
             if(input.hovered == 1) {
                 return vec4f(1,1,0,1);
             }

@@ -1,5 +1,6 @@
 
 import { vec4 } from 'gl-matrix';
+export { Structure } from './Structure';
 
 export class Color {
     public r: number = 255;
@@ -11,13 +12,6 @@ export class Color {
         this.g = g;
         this.b = b;
     }
-}
-
-// TODO refactor out of scene module
-export class Structure {
-    public id?: number;
-    public name: string = "";
-    public points: Point[] = []
 }
 
 export class ParticleType {
@@ -43,10 +37,12 @@ export class Point {
     public position: vec4;
     public velocity: vec4 = vec4.fromValues(0,0,0,0);
     public particleTypeId: number;
+    public selected: number = 0;
     
-    constructor(position: vec4, typeId: number) {
+    constructor(position: vec4, typeId: number, selected: number = 0) {
         this.position = position;
         this.particleTypeId = typeId;
+        this.selected = selected;
     }
 }
 

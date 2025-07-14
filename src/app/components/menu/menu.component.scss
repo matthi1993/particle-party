@@ -15,6 +15,15 @@
   border-radius: 1rem;
 }
 
+.structure-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  display: inline-block;
+  text-align: center;
+  line-height: 0.75rem;
+  color: var(--text-color);
+}
+
 p-chip.selected {
   background-color: var(--p-emerald-200);
 }
