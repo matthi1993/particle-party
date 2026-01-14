@@ -4,9 +4,6 @@ A real-time, GPU-accelerated particle simulation built with Angular and WebGPU. 
 
 ## Live Demo
 See it running on: https://matthi1993.github.io/particle-party/
-### deploy
-ng build --base-href "https://matthi1993.github.io/particle-party/"
-npx angular-cli-ghpages --dir=dist/first-app/browser
 
 
 ## Main Features
