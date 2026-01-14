@@ -2,6 +2,8 @@
 
 A real-time, GPU-accelerated particle simulation built with Angular and WebGPU. Create, interact with, and observe complex particle systems with customizable physics properties.
 
+*This only works with Browsers that support WebGPU!*
+
 ## Live Demo
 See it running on: https://matthi1993.github.io/particle-party/
 
