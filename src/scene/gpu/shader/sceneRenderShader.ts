@@ -50,7 +50,7 @@ export const sceneRenderShader = `
         let blurStrength = uniforms.motionBlurStrength;
         let trailLength = min(speed * blurStrength, 20.0);
 
-        if (speed > 0.1 && blurStrength > 0.0 && trailLength > 0.01) {
+        if (speed > 0.25 && blurStrength > 0.0 && trailLength > 0.01) {
             let velDir = vel / speed;
             let perpDir = vec2f(-velDir.y, velDir.x);
 
