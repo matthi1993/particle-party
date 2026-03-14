@@ -26,17 +26,22 @@ export class ParticleSimulation {
     private sceneStorage: SceneStorage = new SceneStorage();
 
     private step = 0;
-    private RENDER_UPDATE_INTERVAL = 30;
     private SIMULATION_UPDATE_INTERVAL = 30;
     private simulateIntervalId: any = undefined;
-    private renderIntervalId: any = undefined;
+    private renderAnimFrameId: any = undefined;
 
     private mousePos = vec3.fromValues(0, 0, 0);
     private selectionRadius = 0;
 
+    // Per-particle motion blur strength (configurable, 0 = off)
+    public motionBlurStrength: number = 5.0;
+
+    // 2D/3D mode
+    public is3D: boolean = false;
+
     public async setup(canvas: HTMLCanvasElement, width: number, height: number) {
         this.gpuContext = new GpuContext(canvas, width, height);
-        this.camera = new Camera(width, height, 50);
+        this.camera = new Camera(width, height, 250);
         await this.gpuContext.setup();
 
         // set Camera Movement Listeners
@@ -44,11 +49,11 @@ export class ParticleSimulation {
             this.gpuContext.canvas!!,
             () => this.simulationLoop(!this.isPlaying),
             (x: number, y: number, z: number) => {
-                this.camera.position[0] += x * this.camera.position[2] / this.camera.moveSpeed;
-                this.camera.position[1] += y * this.camera.position[2] / this.camera.moveSpeed;
-                this.camera.position[2] += z * this.camera.position[2] / this.camera.moveSpeed;
-
-                this.camera.position[2] = Math.min(Math.max(this.camera.position[2], this.camera.minZoom), this.camera.maxZoom);
+                this.camera.translate(x, y, -z);
+            },
+            (x: number, y: number) => {
+                console.log("Orbit: " + x + ", " + y);
+                this.camera.orbit(x, y);
             },
             (x: number, y: number) => {
                 const worldPoint = ndcToWorld(x, y, this.camera);
@@ -69,6 +74,47 @@ export class ParticleSimulation {
         // set buffers
         this.sceneStorage.createComputeUniformBuffer(this.gpuContext)
         this.sceneStorage.createRenderUniformBuffer(this.gpuContext, this.camera);
+    }
+
+    public getIsPlaying(): boolean {
+        return this.isPlaying;
+    }
+
+    public setMotionBlurStrength(strength: number) {
+        this.motionBlurStrength = Math.max(0, Math.min(strength, 20));
+    }
+
+    public async toggleDimension() {
+        const wasPlaying = this.isPlaying;
+        this.simulationLoop(false);
+
+        const currentPoints = await this.getCurrentPoints();
+        const SCENE_SIZE = 200; // matches bounding sphere in compute shader
+
+        if (this.is3D) {
+            // Switching to 2D: flatten all z positions to 0, zero z velocity
+            currentPoints.forEach(point => {
+                point.position[2] = 0;
+                point.velocity[2] = 0;
+            });
+            this.is3D = false;
+        } else {
+            // Switching to 3D: give random z positions within scene bounds
+            currentPoints.forEach(point => {
+                point.position[2] = (Math.random() * 2 - 1) * SCENE_SIZE * 0.5;
+                point.velocity[2] = 0;
+            });
+            this.is3D = true;
+        }
+
+        this.points = currentPoints;
+        this.step = 0;
+        this.sceneStorage.updatePointValues(this.gpuContext, this.points, this.physicsData);
+        this.updateBindGroups();
+
+        if (wasPlaying) {
+            this.simulationLoop(true);
+        }
     }
 
     public setScene(physicsData: PhysicsData, points: Point[]) {
@@ -140,13 +186,15 @@ export class ParticleSimulation {
     }
 
     public renderLoop(shouldPlay: boolean) {
-        if (shouldPlay && !this.renderIntervalId) {
-            this.renderIntervalId = setInterval(() => {
+        if (shouldPlay && !this.renderAnimFrameId) {
+            const renderFrame = () => {
                 this.render();
-            }, this.RENDER_UPDATE_INTERVAL);
-        } else if (this.renderIntervalId) {
-            clearInterval(this.renderIntervalId);
-            this.renderIntervalId = undefined;
+                this.renderAnimFrameId = requestAnimationFrame(renderFrame);
+            };
+            this.renderAnimFrameId = requestAnimationFrame(renderFrame);
+        } else if (!shouldPlay && this.renderAnimFrameId) {
+            cancelAnimationFrame(this.renderAnimFrameId);
+            this.renderAnimFrameId = undefined;
         }
     }
 
@@ -181,6 +229,8 @@ export class ParticleSimulation {
     }
 
     render() {
+        if (!this.points || this.points.length === 0) return;
+
         // update buffers
         this.camera.updateCamera();
         this.sceneStorage.updateRenderUniformsBuffer(
@@ -188,18 +238,19 @@ export class ParticleSimulation {
             this.camera,
             this.mousePos[0],
             this.mousePos[1],
-            this.selectionRadius
+            this.selectionRadius,
+            this.motionBlurStrength
         );
 
-        // setup render pipelines
         const encoder = this.gpuContext.device.createCommandEncoder();
+
         const renderPass = encoder.beginRenderPass({
             colorAttachments: [{
                 view: this.gpuContext.context.getCurrentTexture().createView(),
                 loadOp: "clear",
                 clearValue: BACKGROUND_COLOR,
                 storeOp: "store",
-            }]
+            }],
         });
 
         this.simulationRenderer?.execute(
@@ -262,3 +313,4 @@ export class ParticleSimulation {
         return this.points;
     }
 }
+

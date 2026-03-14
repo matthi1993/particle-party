@@ -51,13 +51,13 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.forcesStorage, 0, forcesArray);
   }
 
-  public updateRenderUniformsBuffer(gpuContext: GpuContext, camera: Camera, mouseX: number, mouseY: number, brushRadius: number) {
+  public updateRenderUniformsBuffer(gpuContext: GpuContext, camera: Camera, mouseX: number, mouseY: number, brushRadius: number, motionBlurStrength: number = 0) {
     let uniforms = new Float32Array([
       ...camera.getViewProjectionMatrix(),
       mouseX, 
       mouseY,
       brushRadius,
-      0
+      motionBlurStrength
     ])
     gpuContext.device.queue.writeBuffer(this.renderUniformsBuffer, 0, uniforms);
   }

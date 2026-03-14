@@ -1,4 +1,3 @@
-
 import { GpuContext } from './gpu.context';
 import { sceneRenderShader } from './shader/sceneRenderShader';
 import { Shape } from './shapes/shapes';
@@ -43,7 +42,7 @@ export class Render {
                 module: shaderModule,
                 entryPoint: "fragmentMain",
                 targets: [FORMAT_SHADER_LAYOUT]
-            }
+            },
         });
 
     }

@@ -1,3 +1,9 @@
+<div class="play-button-container">
+    <button pButton class="play-btn" (click)="togglePlayPause()" [title]="scene.getIsPlaying() ? 'Pause (Space)' : 'Play (Space)'">
+        <i [class]="scene.getIsPlaying() ? 'pi pi-pause' : 'pi pi-play'"></i>
+    </button>
+</div>
+
 <app-menu [scene]="this.scene" [brush]="this.brush"></app-menu>
 
 <canvas #gpuCanvas id="gpuCanvas"></canvas>

@@ -10,10 +10,11 @@ import {MenuComponent} from "../menu/menu.component";
 import {BrushComponent} from "../brush/brush.component";
 import {Point} from 'src/scene/model/Point';
 import {vec4} from 'gl-matrix';
+import {ButtonModule} from 'primeng/button';
 
 @Component({
     selector: 'app-simulation',
-    imports: [FormsModule, MenuComponent, BrushComponent],
+    imports: [FormsModule, MenuComponent, BrushComponent, ButtonModule],
     templateUrl: './simulation.component.html',
     styleUrls: ['./simulation.component.scss']
 })
@@ -130,6 +131,10 @@ export class SimulationComponent implements OnInit {
             // Update the points in the scene
             await this.scene.updatePoints(currentPoints);
         }
+    }
+
+    public togglePlayPause() {
+        this.scene.simulationLoop(!this.scene.getIsPlaying());
     }
 
     public async resetPointSelection() {

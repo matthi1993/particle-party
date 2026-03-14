@@ -1,4 +1,3 @@
-
 import { vec4 } from 'gl-matrix';
 export { Structure } from './Structure';
 
@@ -46,7 +45,7 @@ export class Point {
     }
 }
 
-export function create(count: number, type: ParticleType, radius: number) {
+export function create(count: number, type: ParticleType, radius: number, is3D: boolean = true) {
     let list = [];
     for (let i = 0; i < count; i++) {
         let point = randomPointInSphere(radius);
@@ -55,7 +54,7 @@ export function create(count: number, type: ParticleType, radius: number) {
                 vec4.fromValues(
                     point.x,
                     point.y,
-                    0,//point.z,
+                    is3D ? point.z : 0,
                     1
                 ),
                 type.id

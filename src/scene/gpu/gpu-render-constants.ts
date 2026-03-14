@@ -1,4 +1,4 @@
-export const BACKGROUND_COLOR = {r: 0.041, g: 0.057, b: 0.084, a: 0.0};
+export const BACKGROUND_COLOR = {r: 0.041, g: 0.057, b: 0.084, a: 1.0};
 
 export const BIND_GROUP_LAYOUT = {
     label: "Cell Bind Group Layout",
@@ -27,12 +27,12 @@ export const FORMAT_SHADER_LAYOUT = {
     blend: {
         color: {
             srcFactor: "src-alpha",
-            dstFactor: "one-minus-src-alpha",
+            dstFactor: "one",
             operation: "add",
         },
         alpha: {
-            srcFactor: "one",
-            dstFactor: "one-minus-src-alpha",
+            srcFactor: "src-alpha",
+            dstFactor: "one",
             operation: "add",
         },
     },
