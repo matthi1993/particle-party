@@ -18,6 +18,13 @@
             <p-slider [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="2000"/>
 
 
+            <div class="mt-4 flex align-items-center gap-2">
+                <p-button [severity]="scene.is3D ? 'success' : 'secondary'" (click)="toggleDimension()">
+                    <i class="pi" [ngClass]="scene.is3D ? 'pi-box' : 'pi-stop'"></i>
+                    {{ scene.is3D ? '3D' : '2D' }}
+                </p-button>
+            </div>
+
             <div class="mt-4 flex align-items-center">
                 <p-button (click)="saveSimulation()" class="mr-2"> save simulation</p-button>
                 <p-fileUpload
@@ -117,18 +124,33 @@
                         </td>
                         @for (itemB of dataStore.simulationData.physicsData.types; track itemB; let innerIndex = $index) {
                             <td style="text-align: center">
-                                <p-knob strokeWidth="50"
-                                        [valueColor]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] < 0 ? 'var(--p-red-600)' : 'var(--p-focus-ring-color)'"
-                                        (dblclick)="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] = 0"
+                                <div class="force-cell">
+                                    <p-inputnumber
+                                        [inputStyle]="{'width': '60px', 'text-align': 'center', 'color': this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] < 0 ? 'var(--p-red-600)' : 'var(--p-focus-ring-color)'}"
                                         [title]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] + ' (' + itemA.name + '/' + itemB.name +')'"
-                                        valueTemplate="O"
+                                        (ngModelChange)="updatePhysics()"
+                                        [(ngModel)]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex]"
+                                        [step]="0.01"
+                                        [minFractionDigits]="2"
+                                        [maxFractionDigits]="3"
+                                        [inputStyle]="{'width': '42px', 'text-align': 'center', 'font-size': '0.7rem', 'padding': '0.15rem 0.1rem', 'color': this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] < 0 ? 'var(--p-red-600)' : 'var(--p-focus-ring-color)'}"
+                                        [max]="LIMITS.MAX_FORCE"
+                                        [showButtons]="true"
+                                        buttonLayout="horizontal"
+                                        incrementButtonIcon="pi pi-plus"
+                                        decrementButtonIcon="pi pi-minus"
+                                        size="small"
+                                    />
+                                    <p-slider
+                                        class="force-slider"
                                         (onChange)="updatePhysics()"
                                         [(ngModel)]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex]"
                                         [step]="0.001"
-                                        [size]="50"
                                         [min]="-LIMITS.MAX_FORCE"
-                                        [max]="LIMITS.MAX_FORCE"/>
-                                <div class="flex" [style]="'position: relative; top: -0.4rem;'">
+                                        [max]="LIMITS.MAX_FORCE"
+                                    />
+                                </div>
+                                <div class="flex" [style]="'position: relative; top: -0.2rem;'">
                                     <div class="particle-circle"
                                          [title]="itemB.name"
                                          [style]="'margin: auto; background-color: rgb(' + itemB.color.r +  ',' + itemB.color.g + ', ' + itemB.color.b + ');'">

@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {TabsModule} from 'primeng/tabs';
 import {FormsModule} from "@angular/forms";
+import {NgClass} from "@angular/common";
 import {Color, create, ParticleType, Point} from "../../../scene/model/Point";
 import {randomRounded} from "../utils/utils";
 import {DataStore} from "../../store/data.store";
@@ -28,7 +29,7 @@ import { vec4 } from 'gl-matrix';
 
 @Component({
     selector: 'app-menu',
-    imports: [SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule, DialogModule],
+    imports: [NgClass, SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule, DialogModule],
     templateUrl: './menu.component.html',
     styleUrl: './menu.component.scss'
 })
@@ -43,12 +44,12 @@ export class MenuComponent {
     public structureName = '';
 
     public LIMITS = {
-        MIN_FORCE: -1,
-        MAX_FORCE: 1,
+        MIN_FORCE: -3,
+        MAX_FORCE: 3,
         MAX_RADIUS: 100,
         MAX_MASS: 0.25,
         MIN_SIZE: 0.25,
-        MAX_SIZE: 1.5
+        MAX_SIZE: 1.0
     }
 
     constructor(public dataStore: DataStore, public dataService: DataService) {
@@ -57,7 +58,7 @@ export class MenuComponent {
     public createRandomWorld() {
         let newPoints: Point[] = [];
         this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-            newPoints.push(...create(this.pointNumber, type, 200));
+            newPoints.push(...create(this.pointNumber, type, 200, this.scene.is3D));
         })
         this.dataStore.simulationData.points = newPoints;
 
@@ -245,5 +246,9 @@ export class MenuComponent {
     public cancelSaveStructure() {
         this.showSaveDialog = false;
         this.structureName = '';
+    }
+
+    public async toggleDimension() {
+        await this.scene.toggleDimension();
     }
 }

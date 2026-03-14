@@ -1,4 +1,3 @@
-
 import { GpuContext } from './gpu.context';
 import { sceneRenderShader } from './shader/sceneRenderShader';
 import { Shape } from './shapes/shapes';
@@ -43,11 +42,6 @@ export class Render {
                 module: shaderModule,
                 entryPoint: "fragmentMain",
                 targets: [FORMAT_SHADER_LAYOUT]
-            },
-            depthStencil: {
-                depthWriteEnabled: true,
-                depthCompare: 'less',
-                format: 'depth24plus',
             },
         });
 
