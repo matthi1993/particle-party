@@ -108,11 +108,16 @@ export const sceneComputeShader = `
                     
                     // ##### attraction force #####
                     if (distance <= myType.radius){
-                        let relativeDistance = distance - (myType.size);
-                        let relativeRadius = myType.radius - (myType.size);
-                        let halfRadius = relativeRadius / 2;
+                        let relativeDistance = distance - myType.size;
+                        let relativeRadius = myType.radius - myType.size;
 
-                        var electricAttraction = 1 - (1 / pow(halfRadius, 2)) * pow(relativeDistance - halfRadius, 2); // smooth
+                        // t goes from 0 (at size edge) to 1 (at radius)
+                        let t = clamp(relativeDistance / relativeRadius, 0.0, 1.0);
+
+                        // Exponential decay: strongest at t=0, approaches 0 at t=1
+                        let decayRate = 5.0;
+                        var electricAttraction = (exp(-decayRate * t) - exp(-decayRate)) / (1.0 - exp(-decayRate));
+
                         let forceMagnitude = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
                     
                         force -= electricAttraction * forceMagnitude * normalizeVector(direction);
