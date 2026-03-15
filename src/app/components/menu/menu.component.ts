@@ -28,7 +28,7 @@ import { Structure } from '../../../scene/model/Structure';
 import { vec4 } from 'gl-matrix';
 import { SelectModule } from 'primeng/select';
 import { HttpClient } from '@angular/common/http';
-import { GRAVITY_CONSTANT, ATTRACTION_CONSTANT } from '../../../scene/scene-constants';
+import { GRAVITY_CONSTANT, ATTRACTION_CONSTANT, RANDOM_FORCE_FACTOR } from '../../../scene/scene-constants';
 
 @Component({
     selector: 'app-menu',
@@ -68,6 +68,20 @@ export class MenuComponent implements OnInit {
         this.dataService.loadPresetList().subscribe(presets => {
             this.presetOptions = presets;
         });
+    }
+
+    public resetWorld() {
+        this.dataStore.simulationData.physicsData.types = [];
+        this.dataStore.simulationData.physicsData.forces = [];
+        this.dataStore.simulationData.physicsData.gravityConstant = GRAVITY_CONSTANT;
+        this.dataStore.simulationData.physicsData.attractionConstant = ATTRACTION_CONSTANT;
+        this.dataStore.simulationData.points = [];
+        this.dataStore.simulationData.structures = [];
+
+        this.scene.setScene(
+            this.dataStore.simulationData.physicsData,
+            this.dataStore.simulationData.points
+        );
     }
 
     public createRandomWorld() {
@@ -110,7 +124,7 @@ export class MenuComponent implements OnInit {
         for (let i = 0; i < numTypes; i++) {
             const row: number[] = [];
             for (let j = 0; j < numTypes; j++) {
-                row.push(randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE));
+                row.push(randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE * RANDOM_FORCE_FACTOR));
             }
             this.dataStore.simulationData.physicsData.forces.push(row);
         }
@@ -143,7 +157,7 @@ export class MenuComponent implements OnInit {
     randomForces() {
         this.dataStore.simulationData.physicsData.types.forEach((type, rowIndex) => {
             this.dataStore.simulationData.physicsData.types.forEach((col, colIndex) => {
-                this.dataStore.simulationData.physicsData.forces[rowIndex][colIndex] = randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE);
+                this.dataStore.simulationData.physicsData.forces[rowIndex][colIndex] = randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE * RANDOM_FORCE_FACTOR);
             })
         });
 
