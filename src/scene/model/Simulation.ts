@@ -1,4 +1,3 @@
-
 import { ParticleType, Point } from 'src/scene/model/Point';
 import { Structure } from 'src/scene/model/Structure';
 
@@ -15,6 +14,7 @@ export class SimulationData {
   public physicsData: PhysicsData = new PhysicsData(0, "none");
   public points: Point[] = [];
   public structures: Structure[] = [];
+  public is3D: boolean = false;
 }
 
 export class PhysicsData {

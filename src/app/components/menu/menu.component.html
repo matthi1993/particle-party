@@ -19,10 +19,17 @@
 
 
             <div class="mt-4 flex align-items-center gap-2">
-                <p-button [severity]="scene.is3D ? 'success' : 'secondary'" (click)="toggleDimension()">
-                    <i class="pi" [ngClass]="scene.is3D ? 'pi-box' : 'pi-stop'"></i>
-                    {{ scene.is3D ? '3D' : '2D' }}
-                </p-button>
+                <span>2D</span>
+                <p-toggleswitch [(ngModel)]="is3D" (onChange)="onDimensionToggleChange()"></p-toggleswitch>
+                <span>3D</span>
+
+                <p-select
+                    [options]="presetOptions"
+                    [(ngModel)]="selectedPreset"
+                    placeholder="Load preset..."
+                    (onChange)="loadPreset($event.value)"
+                    [style]="{'min-width': '180px'}">
+                </p-select>
             </div>
 
             <div class="mt-4 flex align-items-center">
@@ -119,12 +126,22 @@
                             <div class="flex align-items-center align-center">
                                 <div class="particle-circle mr-2"
                                      [style]="'background-color: rgb(' + itemA.color.r +  ',' + itemA.color.g + ', ' + itemA.color.b + ');'"></div>
-                                {{ itemA.name }}
                             </div>
                         </td>
                         @for (itemB of dataStore.simulationData.physicsData.types; track itemB; let innerIndex = $index) {
                             <td style="text-align: center">
                                 <div class="force-cell">
+                                    <div class="flex" [style]="'position: relative; top: -0.2rem; width: 100%;'">
+                                        <div class="particle-circle"
+                                             [title]="itemB.name"
+                                             [style]="'margin: auto; background-color: rgb(' + itemB.color.r +  ',' + itemB.color.g + ', ' + itemB.color.b + ');'">
+                                        </div>
+                                        <i class="pi pi-arrow-right" style="font-size: 0.5rem"></i>
+                                        <div class="particle-circle"
+                                             [title]="itemA.name"
+                                             [style]="'margin: auto; background-color: rgb(' + itemA.color.r +  ',' + itemA.color.g + ', ' + itemA.color.b + ');'">
+                                        </div>
+                                    </div>
                                     <p-inputnumber
                                         [inputStyle]="{'width': '60px', 'text-align': 'center', 'color': this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] < 0 ? 'var(--p-red-600)' : 'var(--p-focus-ring-color)'}"
                                         [title]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex] + ' (' + itemA.name + '/' + itemB.name +')'"
@@ -145,21 +162,10 @@
                                         class="force-slider"
                                         (onChange)="updatePhysics()"
                                         [(ngModel)]="this.dataStore.simulationData.physicsData.forces[innerIndex][outerIndex]"
-                                        [step]="0.001"
+                                        [step]="0.01"
                                         [min]="-LIMITS.MAX_FORCE"
                                         [max]="LIMITS.MAX_FORCE"
                                     />
-                                </div>
-                                <div class="flex" [style]="'position: relative; top: -0.2rem;'">
-                                    <div class="particle-circle"
-                                         [title]="itemB.name"
-                                         [style]="'margin: auto; background-color: rgb(' + itemB.color.r +  ',' + itemB.color.g + ', ' + itemB.color.b + ');'">
-                                    </div>
-                                    <i class="pi pi-arrow-right" style="font-size: 0.5rem"></i>
-                                    <div class="particle-circle"
-                                         [title]="itemA.name"
-                                         [style]="'margin: auto; background-color: rgb(' + itemA.color.r +  ',' + itemA.color.g + ', ' + itemA.color.b + ');'">
-                                    </div>
                                 </div>
                             </td>
                         }

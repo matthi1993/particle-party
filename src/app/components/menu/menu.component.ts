@@ -26,10 +26,12 @@ import { SimulationEditComponent } from '../simulation-edit/simulation-edit.comp
 import { DialogModule } from 'primeng/dialog';
 import { Structure } from '../../../scene/model/Structure';
 import { vec4 } from 'gl-matrix';
+import { SelectModule } from 'primeng/select';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-menu',
-    imports: [NgClass, SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule, DialogModule],
+    imports: [NgClass, SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule, DialogModule, SelectModule],
     templateUrl: './menu.component.html',
     styleUrl: './menu.component.scss'
 })
@@ -39,9 +41,18 @@ export class MenuComponent {
     @Input() public brush!: Brush;
 
     public pointNumber: number = 500;
-    public BrushState = BrushState; // Make enum available in template
+    public BrushState = BrushState;
     public showSaveDialog = false;
     public structureName = '';
+    public is3D: boolean = false;
+
+    public presetOptions = [
+        { label: 'cell', value: 'assets/presets/cell.json' },
+        { label: 'simulation', value: 'assets/presets/simulation.json' },
+        { label: 'simulation2', value: 'assets/presets/simulation2.json' },
+        { label: 'simulation_2', value: 'assets/presets/simulation_2.json' },
+    ];
+    public selectedPreset: string | null = null;
 
     public LIMITS = {
         MIN_FORCE: -3,
@@ -52,7 +63,7 @@ export class MenuComponent {
         MAX_SIZE: 1.0
     }
 
-    constructor(public dataStore: DataStore, public dataService: DataService) {
+    constructor(public dataStore: DataStore, public dataService: DataService, private http: HttpClient) {
     }
 
     public createRandomWorld() {
@@ -128,11 +139,15 @@ export class MenuComponent {
     async saveSimulation() {
         const sim = this.dataStore.simulationData;
         sim.points = await this.scene.getCurrentPoints();
+        sim.is3D = this.scene.is3D;
         await this.dataService.saveSimulation(sim);
     }
 
     async selectScene(event: FileSelectEvent) {
         this.dataStore.simulationData = await readFile<SimulationData>(event);
+        const is3D = this.dataStore.simulationData.is3D ?? false;
+        this.is3D = is3D;
+        this.scene.is3D = is3D;
         this.scene.setScene(
             this.dataStore.simulationData.physicsData,
             this.dataStore.simulationData.points
@@ -250,5 +265,26 @@ export class MenuComponent {
 
     public async toggleDimension() {
         await this.scene.toggleDimension();
+        this.is3D = this.scene.is3D;
+    }
+
+    public async onDimensionToggleChange() {
+        await this.scene.toggleDimension();
+        this.is3D = this.scene.is3D;
+    }
+
+    public loadPreset(presetPath: string) {
+        if (!presetPath) return;
+        this.http.get<SimulationData>(presetPath).subscribe(data => {
+            this.dataStore.simulationData = data;
+            const is3D = data.is3D ?? false;
+            this.is3D = is3D;
+            this.scene.is3D = is3D;
+            this.scene.setScene(
+                this.dataStore.simulationData.physicsData,
+                this.dataStore.simulationData.points
+            );
+            this.selectedPreset = null;
+        });
     }
 }
