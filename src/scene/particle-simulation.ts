@@ -49,15 +49,17 @@ export class ParticleSimulation {
             this.gpuContext.canvas!!,
             () => this.simulationLoop(!this.isPlaying),
             (x: number, y: number, z: number) => {
-                this.camera.translate(x, y, -z);
+                this.camera.translate(x, y, z);
             },
             (x: number, y: number) => {
-                console.log("Orbit: " + x + ", " + y);
                 this.camera.orbit(x, y);
             },
             (x: number, y: number) => {
                 const worldPoint = ndcToWorld(x, y, this.camera);
                 this.mousePos = projectToScenePlane(worldPoint, this.camera);
+            },
+            (ndcX: number, ndcY: number, delta: number, shiftHeld: boolean) => {
+                this.camera.zoomTowardCursor(ndcX, ndcY, delta, shiftHeld);
             }
         );
 
