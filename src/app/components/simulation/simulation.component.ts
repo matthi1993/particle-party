@@ -12,11 +12,12 @@ import {BrushComponent} from "../brush/brush.component";
 import {Point} from 'src/scene/model/Point';
 import {vec4} from 'gl-matrix';
 import {ButtonModule} from 'primeng/button';
+import {InputNumberModule} from 'primeng/inputnumber';
 import {switchMap} from 'rxjs';
 
 @Component({
     selector: 'app-simulation',
-    imports: [FormsModule, MenuComponent, BrushComponent, ButtonModule],
+    imports: [FormsModule, MenuComponent, BrushComponent, ButtonModule, InputNumberModule],
     templateUrl: './simulation.component.html',
     styleUrls: ['./simulation.component.scss']
 })

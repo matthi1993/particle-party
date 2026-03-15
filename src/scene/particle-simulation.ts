@@ -26,7 +26,8 @@ export class ParticleSimulation {
     private sceneStorage: SceneStorage = new SceneStorage();
 
     private step = 0;
-    private SIMULATION_UPDATE_INTERVAL = 30;
+    private _simulationInterval = 10;
+    private _renderInterval = 30;
     private simulateIntervalId: any = undefined;
     private renderAnimFrameId: any = undefined;
 
@@ -84,6 +85,36 @@ export class ParticleSimulation {
 
     public setMotionBlurStrength(strength: number) {
         this.motionBlurStrength = Math.max(0, Math.min(strength, 20));
+    }
+
+    public get simulationInterval(): number {
+        return this._simulationInterval;
+    }
+
+    public set simulationInterval(value: number) {
+        const clamped = Math.max(1, Math.min(value, 1000));
+        this._simulationInterval = clamped;
+        // Restart simulation loop if currently playing
+        if (this.isPlaying && this.simulateIntervalId) {
+            clearInterval(this.simulateIntervalId);
+            this.simulateIntervalId = undefined;
+            this.simulationLoop(true);
+        }
+    }
+
+    public get renderInterval(): number {
+        return this._renderInterval;
+    }
+
+    public set renderInterval(value: number) {
+        const clamped = Math.max(1, Math.min(value, 1000));
+        this._renderInterval = clamped;
+        // Restart render loop if currently running
+        if (this.renderAnimFrameId) {
+            clearInterval(this.renderAnimFrameId);
+            this.renderAnimFrameId = undefined;
+            this.renderLoop(true);
+        }
     }
 
     public async toggleDimension() {
@@ -160,7 +191,7 @@ export class ParticleSimulation {
         this.renderLoop(false);
 
         // Small delay to ensure no simulation loop is running
-        await new Promise(resolve => setTimeout(resolve, this.SIMULATION_UPDATE_INTERVAL));
+
 
         const currentPoints = await this.getCurrentPoints();
         const remainingPoints = currentPoints.filter(point => point.selected !== 1);
@@ -205,7 +236,7 @@ export class ParticleSimulation {
         if (shouldPlay && !this.simulateIntervalId) {
             this.simulateIntervalId = setInterval(() => {
                 this.simulate();
-            }, this.SIMULATION_UPDATE_INTERVAL);
+            }, this._simulationInterval);
         } else if (this.simulateIntervalId) {
             clearInterval(this.simulateIntervalId);
             this.simulateIntervalId = undefined;
@@ -214,13 +245,11 @@ export class ParticleSimulation {
 
     public renderLoop(shouldPlay: boolean) {
         if (shouldPlay && !this.renderAnimFrameId) {
-            const renderFrame = () => {
+            this.renderAnimFrameId = setInterval(() => {
                 this.render();
-                this.renderAnimFrameId = requestAnimationFrame(renderFrame);
-            };
-            this.renderAnimFrameId = requestAnimationFrame(renderFrame);
+            }, this._renderInterval);
         } else if (!shouldPlay && this.renderAnimFrameId) {
-            cancelAnimationFrame(this.renderAnimFrameId);
+            clearInterval(this.renderAnimFrameId);
             this.renderAnimFrameId = undefined;
         }
     }
@@ -252,7 +281,7 @@ export class ParticleSimulation {
 
             this.simulationLoop(shouldPlay);
             this.renderLoop(true);
-        }, this.SIMULATION_UPDATE_INTERVAL)
+        }, this._simulationInterval)
     }
 
     render() {
