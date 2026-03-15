@@ -17,3 +17,37 @@
 p-chip.selected {
     background-color: var(--p-emerald-200);
 }
+
+.slider-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  label {
+    min-width: 50px;
+    white-space: nowrap;
+  }
+}
+
+.compact-input {
+  ::ng-deep .p-inputnumber-input {
+    width: 60px !important;
+    padding: 0.25rem 0.2rem;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  ::ng-deep .p-inputnumber-button {
+    width: 1.4rem;
+    padding: 0;
+
+    .pi {
+      font-size: 0.6rem;
+    }
+  }
+}
+
+.compact-slider {
+  flex: 1;
+  min-width: 80px;
+}

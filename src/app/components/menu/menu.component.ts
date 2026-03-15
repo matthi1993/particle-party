@@ -79,6 +79,39 @@ export class MenuComponent {
         );
     }
 
+    public createRandomWorldWithRandomPhysics() {
+        // Randomize particle type values (color, radius, size, mass)
+        this.dataStore.simulationData.physicsData.types.forEach((type) => {
+            type.radius = randomRounded(0, this.LIMITS.MAX_RADIUS);
+            type.mass = randomRounded(0, this.LIMITS.MAX_MASS);
+            type.size = randomRounded(this.LIMITS.MIN_SIZE, this.LIMITS.MAX_SIZE);
+            type.color = new Color(
+                randomRounded(0, 255),
+                randomRounded(0, 255),
+                randomRounded(0, 255)
+            );
+        });
+
+        // Randomize forces
+        this.dataStore.simulationData.physicsData.types.forEach((type, rowIndex) => {
+            this.dataStore.simulationData.physicsData.types.forEach((col, colIndex) => {
+                this.dataStore.simulationData.physicsData.forces[rowIndex][colIndex] = randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE);
+            });
+        });
+
+        // Create random points and set scene
+        let newPoints: Point[] = [];
+        this.dataStore.simulationData.physicsData.types.forEach((type) => {
+            newPoints.push(...create(this.pointNumber, type, 200, this.scene.is3D));
+        });
+        this.dataStore.simulationData.points = newPoints;
+
+        this.scene.setScene(
+            this.dataStore.simulationData.physicsData,
+            this.dataStore.simulationData.points
+        );
+    }
+
     resetForces() {
         this.dataStore.simulationData.physicsData.types.forEach((type, rowIndex) => {
             this.dataStore.simulationData.physicsData.types.forEach((col, colIndex) => {
@@ -286,5 +319,14 @@ export class MenuComponent {
             );
             this.selectedPreset = null;
         });
+    }
+
+    public onTabChange(event: any) {
+        console.log("switching")
+        // When switching away from the Edit tab, reset brush mode to None
+        if (event.index !== '4' && this.brush.state !== BrushState.None) {
+            this.brush.state = BrushState.None;
+            this.scene.resetPointSelection();
+        }
     }
 }

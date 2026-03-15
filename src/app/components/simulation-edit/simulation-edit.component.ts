@@ -1,9 +1,10 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 import {DataStore} from "../../store/data.store";
 import {DataService} from "../../services/data.service";
 import {SliderModule} from 'primeng/slider';
+import {InputNumberModule} from 'primeng/inputnumber';
 import {ButtonModule} from 'primeng/button';
 import {FieldsetModule} from 'primeng/fieldset';
 import {ChipModule} from 'primeng/chip';
@@ -12,7 +13,7 @@ import {Brush, BrushState} from "../../model/Brush";
 
 @Component({
     selector: 'app-simulation-edit',
-    imports: [CommonModule, ButtonModule, FieldsetModule, ChipModule, SliderModule, FormsModule],
+    imports: [CommonModule, ButtonModule, FieldsetModule, ChipModule, SliderModule, InputNumberModule, FormsModule],
     templateUrl: './simulation-edit.component.html',
     styleUrl: './simulation-edit.component.scss'
 })
@@ -20,6 +21,7 @@ export class SimulationEditComponent {
 
     @Input() public scene!: ParticleSimulation;
     @Input() public brush!: Brush;
+    @Output() public onSaveStructure = new EventEmitter<void>();
 
     public BrushState = BrushState; // Make enum available in template
 
@@ -43,4 +45,4 @@ export class SimulationEditComponent {
         this.brush.structureId = index;
         this.brush.particleId = -1; // Deselect particle
     }
-} 
+}

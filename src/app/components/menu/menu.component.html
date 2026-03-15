@@ -1,4 +1,4 @@
-<p-tabs value="0">
+<p-tabs value="0" (onChange)="onTabChange($event)">
     <p-tablist>
         <p-tab value="0">Scene</p-tab>
         <p-tab value="1">Particles</p-tab>
@@ -8,41 +8,41 @@
     </p-tablist>
     <p-tabpanels>
         <p-tabpanel value="0">
-            <div class="flex align-content-center align-items-center mb-2 gap-2">
-                <p-button severity="info" (click)="createRandomWorld()">create random world</p-button>
-                <p-floatlabel variant="in">
-                    <p-inputnumber inputId="points" [(ngModel)]="pointNumber" [min]="0" [max]="1000"/>
-                    <label>Points</label>
-                </p-floatlabel>
+            <div class="flex align-items-center gap-3">
+                <p-button severity="info" (click)="createRandomWorld()">create world</p-button>
+                <p-button severity="warn" (click)="createRandomWorldWithRandomPhysics()">create random</p-button>
+                <div class="flex flex-column gap-1">
+                    <div class="slider-input-row">
+                        <label>Points:</label>
+                        <p-inputnumber class="compact-input" [(ngModel)]="pointNumber" [min]="0" [max]="2000" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+                    </div>
+                    <p-slider class="compact-slider" [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="2000"/>
+                </div>
+                <div class="flex align-items-center gap-2">
+                    <p-toggleswitch [(ngModel)]="is3D" (onChange)="onDimensionToggleChange()"></p-toggleswitch>
+                    <span>3D</span>
+                </div>
             </div>
-            <p-slider [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="2000"/>
-
 
             <div class="mt-4 flex align-items-center gap-2">
-                <span>2D</span>
-                <p-toggleswitch [(ngModel)]="is3D" (onChange)="onDimensionToggleChange()"></p-toggleswitch>
-                <span>3D</span>
-
-                <p-select
-                    [options]="presetOptions"
-                    [(ngModel)]="selectedPreset"
-                    placeholder="Load preset..."
-                    (onChange)="loadPreset($event.value)"
-                    [style]="{'min-width': '180px'}">
-                </p-select>
-            </div>
-
-            <div class="mt-4 flex align-items-center">
-                <p-button (click)="saveSimulation()" class="mr-2"> save simulation</p-button>
+                <p-button (click)="saveSimulation()" icon="pi pi-save" label="save"></p-button>
                 <p-fileUpload
                         mode="basic"
                         name="file"
                         accept=".json"
                         chooseIcon="pi pi-upload"
-                        chooseLabel="load simulation"
+                        chooseLabel="load"
                         auto="true"
                         (onSelect)="selectScene($event)">
                 </p-fileUpload>
+                <p-select
+                    [options]="presetOptions"
+                    [(ngModel)]="selectedPreset"
+                    placeholder="Load preset..."
+                    (onChange)="loadPreset($event.value)"
+                    [style]="{'min-width': '180px'}"
+                    appendTo="body">
+                </p-select>
             </div>
 
         </p-tabpanel>
@@ -70,23 +70,20 @@
                     <button pButton severity="danger" (click)="deleteType($index)">
                         <i class="pi pi-times"></i>
                     </button>
-                    <div class="flex align-items-center gap-2 px-2 mt-2">
-                        <label [style.width]="'70px'" for="sizeSlider" class="mr-2">size:</label>
-                        <p-slider (onChange)="updatePhysics()" [style.width]="'200px'" id="sizeSlider"
-                                  [(ngModel)]="item.size" class="w-full" [step]="0.01" [min]="LIMITS.MIN_SIZE"
-                                  [max]="LIMITS.MAX_SIZE"/>
+                    <div class="slider-input-row mt-2">
+                        <label>size:</label>
+                        <p-inputnumber class="compact-input" (ngModelChange)="updatePhysics()" [(ngModel)]="item.size" [step]="0.01" [min]="LIMITS.MIN_SIZE" [max]="LIMITS.MAX_SIZE" [minFractionDigits]="2" [maxFractionDigits]="2" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+                        <p-slider class="compact-slider" (onChange)="updatePhysics()" [(ngModel)]="item.size" [step]="0.01" [min]="LIMITS.MIN_SIZE" [max]="LIMITS.MAX_SIZE"/>
                     </div>
-                    <div class="flex align-items-center gap-2 px-2 mt-2">
-                        <label [style.width]="'70px'" for="radiusSlider" class="mr-2">radius:</label>
-                        <p-slider (onChange)="updatePhysics()" [style.width]="'200px'" id="radiusSlider"
-                                  [(ngModel)]="item.radius" class="w-full"
-                                  [step]="0.01" [min]="0" [max]="LIMITS.MAX_RADIUS"/>
+                    <div class="slider-input-row mt-2">
+                        <label>radius:</label>
+                        <p-inputnumber class="compact-input" (ngModelChange)="updatePhysics()" [(ngModel)]="item.radius" [step]="0.01" [min]="0" [max]="LIMITS.MAX_RADIUS" [minFractionDigits]="2" [maxFractionDigits]="2" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+                        <p-slider class="compact-slider" (onChange)="updatePhysics()" [(ngModel)]="item.radius" [step]="0.01" [min]="0" [max]="LIMITS.MAX_RADIUS"/>
                     </div>
-                    <div class="flex align-items-center gap-2 px-2 mt-2">
-                        <label [style.width]="'70px'" for="massSlider" class="mr-2">mass:</label>
-                        <p-slider (onChange)="updatePhysics()" [style.width]="'200px'" id="massSlider"
-                                  [(ngModel)]="item.mass" class="w-full"
-                                  [step]="0.001" [min]="0" [max]="LIMITS.MAX_MASS"/>
+                    <div class="slider-input-row mt-2">
+                        <label>mass:</label>
+                        <p-inputnumber class="compact-input" (ngModelChange)="updatePhysics()" [(ngModel)]="item.mass" [step]="0.001" [min]="0" [max]="LIMITS.MAX_MASS" [minFractionDigits]="3" [maxFractionDigits]="3" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+                        <p-slider class="compact-slider" (onChange)="updatePhysics()" [(ngModel)]="item.mass" [step]="0.001" [min]="0" [max]="LIMITS.MAX_MASS"/>
                     </div>
                 </p-fieldset>
             }
@@ -174,14 +171,8 @@
             </p-table>
         </p-tabpanel>
         <p-tabpanel value="3">
-            <div class="flex gap-2 mb-2">
-                <p-button severity="info" (click)="openSaveStructureDialog()">
-                    <i class="pi pi-save"></i>
-                    Save Selected Points as Structure
-                </p-button>
-            </div>
             <div class="mb-3">
-                <small class="text-gray-500">Select points using the Select brush mode in the Edit tab, then click this button to save them as a reusable structure.</small>
+                <small class="text-gray-500">Select points using the Select brush mode in the Edit tab, then save them as a reusable structure.</small>
             </div>
 
             @for (item of dataStore.simulationData.structures; track item; let index = $index) {
@@ -203,48 +194,9 @@
                     </div>
                 </p-fieldset>
             }
-
-            <!-- Save Structure Dialog -->
-            <p-dialog 
-                header="Save Structure" 
-                [(visible)]="showSaveDialog" 
-                [modal]="true" 
-                [style]="{width: '400px'}"
-                [draggable]="false" 
-                [resizable]="false">
-                
-                <div class="flex flex-column gap-3">
-                    <div class="flex flex-column gap-2">
-                        <label for="structureName">Structure Name:</label>
-                        <input 
-                            id="structureName"
-                            type="text" 
-                            pInputText 
-                            [(ngModel)]="structureName" 
-                            placeholder="Enter structure name"
-                            (keyup.enter)="saveSelectedPointsAsStructure()"
-                            autofocus>
-                    </div>
-                </div>
-                
-                <ng-template pTemplate="footer">
-                    <div class="flex justify-content-end gap-2">
-                        <p-button 
-                            label="Cancel" 
-                            [outlined]="true"
-                            (click)="cancelSaveStructure()">
-                        </p-button>
-                        <p-button 
-                            label="Save" 
-                            [severity]="'success'"
-                            (click)="saveSelectedPointsAsStructure()">
-                        </p-button>
-                    </div>
-                </ng-template>
-            </p-dialog>
         </p-tabpanel>
         <p-tabpanel value="4">
-            <app-simulation-edit [scene]="scene" [brush]="brush"></app-simulation-edit>
+            <app-simulation-edit [scene]="scene" [brush]="brush" (onSaveStructure)="openSaveStructureDialog()"></app-simulation-edit>
         </p-tabpanel>
     </p-tabpanels>
 </p-tabs>
