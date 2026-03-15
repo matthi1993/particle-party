@@ -50,4 +50,9 @@ export class SimulationEditComponent {
         const remainingPoints = await this.scene.deleteSelectedPoints();
         this.dataStore.simulationData.points = remainingPoints;
     }
+
+    public async reduceSelectedPoints() {
+        const remainingPoints = await this.scene.reduceSelectedPoints();
+        this.dataStore.simulationData.points = remainingPoints;
+    }
 }

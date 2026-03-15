@@ -12,6 +12,7 @@ import {SQUARE} from "./gpu/shapes/square";
 import {ndcToWorld, projectToScenePlane} from "./scene.mousevent";
 import {BACKGROUND_COLOR} from "./gpu/gpu-render-constants";
 import {CameraMovementListeners} from "./mouse-listeners";
+import {POINT_REDUCTION_FACTOR} from "./scene-constants";
 
 export class ParticleSimulation {
     private isPlaying = false;
@@ -200,6 +201,49 @@ export class ParticleSimulation {
 
         const currentPoints = await this.getCurrentPoints();
         const remainingPoints = currentPoints.filter(point => point.selected !== 1);
+
+        this.points = remainingPoints;
+        this.step = 0;
+
+        this.sceneStorage.createReadStorage(this.gpuContext, this.points, this.physicsData);
+        this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
+        this.updateBindGroups();
+
+        this.simulationLoop(wasPlaying);
+        this.renderLoop(true);
+
+        return remainingPoints;
+    }
+
+    public async reduceSelectedPoints() {
+        const wasPlaying = this.isPlaying;
+        this.simulationLoop(false);
+        this.renderLoop(false);
+
+        const currentPoints = await this.getCurrentPoints();
+
+        // Group selected points by particle type
+        const selectedByType = new Map<number, number[]>();
+        currentPoints.forEach((point, index) => {
+            if (point.selected === 1) {
+                if (!selectedByType.has(point.particleTypeId)) {
+                    selectedByType.set(point.particleTypeId, []);
+                }
+                selectedByType.get(point.particleTypeId)!.push(index);
+            }
+        });
+
+        // Determine which indices to remove based on POINT_REDUCTION_FACTOR, but keep at least 1
+        const indicesToRemove = new Set<number>();
+        selectedByType.forEach((indices) => {
+            if (indices.length <= 1) return; // keep it if only 1
+            const countToRemove = Math.floor(indices.length * POINT_REDUCTION_FACTOR);
+            for (let i = 0; i < countToRemove; i++) {
+                indicesToRemove.add(indices[indices.length - 1 - i]); // remove from the end
+            }
+        });
+
+        const remainingPoints = currentPoints.filter((_, index) => !indicesToRemove.has(index));
 
         this.points = remainingPoints;
         this.step = 0;

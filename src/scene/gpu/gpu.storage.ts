@@ -108,5 +108,6 @@ export class SceneStorage {
   public updatePointValues(gpuContext: GpuContext, points: Point[], physicsData: PhysicsData) {
     let positionArray = createArraysFromPoints(points);
     gpuContext.device.queue.writeBuffer(this.positionsStorage[0], 0, positionArray);
+    gpuContext.device.queue.writeBuffer(this.positionsStorage[1], 0, positionArray);
   }
 }

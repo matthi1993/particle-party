@@ -23,8 +23,11 @@
             size="small">
         </p-button>
     </div>
-    <p-button class="ml-3" (click)="onSaveStructure.emit()" icon="pi pi-save" label="save structure" size="small"></p-button>
-    <p-button class="ml-2" (click)="deleteSelectedPoints()" icon="pi pi-trash" label="delete" severity="danger" size="small"></p-button>
+</div>
+<div class="flex align-items-center gap-2 mt-2">
+    <p-button (click)="onSaveStructure.emit()" icon="pi pi-save" label="save structure" size="small"></p-button>
+    <p-button (click)="reduceSelectedPoints()" icon="pi pi-minus-circle" label="reduce points" severity="warn" size="small"></p-button>
+    <p-button (click)="deleteSelectedPoints()" icon="pi pi-trash" label="delete" severity="danger" size="small"></p-button>
 </div>
 <div class="slider-input-row mt-2">
     <label>radius:</label>
