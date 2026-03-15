@@ -10,12 +10,8 @@ import { combineLatest} from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class DataService {
 
-    public physics = [
-        "assets/presets/physics-base.json",
-        "assets/presets/orange.json",
-    ]
-    public structures = [
-    ]
+    public physics: string[] = []
+    public structures: string[] = []
     public simulations = [
         "assets/presets/simulation.json",
     ]
@@ -39,14 +35,6 @@ export class DataService {
         let requests: Observable<SimulationData>[] = [];
         this.simulations.forEach(file => {
             requests.push(this.http.get<SimulationData>(file))
-        })
-        return combineLatest(requests);
-    }
-
-    listPhysicsModels(): Observable<PhysicsData[]> {
-        let requests: Observable<PhysicsData>[] = [];
-        this.physics.forEach(file => {
-            requests.push(this.http.get<PhysicsData>(file))
         })
         return combineLatest(requests);
     }

@@ -29,11 +29,9 @@ export class SimulationComponent implements OnInit {
     }
 
     async ngOnInit() {
-        this.dataService.listPhysicsModels().subscribe(physics => {
-            this.dataStore.physicsDataOptions = physics;
-        });
         this.dataService.listSimulationModels().subscribe(simulations => {
             this.dataStore.simulationData = simulations[0];
+            this.dataStore.physicsDataOptions = [this.dataStore.simulationData.physicsData];
 
             let canvas = document.querySelector("canvas")!!;
             this.scene.setup(
