@@ -167,9 +167,14 @@ export class ParticleSimulation {
 
     public updatePhysics(physicsData: PhysicsData) {
         this.physicsData = physicsData;
-        this.sceneStorage.updateForceValues(this.gpuContext, this.physicsData);
-        this.sceneStorage.updateTypeValues(this.gpuContext, this.physicsData);
+
+        // Recreate force and type storage buffers since their size may have changed
+        this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
+        this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
         this.sceneStorage.updateComputeUniformsBuffer(this.gpuContext, this.physicsData);
+
+        // Rebind since buffers may have been recreated
+        this.updateBindGroups();
     }
 
     public async updatePoints(points: Point[]) {
