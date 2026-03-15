@@ -254,8 +254,6 @@ export class ParticleSimulation {
     }
 
     render() {
-        if (!this.points || this.points.length === 0) return;
-
         // update buffers
         this.camera.updateCamera();
         this.sceneStorage.updateRenderUniformsBuffer(
@@ -278,17 +276,20 @@ export class ParticleSimulation {
             }],
         });
 
-        this.simulationRenderer?.execute(
-            renderPass,
-            this.step,
-            this.points.length
-        );
+        if (this.points && this.points.length > 0) {
+            this.simulationRenderer?.execute(
+                renderPass,
+                this.step,
+                this.points.length
+            );
+        }
 
         renderPass.end();
         this.gpuContext.device.queue.submit([encoder.finish()]);
     }
 
     simulate() {
+        if (!this.points || this.points.length === 0) return;
         const encoder = this.gpuContext.device.createCommandEncoder();
         this.simulationCompute?.execute(encoder, this.step, this.points.length);
         this.step++;

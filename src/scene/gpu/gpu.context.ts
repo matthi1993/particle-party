@@ -34,7 +34,7 @@ export class GpuContext {
   public createStorageBuffer(label: string, byteLength: number) {
     return this.device.createBuffer({
         label: label,
-        size: byteLength,
+        size: Math.max(byteLength, 4),
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
       })
   }
@@ -42,7 +42,7 @@ export class GpuContext {
   public createReadBuffer(label: string, byteLength: number) {
     return this.device.createBuffer({
       label: label,
-      size: byteLength,
+      size: Math.max(byteLength, 4),
       usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST
     });
   }
