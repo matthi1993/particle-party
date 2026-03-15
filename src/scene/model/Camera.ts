@@ -47,15 +47,62 @@ export class Camera {
         return vec3.distance(this.position, this.center);
     }
 
+    /** Camera right vector (extracted from the view matrix). */
+    getCameraRight(): vec3 {
+        return vec3.fromValues(this.viewMatrix[0], this.viewMatrix[4], this.viewMatrix[8]);
+    }
+
+    /** Camera up vector (extracted from the view matrix). */
+    getCameraUp(): vec3 {
+        return vec3.fromValues(this.viewMatrix[1], this.viewMatrix[5], this.viewMatrix[9]);
+    }
+
+    /** Unproject an NDC point to a world-space ray direction from the camera. */
+    private ndcToWorldRay(ndcX: number, ndcY: number): vec3 {
+        const invProj = mat4.create();
+        mat4.invert(invProj, this.projectionMatrix);
+        const invView = mat4.create();
+        mat4.invert(invView, this.viewMatrix);
+
+        // Point in clip space at near plane
+        const clipPoint = vec4.fromValues(ndcX, ndcY, -1, 1);
+        const eyePoint = vec4.create();
+        vec4.transformMat4(eyePoint, clipPoint, invProj);
+        // We want a direction, not a point
+        eyePoint[2] = -1;
+        eyePoint[3] = 0;
+
+        const worldDir = vec4.create();
+        vec4.transformMat4(worldDir, eyePoint, invView);
+        const dir = vec3.fromValues(worldDir[0], worldDir[1], worldDir[2]);
+        vec3.normalize(dir, dir);
+        return dir;
+    }
+
+    /** Find world point where a ray from camera through NDC (x,y) hits the plane at distance=zoomDist from camera along the forward axis. */
+    private ndcToWorldPoint(ndcX: number, ndcY: number): vec3 {
+        const ray = this.ndcToWorldRay(ndcX, ndcY);
+        const forward = vec3.create();
+        vec3.subtract(forward, this.center, this.position);
+        const dist = vec3.length(forward);
+        vec3.normalize(forward, forward);
+
+        // Intersect with the plane perpendicular to forward, passing through center
+        const denom = vec3.dot(ray, forward);
+        if (Math.abs(denom) < 0.0001) {
+            return vec3.clone(this.center);
+        }
+        const t = dist / denom;
+        const worldPoint = vec3.create();
+        vec3.scaleAndAdd(worldPoint, this.position, ray, t);
+        return worldPoint;
+    }
+
     /**
      * Pan the camera in the right/up plane, and zoom along the forward axis.
-     * `rightNorm` and `upNorm` are expected to be normalised mouse deltas (pixels / element size),
-     * so the caller doesn't need to know about zoom — we scale here.
      */
     translate(rightNorm: number, upNorm: number, forwardNorm: number) {
         const zoomDist = this.getZoomDistance();
-
-        // Pan speed scales linearly with zoom distance so close-up = subtle, far away = fast
         const panScale = zoomDist * 1.5;
 
         const forward = vec3.create();
@@ -72,21 +119,17 @@ export class Camera {
         vec3.scaleAndAdd(movement, movement, right, rightNorm * panScale);
         vec3.scaleAndAdd(movement, movement, up, upNorm * panScale);
 
-        // For zoom (forward) we use exponential scaling: multiply distance by a factor
-        // forwardNorm is positive => zoom in, negative => zoom out
         if (Math.abs(forwardNorm) > 0.0001) {
             const zoomFactor = Math.pow(1 + 0.01 * this.ZOOM_SPEED, -forwardNorm * 100);
             const newDist = Math.max(this.minZoom, Math.min(this.maxZoom, zoomDist * zoomFactor));
             const ratio = newDist / zoomDist;
 
-            // Scale the offset from center
             const offset = vec3.create();
             vec3.subtract(offset, this.position, this.center);
             vec3.scale(offset, offset, ratio);
             vec3.add(this.position, this.center, offset);
         }
 
-        // Apply pan
         vec3.add(this.position, this.position, movement);
         vec3.add(this.center, this.center, movement);
 
@@ -95,13 +138,13 @@ export class Camera {
 
     /**
      * Zoom toward a specific NDC point (cursor position).
-     * `ndcX`, `ndcY` are the cursor position in normalised device coordinates [-1, 1].
-     * `delta` is the raw wheel deltaY.
+     * Uses proper unprojection so the world point under the cursor stays fixed.
      */
     zoomTowardCursor(ndcX: number, ndcY: number, delta: number, shiftHeld: boolean) {
-        const zoomDist = this.getZoomDistance();
+        // Find the world point under the cursor BEFORE zooming
+        const worldPointBefore = this.ndcToWorldPoint(ndcX, ndcY);
 
-        // Finer control when shift is held
+        const zoomDist = this.getZoomDistance();
         const shiftMultiplier = shiftHeld ? 0.3 : 1.0;
         const zoomFactor = Math.pow(1 + 0.01 * this.ZOOM_SPEED, delta * 100 * shiftMultiplier);
         const newDist = Math.max(this.minZoom, Math.min(this.maxZoom, zoomDist * zoomFactor));
@@ -110,40 +153,29 @@ export class Camera {
 
         const ratio = newDist / zoomDist;
 
-        // --- zoom: scale the camera–center offset ---
+        // Scale the camera–center offset to zoom
         const offset = vec3.create();
         vec3.subtract(offset, this.position, this.center);
         vec3.scale(offset, offset, ratio);
         vec3.add(this.position, this.center, offset);
 
-        // --- pan toward cursor so the point under the cursor stays fixed ---
-        const forward = vec3.create();
-        vec3.subtract(forward, this.center, this.position);
-        vec3.normalize(forward, forward);
+        // Rebuild the view matrix so we can unproject again
+        this.updateCamera();
 
-        const right = vec3.create();
-        vec3.cross(right, forward, this.up);
-        vec3.normalize(right, right);
+        // Find the world point under the cursor AFTER zooming
+        const worldPointAfter = this.ndcToWorldPoint(ndcX, ndcY);
 
-        const up = vec3.clone(this.up);
+        // Shift the camera so the point under the cursor stays in the same place
+        const correction = vec3.create();
+        vec3.subtract(correction, worldPointBefore, worldPointAfter);
 
-        // The amount the world shifts under the cursor due to the zoom
-        const panCompensation = (1 - ratio) * zoomDist;
-        const panX = ndcX * panCompensation * 0.8;
-        const panY = ndcY * panCompensation * 0.8;
-
-        const panMovement = vec3.create();
-        vec3.scaleAndAdd(panMovement, panMovement, right, panX);
-        vec3.scaleAndAdd(panMovement, panMovement, up, panY);
-
-        vec3.add(this.position, this.position, panMovement);
-        vec3.add(this.center, this.center, panMovement);
+        vec3.add(this.position, this.position, correction);
+        vec3.add(this.center, this.center, correction);
 
         this.updateCamera();
     }
 
     orbit(yawNorm: number, pitchNorm: number) {
-        // Speed scales so orbit feels consistent regardless of viewport
         const speed = 3.0;
 
         const rotation = mat4.create();

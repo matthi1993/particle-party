@@ -28,6 +28,10 @@ export const sceneRenderShader = `
         selectionCoordinates: vec2f,
         selectionRadius: f32,
         motionBlurStrength: f32,
+        cameraRight: vec3f,
+        _pad0: f32,
+        cameraUp: vec3f,
+        _pad1: f32,
     }
 
     @group(0) @binding(0) var<storage> dataIn: array<Particle>;
@@ -41,36 +45,56 @@ export const sceneRenderShader = `
     ) -> VertexOutput {
 
         let myType = particleTypes[i32(dataIn[instance].particleAttributes.x)];
-        let vel = dataIn[instance].velocity.xy;
+        let vel = dataIn[instance].velocity.xyz;
         let speed = length(vel);
 
         var output: VertexOutput;
         let mvp = uniforms.viewProjectionMatrix;
 
+        // Billboard basis vectors from camera
+        let camRight = uniforms.cameraRight;
+        let camUp = uniforms.cameraUp;
+
         let blurStrength = uniforms.motionBlurStrength;
         let trailLength = min(speed * blurStrength, 20.0);
 
         if (speed > 0.25 && blurStrength > 0.0 && trailLength > 0.01) {
-            let velDir = vel / speed;
-            let perpDir = vec2f(-velDir.y, velDir.x);
+            // Project velocity into the camera plane for trail direction
+            let velInCamX = dot(vel, camRight);
+            let velInCamY = dot(vel, camUp);
+            let vel2d = vec2f(velInCamX, velInCamY);
+            let speed2d = length(vel2d);
 
-            // Total half-length along velocity: particle radius + trail behind
-            let halfSize = myType.size; // the particle half-extent
-            let totalHalfLen = halfSize + trailLength;
+            if (speed2d > 0.001) {
+                let velDir2d = vel2d / speed2d;
+                let perpDir2d = vec2f(-velDir2d.y, velDir2d.x);
 
-            // Map position.x (-1..1) to the stretched range
-            let alongVel = mix(-totalHalfLen, halfSize, (position.x + 1.0) * 0.5);
-            let perpVel = position.y * halfSize;
+                let halfSize = myType.size;
+                let totalHalfLen = halfSize + trailLength;
 
-            let worldOffset = velDir * alongVel + perpDir * perpVel;
-            let worldPos = dataIn[instance].position + vec4f(worldOffset, 0, 0);
-            output.position = mvp * worldPos;
+                let alongVel = mix(-totalHalfLen, halfSize, (position.x + 1.0) * 0.5);
+                let perpVel = position.y * halfSize;
 
-            // UV: x maps 0..1 along the stretched direction, y maps 0..1 perpendicular
-            output.uv = vec2f((position.x + 1.0) * 0.5, (position.y + 1.0) * 0.5);
-            output.trailStretch = trailLength / halfSize;
+                // Reconstruct 3D offset using camera basis
+                let worldOffset = camRight * (velDir2d.x * alongVel + perpDir2d.x * perpVel)
+                                + camUp    * (velDir2d.y * alongVel + perpDir2d.y * perpVel);
+                let worldPos = dataIn[instance].position + vec4f(worldOffset, 0);
+                output.position = mvp * worldPos;
+
+                output.uv = vec2f((position.x + 1.0) * 0.5, (position.y + 1.0) * 0.5);
+                output.trailStretch = trailLength / halfSize;
+            } else {
+                // Velocity is perpendicular to view — just billboard normally
+                let worldOffset = camRight * position.x * myType.size + camUp * position.y * myType.size;
+                let worldPos = dataIn[instance].position + vec4f(worldOffset, 0);
+                output.position = mvp * worldPos;
+                output.uv = position * 0.5 + 0.5;
+                output.trailStretch = 0.0;
+            }
         } else {
-            let worldPos = dataIn[instance].position + vec4f(position * myType.size, 0, 0);
+            // Billboard quad: offset along camera right and up
+            let worldOffset = camRight * position.x * myType.size + camUp * position.y * myType.size;
+            let worldPos = dataIn[instance].position + vec4f(worldOffset, 0);
             output.position = mvp * worldPos;
             output.uv = position * 0.5 + 0.5;
             output.trailStretch = 0.0;

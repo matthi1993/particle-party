@@ -35,7 +35,9 @@ export class SceneStorage {
   createRenderUniformBuffer(gpuContext: GpuContext, camera: Camera, selectionCoord: vec4 = vec4.fromValues(0,0,0,-1)) {
     let uniforms = new Float32Array([
       ...camera.getViewProjectionMatrix(),
-      ...selectionCoord
+      ...selectionCoord,
+      ...camera.getCameraRight(), 0,  // pad to vec4 alignment
+      ...camera.getCameraUp(), 0,     // pad to vec4 alignment
     ])
     this.renderUniformsBuffer = gpuContext.device.createBuffer({
       size: uniforms.byteLength,
@@ -57,7 +59,9 @@ export class SceneStorage {
       mouseX, 
       mouseY,
       brushRadius,
-      motionBlurStrength
+      motionBlurStrength,
+      ...camera.getCameraRight(), 0,  // pad to vec4 alignment
+      ...camera.getCameraUp(), 0,     // pad to vec4 alignment
     ])
     gpuContext.device.queue.writeBuffer(this.renderUniformsBuffer, 0, uniforms);
   }
