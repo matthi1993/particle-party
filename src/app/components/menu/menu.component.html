@@ -9,7 +9,7 @@
     <p-tabpanels>
         <p-tabpanel value="0">
             <div class="flex align-items-center gap-3">
-                <p-button severity="info" (click)="createRandomWorld()">create world</p-button>
+                <p-button severity="info" (click)="createRandomWorld()">recreate world</p-button>
                 <p-button severity="warn" (click)="createRandomWorldWithRandomPhysics()">create random</p-button>
                 <div class="flex flex-column gap-1">
                     <div class="slider-input-row">
@@ -17,10 +17,6 @@
                         <p-inputnumber class="compact-input" [(ngModel)]="pointNumber" [min]="0" [max]="2000" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
                     </div>
                     <p-slider class="compact-slider" [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="2000"/>
-                </div>
-                <div class="flex align-items-center gap-2">
-                    <p-toggleswitch [(ngModel)]="is3D" (onChange)="onDimensionToggleChange()"></p-toggleswitch>
-                    <span>3D</span>
                 </div>
             </div>
 
@@ -43,6 +39,10 @@
                     [style]="{'min-width': '180px'}"
                     appendTo="body">
                 </p-select>
+                <div class="flex align-items-center gap-2">
+                    <p-toggleswitch [(ngModel)]="is3D" (onChange)="onDimensionToggleChange()"></p-toggleswitch>
+                    <span>3D</span>
+                </div>
             </div>
 
         </p-tabpanel>

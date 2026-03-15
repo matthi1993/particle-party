@@ -151,6 +151,30 @@ export class ParticleSimulation {
         await this.updatePoints(currentPoints);
     }
 
+    public async deleteSelectedPoints() {
+        const wasPlaying = this.isPlaying;
+        this.simulationLoop(false);
+        this.renderLoop(false);
+
+        // Small delay to ensure no simulation loop is running
+        await new Promise(resolve => setTimeout(resolve, this.SIMULATION_UPDATE_INTERVAL));
+
+        const currentPoints = await this.getCurrentPoints();
+        const remainingPoints = currentPoints.filter(point => point.selected !== 1);
+
+        this.points = remainingPoints;
+        this.step = 0;
+
+        this.sceneStorage.createReadStorage(this.gpuContext, this.points, this.physicsData);
+        this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
+        this.updateBindGroups();
+
+        this.simulationLoop(wasPlaying);
+        this.renderLoop(true);
+
+        return remainingPoints;
+    }
+
     private updateBindGroups() {
         if (this.simulationCompute) {
             this.simulationCompute.updateBindGroups(
@@ -313,4 +337,3 @@ export class ParticleSimulation {
         return this.points;
     }
 }
-

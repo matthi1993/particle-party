@@ -45,4 +45,9 @@ export class SimulationEditComponent {
         this.brush.structureId = index;
         this.brush.particleId = -1; // Deselect particle
     }
+
+    public async deleteSelectedPoints() {
+        const remainingPoints = await this.scene.deleteSelectedPoints();
+        this.dataStore.simulationData.points = remainingPoints;
+    }
 }
