@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {TabsModule} from 'primeng/tabs';
 import {FormsModule} from "@angular/forms";
 import {NgClass} from "@angular/common";
@@ -28,6 +28,7 @@ import { Structure } from '../../../scene/model/Structure';
 import { vec4 } from 'gl-matrix';
 import { SelectModule } from 'primeng/select';
 import { HttpClient } from '@angular/common/http';
+import { GRAVITY_CONSTANT, ATTRACTION_CONSTANT } from '../../../scene/scene-constants';
 
 @Component({
     selector: 'app-menu',
@@ -35,23 +36,18 @@ import { HttpClient } from '@angular/common/http';
     templateUrl: './menu.component.html',
     styleUrl: './menu.component.scss'
 })
-export class MenuComponent {
+export class MenuComponent implements OnInit {
 
     @Input() public scene!: ParticleSimulation;
     @Input() public brush!: Brush;
 
-    public pointNumber: number = 500;
+    public pointNumber: number = 3000;
     public BrushState = BrushState;
     public showSaveDialog = false;
     public structureName = '';
     public is3D: boolean = false;
 
-    public presetOptions = [
-        { label: 'cell', value: 'assets/presets/cell.json' },
-        { label: 'simulation', value: 'assets/presets/simulation.json' },
-        { label: 'simulation2', value: 'assets/presets/simulation2.json' },
-        { label: 'simulation_2', value: 'assets/presets/simulation_2.json' },
-    ];
+    public presetOptions: { label: string; value: string }[] = [];
     public selectedPreset: string | null = null;
 
     public LIMITS = {
@@ -60,16 +56,29 @@ export class MenuComponent {
         MAX_RADIUS: 100,
         MAX_MASS: 0.25,
         MIN_SIZE: 0.25,
-        MAX_SIZE: 1.0
+        MAX_SIZE: 1.0,
+        MAX_GRAVITY: 0.1,
+        MAX_ATTRACTION: 1.0
     }
 
     constructor(public dataStore: DataStore, public dataService: DataService, private http: HttpClient) {
     }
 
+    ngOnInit() {
+        this.http.get<string[]>('assets/presets/presets.json').subscribe(files => {
+            this.presetOptions = files.map(file => ({
+                label: file.replace('.json', ''),
+                value: `assets/presets/${file}`
+            }));
+        });
+    }
+
     public createRandomWorld() {
         let newPoints: Point[] = [];
+        const numTypes = this.dataStore.simulationData.physicsData.types.length;
+        const pointsPerType = Math.floor(this.pointNumber / numTypes);
         this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-            newPoints.push(...create(this.pointNumber, type, 200, this.scene.is3D));
+            newPoints.push(...create(pointsPerType, type, 200, this.scene.is3D));
         })
         this.dataStore.simulationData.points = newPoints;
 
@@ -80,29 +89,40 @@ export class MenuComponent {
     }
 
     public createRandomWorldWithRandomPhysics() {
-        // Randomize particle type values (color, radius, size, mass)
-        this.dataStore.simulationData.physicsData.types.forEach((type) => {
-            type.radius = randomRounded(0, this.LIMITS.MAX_RADIUS);
-            type.mass = randomRounded(0, this.LIMITS.MAX_MASS);
-            type.size = randomRounded(this.LIMITS.MIN_SIZE, this.LIMITS.MAX_SIZE);
-            type.color = new Color(
-                randomRounded(0, 255),
-                randomRounded(0, 255),
-                randomRounded(0, 255)
-            );
-        });
+        // Create random number of particle types (between 3 and 30)
+        const numTypes = Math.floor(Math.random() * 18) + 3; // 3 to 30
+        const newTypes: ParticleType[] = [];
+        for (let i = 0; i < numTypes; i++) {
+            newTypes.push(new ParticleType(
+                "Particle " + i,
+                i,
+                new Color(
+                    randomRounded(0, 255),
+                    randomRounded(0, 255),
+                    randomRounded(0, 255)
+                ),
+                randomRounded(0, this.LIMITS.MAX_RADIUS),
+                randomRounded(this.LIMITS.MIN_SIZE, this.LIMITS.MAX_SIZE),
+                randomRounded(0, this.LIMITS.MAX_MASS)
+            ));
+        }
+        this.dataStore.simulationData.physicsData.types = newTypes;
 
-        // Randomize forces
-        this.dataStore.simulationData.physicsData.types.forEach((type, rowIndex) => {
-            this.dataStore.simulationData.physicsData.types.forEach((col, colIndex) => {
-                this.dataStore.simulationData.physicsData.forces[rowIndex][colIndex] = randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE);
-            });
-        });
+        // Rebuild forces matrix for new types
+        this.dataStore.simulationData.physicsData.forces = [];
+        for (let i = 0; i < numTypes; i++) {
+            const row: number[] = [];
+            for (let j = 0; j < numTypes; j++) {
+                row.push(randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE));
+            }
+            this.dataStore.simulationData.physicsData.forces.push(row);
+        }
 
-        // Create random points and set scene
+        // Create random points - total number divided by types
         let newPoints: Point[] = [];
+        const pointsPerType = Math.floor(this.pointNumber / numTypes);
         this.dataStore.simulationData.physicsData.types.forEach((type) => {
-            newPoints.push(...create(this.pointNumber, type, 200, this.scene.is3D));
+            newPoints.push(...create(pointsPerType, type, 200, this.scene.is3D));
         });
         this.dataStore.simulationData.points = newPoints;
 
@@ -178,6 +198,7 @@ export class MenuComponent {
 
     async selectScene(event: FileSelectEvent) {
         this.dataStore.simulationData = await readFile<SimulationData>(event);
+        this.applyPhysicsDefaults(this.dataStore.simulationData);
         const is3D = this.dataStore.simulationData.is3D ?? false;
         this.is3D = is3D;
         this.scene.is3D = is3D;
@@ -310,6 +331,7 @@ export class MenuComponent {
         if (!presetPath) return;
         this.http.get<SimulationData>(presetPath).subscribe(data => {
             this.dataStore.simulationData = data;
+            this.applyPhysicsDefaults(this.dataStore.simulationData);
             const is3D = data.is3D ?? false;
             this.is3D = is3D;
             this.scene.is3D = is3D;
@@ -327,6 +349,18 @@ export class MenuComponent {
         if (event.index !== '4' && this.brush.state !== BrushState.None) {
             this.brush.state = BrushState.None;
             this.scene.resetPointSelection();
+        }
+    }
+
+    private applyPhysicsDefaults(data: SimulationData) {
+        if (data.physicsData.gravityConstant == null) {
+            data.physicsData.gravityConstant = GRAVITY_CONSTANT;
+        }
+        if (data.physicsData.attractionConstant == null) {
+            data.physicsData.attractionConstant = ATTRACTION_CONSTANT;
+        }
+        if (!data.structures) {
+            data.structures = [];
         }
     }
 }

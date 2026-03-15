@@ -5,7 +5,7 @@ import { GpuContext } from './gpu.context'
 import { Camera } from '../model/Camera';
 import { Point } from 'src/scene/model/Point';
 import { vec4 } from 'gl-matrix';
-import {ATTRACTION_CONSTANT, GRAVITY_CONSTANT} from "../scene-constants";
+import { ATTRACTION_CONSTANT, GRAVITY_CONSTANT } from "../scene-constants";
 
 export class SceneStorage {
 
@@ -20,10 +20,10 @@ export class SceneStorage {
   constructor() {
   }
 
-  createComputeUniformBuffer(gpuContext: GpuContext) {
+  createComputeUniformBuffer(gpuContext: GpuContext, physicsData?: PhysicsData) {
     let uniforms = new Float32Array([
-      GRAVITY_CONSTANT,
-      ATTRACTION_CONSTANT
+      physicsData?.gravityConstant ?? GRAVITY_CONSTANT,
+      physicsData?.attractionConstant ?? ATTRACTION_CONSTANT
     ])
     this.computeUniformsBuffer = gpuContext.device.createBuffer({
       size: uniforms.byteLength,
@@ -62,10 +62,10 @@ export class SceneStorage {
     gpuContext.device.queue.writeBuffer(this.renderUniformsBuffer, 0, uniforms);
   }
 
-  public updateComputeUniformsBuffer(gpuContext: GpuContext) {
+  public updateComputeUniformsBuffer(gpuContext: GpuContext, physicsData?: PhysicsData) {
     let uniforms = new Float32Array([
-      GRAVITY_CONSTANT,
-      ATTRACTION_CONSTANT
+      physicsData?.gravityConstant ?? GRAVITY_CONSTANT,
+      physicsData?.attractionConstant ?? ATTRACTION_CONSTANT
     ])
     gpuContext.device.queue.writeBuffer(this.computeUniformsBuffer, 0, uniforms);
   }

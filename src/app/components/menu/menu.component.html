@@ -14,9 +14,9 @@
                 <div class="flex flex-column gap-1">
                     <div class="slider-input-row">
                         <label>Points:</label>
-                        <p-inputnumber class="compact-input" [(ngModel)]="pointNumber" [min]="0" [max]="2000" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+                        <p-inputnumber class="compact-input" [(ngModel)]="pointNumber" [min]="0" [max]="10000" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
                     </div>
-                    <p-slider class="compact-slider" [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="2000"/>
+                    <p-slider class="compact-slider" [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="10000"/>
                 </div>
             </div>
 
@@ -96,9 +96,21 @@
                     randomize
                 </button>
             </div>
-            <div class="flex gap-2 mt-2">
-                <p-button (click)="multiplyForces(2)">forces * 2</p-button>
-                <p-button (click)="multiplyForces(0.5)">forces / 2</p-button>
+
+            <div class="flex gap-3 mt-3">
+                <div class="flex flex-column gap-1 flex-1">
+                    <div class="slider-input-row">
+                        <label>Gravity Constant:</label>
+                        <p-inputnumber class="compact-input" (ngModelChange)="updatePhysics()" [(ngModel)]="dataStore.simulationData.physicsData.gravityConstant" [step]="0.001" [min]="0" [max]="LIMITS.MAX_GRAVITY" [minFractionDigits]="4" [maxFractionDigits]="6" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+                    </div>
+                </div>
+
+                <div class="flex flex-column gap-1 flex-1">
+                    <div class="slider-input-row">
+                        <label>Attraction:</label>
+                        <p-inputnumber class="compact-input" (ngModelChange)="updatePhysics()" [(ngModel)]="dataStore.simulationData.physicsData.attractionConstant" [step]="0.01" [min]="0" [max]="LIMITS.MAX_ATTRACTION" [minFractionDigits]="2" [maxFractionDigits]="4" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+                    </div>
+                </div>
             </div>
 
             <p-table [scrollable]="true" [columns]="dataStore.simulationData.physicsData.types"
@@ -200,3 +212,18 @@
         </p-tabpanel>
     </p-tabpanels>
 </p-tabs>
+
+<p-dialog header="Save Structure" [(visible)]="showSaveDialog" [modal]="true" [style]="{'width': '400px'}">
+    <div class="flex flex-column gap-3">
+        <div class="flex flex-column gap-1">
+            <label for="structureName">Structure Name</label>
+            <input id="structureName" type="text" pInputText [(ngModel)]="structureName" placeholder="Enter structure name"/>
+        </div>
+    </div>
+    <ng-template #footer>
+        <div class="flex justify-content-end gap-2">
+            <p-button label="Cancel" severity="secondary" (click)="cancelSaveStructure()" icon="pi pi-times"></p-button>
+            <p-button label="Save" (click)="saveSelectedPointsAsStructure()" icon="pi pi-check"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>

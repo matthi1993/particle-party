@@ -136,6 +136,7 @@ export class ParticleSimulation {
         this.physicsData = physicsData;
         this.sceneStorage.updateForceValues(this.gpuContext, this.physicsData);
         this.sceneStorage.updateTypeValues(this.gpuContext, this.physicsData);
+        this.sceneStorage.updateComputeUniformsBuffer(this.gpuContext, this.physicsData);
     }
 
     public async updatePoints(points: Point[]) {
