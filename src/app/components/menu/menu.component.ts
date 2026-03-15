@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {TabsModule} from 'primeng/tabs';
 import {FormsModule} from "@angular/forms";
 import {NgClass} from "@angular/common";
@@ -26,22 +26,29 @@ import { SimulationEditComponent } from '../simulation-edit/simulation-edit.comp
 import { DialogModule } from 'primeng/dialog';
 import { Structure } from '../../../scene/model/Structure';
 import { vec4 } from 'gl-matrix';
+import { SelectModule } from 'primeng/select';
+import { HttpClient } from '@angular/common/http';
+import { GRAVITY_CONSTANT, ATTRACTION_CONSTANT, RANDOM_FORCE_FACTOR, DEFAULT_WORLD_SIZE } from '../../../scene/scene-constants';
 
 @Component({
     selector: 'app-menu',
-    imports: [NgClass, SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule, DialogModule],
+    imports: [NgClass, SimulationEditComponent, ToggleSwitchModule, TableModule, KnobModule, ColorPickerModule, FieldsetModule, InputTextModule, ButtonModule, FileUploadModule, ChipModule, TabsModule, FormsModule, SliderModule, InputNumberModule, FloatLabelModule, DialogModule, SelectModule],
     templateUrl: './menu.component.html',
     styleUrl: './menu.component.scss'
 })
-export class MenuComponent {
+export class MenuComponent implements OnInit {
 
     @Input() public scene!: ParticleSimulation;
     @Input() public brush!: Brush;
 
-    public pointNumber: number = 500;
-    public BrushState = BrushState; // Make enum available in template
+    public pointNumber: number = 3000;
+    public BrushState = BrushState;
     public showSaveDialog = false;
     public structureName = '';
+    public is3D: boolean = false;
+
+    public presetOptions: { label: string; value: string }[] = [];
+    public selectedPreset: string | null = null;
 
     public LIMITS = {
         MIN_FORCE: -3,
@@ -49,22 +56,94 @@ export class MenuComponent {
         MAX_RADIUS: 100,
         MAX_MASS: 0.25,
         MIN_SIZE: 0.25,
-        MAX_SIZE: 1.0
+        MAX_SIZE: 1.0,
+        MAX_GRAVITY: 0.1,
+        MAX_ATTRACTION: 1.0,
+        MAX_WORLD_SIZE: 1000
     }
 
-    constructor(public dataStore: DataStore, public dataService: DataService) {
+    constructor(public dataStore: DataStore, public dataService: DataService, private http: HttpClient) {
+    }
+
+    ngOnInit() {
+        this.dataService.loadPresetList().subscribe(presets => {
+            this.presetOptions = presets;
+        });
+    }
+
+    public resetWorld() {
+        this.dataStore.simulationData.physicsData.types = [];
+        this.dataStore.simulationData.physicsData.forces = [];
+        this.dataStore.simulationData.physicsData.gravityConstant = GRAVITY_CONSTANT;
+        this.dataStore.simulationData.physicsData.attractionConstant = ATTRACTION_CONSTANT;
+        this.dataStore.simulationData.points = [];
+        this.dataStore.simulationData.structures = [];
+
+        this.scene.setScene(
+            this.dataStore.simulationData.physicsData,
+            this.dataStore.simulationData.points,
+            this.dataStore.simulationData.worldSize
+        );
     }
 
     public createRandomWorld() {
         let newPoints: Point[] = [];
+        const numTypes = this.dataStore.simulationData.physicsData.types.length;
+        const pointsPerType = Math.floor(this.pointNumber / numTypes);
         this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-            newPoints.push(...create(this.pointNumber, type, 200, this.scene.is3D));
+            newPoints.push(...create(pointsPerType, type, this.dataStore.simulationData.worldSize, this.scene.is3D));
         })
         this.dataStore.simulationData.points = newPoints;
 
         this.scene.setScene(
             this.dataStore.simulationData.physicsData,
-            this.dataStore.simulationData.points
+            this.dataStore.simulationData.points,
+            this.dataStore.simulationData.worldSize
+        );
+    }
+
+    public createRandomWorldWithRandomPhysics() {
+        // Create random number of particle types (between 3 and 30)
+        const numTypes = Math.floor(Math.random() * 18) + 3; // 3 to 30
+        const newTypes: ParticleType[] = [];
+        for (let i = 0; i < numTypes; i++) {
+            newTypes.push(new ParticleType(
+                "Particle " + i,
+                i,
+                new Color(
+                    randomRounded(0, 255),
+                    randomRounded(0, 255),
+                    randomRounded(0, 255)
+                ),
+                randomRounded(0, this.LIMITS.MAX_RADIUS),
+                randomRounded(this.LIMITS.MIN_SIZE, this.LIMITS.MAX_SIZE),
+                randomRounded(0, this.LIMITS.MAX_MASS)
+            ));
+        }
+        this.dataStore.simulationData.physicsData.types = newTypes;
+
+        // Rebuild forces matrix for new types
+        this.dataStore.simulationData.physicsData.forces = [];
+        for (let i = 0; i < numTypes; i++) {
+            const row: number[] = [];
+            for (let j = 0; j < numTypes; j++) {
+                row.push(randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE * RANDOM_FORCE_FACTOR));
+            }
+            this.dataStore.simulationData.physicsData.forces.push(row);
+        }
+
+        // Create random points - total number divided by types
+        let newPoints: Point[] = [];
+        const pointsPerType = Math.floor(this.pointNumber / numTypes);
+        this.dataStore.simulationData.physicsData.types.forEach((type) => {
+            newPoints.push(...create(pointsPerType, type, this.dataStore.simulationData.worldSize, this.scene.is3D));
+        });
+        this.dataStore.simulationData.points = newPoints;
+
+        this.scene.setScene(
+            this.dataStore.simulationData.physicsData,
+            this.dataStore.simulationData.points,
+            this.dataStore.simulationData.worldSize
         );
     }
 
@@ -76,18 +155,18 @@ export class MenuComponent {
         });
 
         // update scene values
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     randomForces() {
         this.dataStore.simulationData.physicsData.types.forEach((type, rowIndex) => {
             this.dataStore.simulationData.physicsData.types.forEach((col, colIndex) => {
-                this.dataStore.simulationData.physicsData.forces[rowIndex][colIndex] = randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE);
+                this.dataStore.simulationData.physicsData.forces[rowIndex][colIndex] = randomRounded(this.LIMITS.MIN_FORCE, this.LIMITS.MAX_FORCE * RANDOM_FORCE_FACTOR);
             })
         });
 
         // update scene values
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     randomParticleValues() {
@@ -103,7 +182,7 @@ export class MenuComponent {
         });
 
         // update scene values
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     multiplyForces(factor: number) {
@@ -122,25 +201,31 @@ export class MenuComponent {
         })
 
         // update scene values
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     async saveSimulation() {
         const sim = this.dataStore.simulationData;
         sim.points = await this.scene.getCurrentPoints();
+        sim.is3D = this.scene.is3D;
         await this.dataService.saveSimulation(sim);
     }
 
     async selectScene(event: FileSelectEvent) {
         this.dataStore.simulationData = await readFile<SimulationData>(event);
+        this.applyPhysicsDefaults(this.dataStore.simulationData);
+        const is3D = this.dataStore.simulationData.is3D ?? false;
+        this.is3D = is3D;
+        this.scene.is3D = is3D;
         this.scene.setScene(
             this.dataStore.simulationData.physicsData,
-            this.dataStore.simulationData.points
+            this.dataStore.simulationData.points,
+            this.dataStore.simulationData.worldSize
         )
     }
 
     updatePhysics() {
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     addType() {
@@ -250,5 +335,52 @@ export class MenuComponent {
 
     public async toggleDimension() {
         await this.scene.toggleDimension();
+        this.is3D = this.scene.is3D;
+    }
+
+    public async onDimensionToggleChange() {
+        await this.scene.toggleDimension();
+        this.is3D = this.scene.is3D;
+    }
+
+    public loadPreset(presetPath: string) {
+        if (!presetPath) return;
+        this.http.get<SimulationData>(presetPath).subscribe(data => {
+            this.dataStore.simulationData = data;
+            this.applyPhysicsDefaults(this.dataStore.simulationData);
+            const is3D = data.is3D ?? false;
+            this.is3D = is3D;
+            this.scene.is3D = is3D;
+            this.scene.setScene(
+                this.dataStore.simulationData.physicsData,
+                this.dataStore.simulationData.points,
+                this.dataStore.simulationData.worldSize
+            );
+            this.selectedPreset = null;
+        });
+    }
+
+    public onTabChange(event: any) {
+        console.log("switching")
+        // When switching away from the Edit tab, reset brush mode to None
+        if (event.index !== '4' && this.brush.state !== BrushState.None) {
+            this.brush.state = BrushState.None;
+            this.scene.resetPointSelection();
+        }
+    }
+
+    private applyPhysicsDefaults(data: SimulationData) {
+        if (data.physicsData.gravityConstant == null) {
+            data.physicsData.gravityConstant = GRAVITY_CONSTANT;
+        }
+        if (data.physicsData.attractionConstant == null) {
+            data.physicsData.attractionConstant = ATTRACTION_CONSTANT;
+        }
+        if (!data.structures) {
+            data.structures = [];
+        }
+        if (data.worldSize == null) {
+            data.worldSize = DEFAULT_WORLD_SIZE;
+        }
     }
 }

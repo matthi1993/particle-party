@@ -5,7 +5,7 @@ import { GpuContext } from './gpu.context'
 import { Camera } from '../model/Camera';
 import { Point } from 'src/scene/model/Point';
 import { vec4 } from 'gl-matrix';
-import {ATTRACTION_CONSTANT, GRAVITY_CONSTANT} from "../scene-constants";
+import { ATTRACTION_CONSTANT, GRAVITY_CONSTANT, DEFAULT_WORLD_SIZE } from "../scene-constants";
 
 export class SceneStorage {
 
@@ -20,10 +20,11 @@ export class SceneStorage {
   constructor() {
   }
 
-  createComputeUniformBuffer(gpuContext: GpuContext) {
+  createComputeUniformBuffer(gpuContext: GpuContext, physicsData?: PhysicsData, worldSize?: number) {
     let uniforms = new Float32Array([
-      GRAVITY_CONSTANT,
-      ATTRACTION_CONSTANT
+      physicsData?.gravityConstant ?? GRAVITY_CONSTANT,
+      physicsData?.attractionConstant ?? ATTRACTION_CONSTANT,
+      worldSize ?? DEFAULT_WORLD_SIZE
     ])
     this.computeUniformsBuffer = gpuContext.device.createBuffer({
       size: uniforms.byteLength,
@@ -35,7 +36,9 @@ export class SceneStorage {
   createRenderUniformBuffer(gpuContext: GpuContext, camera: Camera, selectionCoord: vec4 = vec4.fromValues(0,0,0,-1)) {
     let uniforms = new Float32Array([
       ...camera.getViewProjectionMatrix(),
-      ...selectionCoord
+      ...selectionCoord,
+      ...camera.getCameraRight(), 0,  // pad to vec4 alignment
+      ...camera.getCameraUp(), 0,     // pad to vec4 alignment
     ])
     this.renderUniformsBuffer = gpuContext.device.createBuffer({
       size: uniforms.byteLength,
@@ -57,15 +60,18 @@ export class SceneStorage {
       mouseX, 
       mouseY,
       brushRadius,
-      motionBlurStrength
+      motionBlurStrength,
+      ...camera.getCameraRight(), 0,  // pad to vec4 alignment
+      ...camera.getCameraUp(), 0,     // pad to vec4 alignment
     ])
     gpuContext.device.queue.writeBuffer(this.renderUniformsBuffer, 0, uniforms);
   }
 
-  public updateComputeUniformsBuffer(gpuContext: GpuContext) {
+  public updateComputeUniformsBuffer(gpuContext: GpuContext, physicsData?: PhysicsData, worldSize?: number) {
     let uniforms = new Float32Array([
-      GRAVITY_CONSTANT,
-      ATTRACTION_CONSTANT
+      physicsData?.gravityConstant ?? GRAVITY_CONSTANT,
+      physicsData?.attractionConstant ?? ATTRACTION_CONSTANT,
+      worldSize ?? DEFAULT_WORLD_SIZE
     ])
     gpuContext.device.queue.writeBuffer(this.computeUniformsBuffer, 0, uniforms);
   }
@@ -104,5 +110,6 @@ export class SceneStorage {
   public updatePointValues(gpuContext: GpuContext, points: Point[], physicsData: PhysicsData) {
     let positionArray = createArraysFromPoints(points);
     gpuContext.device.queue.writeBuffer(this.positionsStorage[0], 0, positionArray);
+    gpuContext.device.queue.writeBuffer(this.positionsStorage[1], 0, positionArray);
   }
 }

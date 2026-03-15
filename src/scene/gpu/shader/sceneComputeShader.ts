@@ -25,6 +25,7 @@ export const sceneComputeShader = `
     struct Uniforms {
         G: f32,
         attractionFactor: f32,
+        worldSize: f32,
     }
 
     @group(0) @binding(0) var<storage> particles: array<Particle>;
@@ -97,37 +98,41 @@ export const sceneComputeShader = `
                 let direction = me.position - other.position;
                 let distanceSquared = max(dot(direction, direction), 1e-6); // Avoid division by zero
                 let distance = sqrt(distanceSquared);
+                let dir = normalizeVector(direction);
 
-                // ##### inner atomar force #####
-                if (distance > 0.0 && distance <= myType.size) {
-                    let smoothness = 0.15; // highest energey at the center, smooth curve transition
-                    let diff = 1 / (pow(myType.size, smoothness)) * (pow(distance, smoothness)) -1;
-                    force -=  diff * normalizeVector(direction);
-                    
-                } else {
-                    
-                    // ##### attraction force #####
-                    if (distance <= myType.radius){
-                        let relativeDistance = distance - myType.size;
-                        let relativeRadius = myType.radius - myType.size;
+                // Smooth transition width (controls how gradual the blend is)
+                let transitionWidth = myType.size * 0.2;
 
-                        // t goes from 0 (at size edge) to 1 (at radius)
-                        let t = clamp(relativeDistance / relativeRadius, 0.0, 1.0);
+                // ##### Blend weights using smoothstep for continuous transitions #####
 
-                        // Exponential decay: strongest at t=0, approaches 0 at t=1
-                        let decayRate = 5.0;
-                        var electricAttraction = (exp(-decayRate * t) - exp(-decayRate)) / (1.0 - exp(-decayRate));
+                // innerWeight: 1.0 when deep inside size, smoothly fades to 0 at size boundary
+                let innerWeight = 1.0 - smoothstep(myType.size - transitionWidth, myType.size + transitionWidth, distance);
 
-                        let forceMagnitude = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
-                    
-                        force -= electricAttraction * forceMagnitude * normalizeVector(direction);
-                    }
+                // outerWeight: 0.0 inside size, smoothly rises to 1 at size boundary
+                let outerWeight = smoothstep(myType.size - transitionWidth, myType.size + transitionWidth, distance);
 
-                    // ##### gravity force #####
-                    let gravityMagnitude = uniforms.G * otherType.mass / (distanceSquared + 1e-6);
-                    force -= normalizeVector(direction) * gravityMagnitude;
-                    
-                }
+                // attractionWeight: 1.0 near size edge, smoothly fades to 0 at radius boundary
+                let radiusTransition = (myType.radius - myType.size) * 0.15;
+                let attractionWeight = outerWeight * (1.0 - smoothstep(myType.radius - radiusTransition, myType.radius + radiusTransition, distance));
+
+                // ##### inner atomic repulsion force (blended) #####
+                let smoothness = 0.15;
+                let diff = 1.0 / (pow(myType.size, smoothness)) * (pow(max(distance, 1e-6), smoothness)) - 1.0;
+                let repulsionForce = diff * dir;
+                force -= innerWeight * repulsionForce;
+
+                // ##### attraction force (blended) #####
+                let relativeDistance = distance - myType.size;
+                let relativeRadius = myType.radius - myType.size;
+                let t = clamp(relativeDistance / max(relativeRadius, 1e-6), 0.0, 1.0);
+                let decayRate = 5.0;
+                let electricAttraction = (exp(-decayRate * t) - exp(-decayRate)) / (1.0 - exp(-decayRate));
+                let forceMagnitude = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
+                force -= attractionWeight * electricAttraction * forceMagnitude * dir;
+
+                // ##### gravity force (blended, fades in outside size) #####
+                let gravityMagnitude = uniforms.G * otherType.mass / (distanceSquared + 1e-6);
+                force -= outerWeight * gravityMagnitude * dir;
             }
 
             workgroupBarrier(); // Synchronize before loading the next chunk
@@ -139,7 +144,7 @@ export const sceneComputeShader = `
 
 
 
-        let size = f32(200);
+        let size = uniforms.worldSize;
 
         // ##### Update the velocity and position of the particle #####
         me.velocity = (me.velocity + force) * 0.5;
@@ -147,15 +152,11 @@ export const sceneComputeShader = `
 
 
         // ##### Bounding Sphere #####
-        if(length(me.position) > size) {
-            me.velocity.x = me.velocity.x * -1;
-            me.position.x += me.velocity.x;
+        if(length(me.position) >= size) {
+            me.velocity = me.velocity * -1.0;
+            me.position += me.velocity;
+            me.velocity = vec4f(0, 0,0,0);
 
-            me.velocity.y = me.velocity.y * -1;
-            me.position.y += me.velocity.y;
-
-            me.velocity.z = me.velocity.z * -1;
-            me.position.z += me.velocity.z;
         }
 
         particlesOut[index] = me;

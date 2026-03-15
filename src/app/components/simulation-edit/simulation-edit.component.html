@@ -24,19 +24,20 @@
         </p-button>
     </div>
 </div>
-<div class="flex align-items-center mt-2">
-    <label [style.width]="'150px'" for="brush-radius" class="mr-2">radius ({{ brush.radius }}):</label>
-    <p-slider [style.width]="'150px'"
-              id="brush-radius" [(ngModel)]="brush.radius"
-              class="w-full"
-              [step]="1" [min]="1" [max]="100"/>
+<div class="flex align-items-center gap-2 mt-2">
+    <p-button (click)="onSaveStructure.emit()" icon="pi pi-save" label="save structure" size="small"></p-button>
+    <p-button (click)="reduceSelectedPoints()" icon="pi pi-minus-circle" label="reduce points" severity="warn" size="small"></p-button>
+    <p-button (click)="deleteSelectedPoints()" icon="pi pi-trash" label="delete" severity="danger" size="small"></p-button>
 </div>
-<div class="flex align-items-center mt-2">
-    <label [style.width]="'150px'" for="brush-radius" class="mr-2">amount ({{ brush.count }})::</label>
-    <p-slider [style.width]="'150px'"
-              id="brush-amount" [(ngModel)]="brush.count"
-              class="w-full"
-              [step]="1" [min]="1" [max]="100"/>
+<div class="slider-input-row mt-2">
+    <label>radius:</label>
+    <p-inputnumber class="compact-input" [(ngModel)]="brush.radius" [min]="1" [max]="100" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+    <p-slider class="compact-slider" [(ngModel)]="brush.radius" [step]="1" [min]="1" [max]="100"/>
+</div>
+<div class="slider-input-row mt-2">
+    <label>amount:</label>
+    <p-inputnumber class="compact-input" [(ngModel)]="brush.count" [min]="1" [max]="100" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+    <p-slider class="compact-slider" [(ngModel)]="brush.count" [step]="1" [min]="1" [max]="100"/>
 </div>
 <div class="mt-2" *ngIf="brush.particleId === -1 && brush.structureId === -1">
     <small class="text-gray-500">Select a particle type or structure to paint</small>
@@ -63,4 +64,4 @@
             {{ item.name }}
         </p-chip>
     }
-</p-fieldset> 
+</p-fieldset>

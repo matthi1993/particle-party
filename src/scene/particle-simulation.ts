@@ -12,6 +12,7 @@ import {SQUARE} from "./gpu/shapes/square";
 import {ndcToWorld, projectToScenePlane} from "./scene.mousevent";
 import {BACKGROUND_COLOR} from "./gpu/gpu-render-constants";
 import {CameraMovementListeners} from "./mouse-listeners";
+import {POINT_REDUCTION_FACTOR, DEFAULT_WORLD_SIZE} from "./scene-constants";
 
 export class ParticleSimulation {
     private isPlaying = false;
@@ -19,6 +20,7 @@ export class ParticleSimulation {
     private physicsData!: PhysicsData;
     private points!: Point[];
     private camera!: Camera;
+    private worldSize: number = DEFAULT_WORLD_SIZE;
 
     private gpuContext!: GpuContext;
     private simulationCompute?: Compute;
@@ -26,7 +28,8 @@ export class ParticleSimulation {
     private sceneStorage: SceneStorage = new SceneStorage();
 
     private step = 0;
-    private SIMULATION_UPDATE_INTERVAL = 30;
+    private _simulationInterval = 20;
+    private _renderInterval = 30;
     private simulateIntervalId: any = undefined;
     private renderAnimFrameId: any = undefined;
 
@@ -49,15 +52,17 @@ export class ParticleSimulation {
             this.gpuContext.canvas!!,
             () => this.simulationLoop(!this.isPlaying),
             (x: number, y: number, z: number) => {
-                this.camera.translate(x, y, -z);
+                this.camera.translate(x, y, z);
             },
             (x: number, y: number) => {
-                console.log("Orbit: " + x + ", " + y);
                 this.camera.orbit(x, y);
             },
             (x: number, y: number) => {
                 const worldPoint = ndcToWorld(x, y, this.camera);
                 this.mousePos = projectToScenePlane(worldPoint, this.camera);
+            },
+            (ndcX: number, ndcY: number, delta: number, shiftHeld: boolean) => {
+                this.camera.zoomTowardCursor(ndcX, ndcY, delta, shiftHeld);
             }
         );
 
@@ -84,12 +89,41 @@ export class ParticleSimulation {
         this.motionBlurStrength = Math.max(0, Math.min(strength, 20));
     }
 
+    public get simulationInterval(): number {
+        return this._simulationInterval;
+    }
+
+    public set simulationInterval(value: number) {
+        const clamped = Math.max(1, Math.min(value, 1000));
+        this._simulationInterval = clamped;
+        // Restart simulation loop if currently playing
+        if (this.isPlaying && this.simulateIntervalId) {
+            clearInterval(this.simulateIntervalId);
+            this.simulateIntervalId = undefined;
+            this.simulationLoop(true);
+        }
+    }
+
+    public get renderInterval(): number {
+        return this._renderInterval;
+    }
+
+    public set renderInterval(value: number) {
+        const clamped = Math.max(1, Math.min(value, 1000));
+        this._renderInterval = clamped;
+        // Restart render loop if currently running
+        if (this.renderAnimFrameId) {
+            clearInterval(this.renderAnimFrameId);
+            this.renderAnimFrameId = undefined;
+            this.renderLoop(true);
+        }
+    }
+
     public async toggleDimension() {
         const wasPlaying = this.isPlaying;
         this.simulationLoop(false);
 
         const currentPoints = await this.getCurrentPoints();
-        const SCENE_SIZE = 200; // matches bounding sphere in compute shader
 
         if (this.is3D) {
             // Switching to 2D: flatten all z positions to 0, zero z velocity
@@ -101,7 +135,7 @@ export class ParticleSimulation {
         } else {
             // Switching to 3D: give random z positions within scene bounds
             currentPoints.forEach(point => {
-                point.position[2] = (Math.random() * 2 - 1) * SCENE_SIZE * 0.5;
+                point.position[2] = (Math.random() * 2 - 1) * this.worldSize * 0.5;
                 point.velocity[2] = 0;
             });
             this.is3D = true;
@@ -117,25 +151,38 @@ export class ParticleSimulation {
         }
     }
 
-    public setScene(physicsData: PhysicsData, points: Point[]) {
+    public setScene(physicsData: PhysicsData, points: Point[], worldSize?: number) {
         this.step = 0;
 
         this.physicsData = physicsData;
         this.points = points;
+        if (worldSize !== undefined) {
+            this.worldSize = worldSize;
+        }
 
         this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
         this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
 
         this.sceneStorage.createReadStorage(this.gpuContext, this.points, this.physicsData);
         this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
+        this.sceneStorage.updateComputeUniformsBuffer(this.gpuContext, this.physicsData, this.worldSize);
 
         this.updateBindGroups();
     }
 
-    public updatePhysics(physicsData: PhysicsData) {
+    public updatePhysics(physicsData: PhysicsData, worldSize?: number) {
         this.physicsData = physicsData;
-        this.sceneStorage.updateForceValues(this.gpuContext, this.physicsData);
-        this.sceneStorage.updateTypeValues(this.gpuContext, this.physicsData);
+        if (worldSize !== undefined) {
+            this.worldSize = worldSize;
+        }
+
+        // Recreate force and type storage buffers since their size may have changed
+        this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
+        this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
+        this.sceneStorage.updateComputeUniformsBuffer(this.gpuContext, this.physicsData, this.worldSize);
+
+        // Rebind since buffers may have been recreated
+        this.updateBindGroups();
     }
 
     public async updatePoints(points: Point[]) {
@@ -149,6 +196,73 @@ export class ParticleSimulation {
             point.selected = 0;
         });
         await this.updatePoints(currentPoints);
+    }
+
+    public async deleteSelectedPoints() {
+        const wasPlaying = this.isPlaying;
+        this.simulationLoop(false);
+        this.renderLoop(false);
+
+        // Small delay to ensure no simulation loop is running
+
+
+        const currentPoints = await this.getCurrentPoints();
+        const remainingPoints = currentPoints.filter(point => point.selected !== 1);
+
+        this.points = remainingPoints;
+        this.step = 0;
+
+        this.sceneStorage.createReadStorage(this.gpuContext, this.points, this.physicsData);
+        this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
+        this.updateBindGroups();
+
+        this.simulationLoop(wasPlaying);
+        this.renderLoop(true);
+
+        return remainingPoints;
+    }
+
+    public async reduceSelectedPoints() {
+        const wasPlaying = this.isPlaying;
+        this.simulationLoop(false);
+        this.renderLoop(false);
+
+        const currentPoints = await this.getCurrentPoints();
+
+        // Group selected points by particle type
+        const selectedByType = new Map<number, number[]>();
+        currentPoints.forEach((point, index) => {
+            if (point.selected === 1) {
+                if (!selectedByType.has(point.particleTypeId)) {
+                    selectedByType.set(point.particleTypeId, []);
+                }
+                selectedByType.get(point.particleTypeId)!.push(index);
+            }
+        });
+
+        // Determine which indices to remove based on POINT_REDUCTION_FACTOR, but keep at least 1
+        const indicesToRemove = new Set<number>();
+        selectedByType.forEach((indices) => {
+            if (indices.length <= 1) return; // keep it if only 1
+            const countToRemove = Math.floor(indices.length * POINT_REDUCTION_FACTOR);
+            for (let i = 0; i < countToRemove; i++) {
+                indicesToRemove.add(indices[indices.length - 1 - i]); // remove from the end
+            }
+        });
+
+        const remainingPoints = currentPoints.filter((_, index) => !indicesToRemove.has(index));
+
+        this.points = remainingPoints;
+        this.step = 0;
+
+        this.sceneStorage.createReadStorage(this.gpuContext, this.points, this.physicsData);
+        this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
+        this.updateBindGroups();
+
+        this.simulationLoop(wasPlaying);
+        this.renderLoop(true);
+
+        return remainingPoints;
     }
 
     private updateBindGroups() {
@@ -178,7 +292,7 @@ export class ParticleSimulation {
         if (shouldPlay && !this.simulateIntervalId) {
             this.simulateIntervalId = setInterval(() => {
                 this.simulate();
-            }, this.SIMULATION_UPDATE_INTERVAL);
+            }, this._simulationInterval);
         } else if (this.simulateIntervalId) {
             clearInterval(this.simulateIntervalId);
             this.simulateIntervalId = undefined;
@@ -187,13 +301,11 @@ export class ParticleSimulation {
 
     public renderLoop(shouldPlay: boolean) {
         if (shouldPlay && !this.renderAnimFrameId) {
-            const renderFrame = () => {
+            this.renderAnimFrameId = setInterval(() => {
                 this.render();
-                this.renderAnimFrameId = requestAnimationFrame(renderFrame);
-            };
-            this.renderAnimFrameId = requestAnimationFrame(renderFrame);
+            }, this._renderInterval);
         } else if (!shouldPlay && this.renderAnimFrameId) {
-            cancelAnimationFrame(this.renderAnimFrameId);
+            clearInterval(this.renderAnimFrameId);
             this.renderAnimFrameId = undefined;
         }
     }
@@ -225,12 +337,10 @@ export class ParticleSimulation {
 
             this.simulationLoop(shouldPlay);
             this.renderLoop(true);
-        }, this.SIMULATION_UPDATE_INTERVAL)
+        }, this._simulationInterval)
     }
 
     render() {
-        if (!this.points || this.points.length === 0) return;
-
         // update buffers
         this.camera.updateCamera();
         this.sceneStorage.updateRenderUniformsBuffer(
@@ -253,17 +363,20 @@ export class ParticleSimulation {
             }],
         });
 
-        this.simulationRenderer?.execute(
-            renderPass,
-            this.step,
-            this.points.length
-        );
+        if (this.points && this.points.length > 0) {
+            this.simulationRenderer?.execute(
+                renderPass,
+                this.step,
+                this.points.length
+            );
+        }
 
         renderPass.end();
         this.gpuContext.device.queue.submit([encoder.finish()]);
     }
 
     simulate() {
+        if (!this.points || this.points.length === 0) return;
         const encoder = this.gpuContext.device.createCommandEncoder();
         this.simulationCompute?.execute(encoder, this.step, this.points.length);
         this.step++;
@@ -313,4 +426,3 @@ export class ParticleSimulation {
         return this.points;
     }
 }
-

@@ -1,7 +1,17 @@
 <div class="play-button-container">
-    <button pButton class="play-btn" (click)="togglePlayPause()" [title]="scene.getIsPlaying() ? 'Pause (Space)' : 'Play (Space)'">
-        <i [class]="scene.getIsPlaying() ? 'pi pi-pause' : 'pi pi-play'"></i>
-    </button>
+    <div class="flex flex-column align-items-center gap-2">
+        <button pButton class="play-btn" (click)="togglePlayPause()" [title]="scene.getIsPlaying() ? 'Pause (Space)' : 'Play (Space)'">
+            <i [class]="scene.getIsPlaying() ? 'pi pi-pause' : 'pi pi-play'"></i>
+        </button>
+        <div class="interval-input">
+            <label>Sim (ms)</label>
+            <p-inputnumber [(ngModel)]="scene.simulationInterval" [min]="1" [max]="1000" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small" [inputStyle]="{'width': '50px', 'text-align': 'center'}"/>
+        </div>
+        <div class="interval-input">
+            <label>Render (ms)</label>
+            <p-inputnumber [(ngModel)]="scene.renderInterval" [min]="1" [max]="1000" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small" [inputStyle]="{'width': '50px', 'text-align': 'center'}"/>
+        </div>
+    </div>
 </div>
 
 <app-menu [scene]="this.scene" [brush]="this.brush"></app-menu>
