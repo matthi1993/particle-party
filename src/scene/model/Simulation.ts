@@ -1,6 +1,6 @@
 import { ParticleType, Point } from 'src/scene/model/Point';
 import { Structure } from 'src/scene/model/Structure';
-import { ATTRACTION_CONSTANT, GRAVITY_CONSTANT } from '../scene-constants';
+import { ATTRACTION_CONSTANT, GRAVITY_CONSTANT, DEFAULT_WORLD_SIZE } from '../scene-constants';
 
 export class ParticleTypeWithForces {
   public type!: ParticleType;
@@ -16,6 +16,7 @@ export class SimulationData {
   public points: Point[] = [];
   public structures: Structure[] = [];
   public is3D: boolean = false;
+  public worldSize: number = DEFAULT_WORLD_SIZE;
 }
 
 export class PhysicsData {

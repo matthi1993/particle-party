@@ -25,6 +25,7 @@ export const sceneComputeShader = `
     struct Uniforms {
         G: f32,
         attractionFactor: f32,
+        worldSize: f32,
     }
 
     @group(0) @binding(0) var<storage> particles: array<Particle>;
@@ -143,7 +144,7 @@ export const sceneComputeShader = `
 
 
 
-        let size = f32(200);
+        let size = uniforms.worldSize;
 
         // ##### Update the velocity and position of the particle #####
         me.velocity = (me.velocity + force) * 0.5;

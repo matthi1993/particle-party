@@ -28,7 +28,7 @@ import { Structure } from '../../../scene/model/Structure';
 import { vec4 } from 'gl-matrix';
 import { SelectModule } from 'primeng/select';
 import { HttpClient } from '@angular/common/http';
-import { GRAVITY_CONSTANT, ATTRACTION_CONSTANT, RANDOM_FORCE_FACTOR } from '../../../scene/scene-constants';
+import { GRAVITY_CONSTANT, ATTRACTION_CONSTANT, RANDOM_FORCE_FACTOR, DEFAULT_WORLD_SIZE } from '../../../scene/scene-constants';
 
 @Component({
     selector: 'app-menu',
@@ -58,7 +58,8 @@ export class MenuComponent implements OnInit {
         MIN_SIZE: 0.25,
         MAX_SIZE: 1.0,
         MAX_GRAVITY: 0.1,
-        MAX_ATTRACTION: 1.0
+        MAX_ATTRACTION: 1.0,
+        MAX_WORLD_SIZE: 1000
     }
 
     constructor(public dataStore: DataStore, public dataService: DataService, private http: HttpClient) {
@@ -80,7 +81,8 @@ export class MenuComponent implements OnInit {
 
         this.scene.setScene(
             this.dataStore.simulationData.physicsData,
-            this.dataStore.simulationData.points
+            this.dataStore.simulationData.points,
+            this.dataStore.simulationData.worldSize
         );
     }
 
@@ -89,13 +91,14 @@ export class MenuComponent implements OnInit {
         const numTypes = this.dataStore.simulationData.physicsData.types.length;
         const pointsPerType = Math.floor(this.pointNumber / numTypes);
         this.dataStore.simulationData.physicsData.types.forEach((type, index) => {
-            newPoints.push(...create(pointsPerType, type, 200, this.scene.is3D));
+            newPoints.push(...create(pointsPerType, type, this.dataStore.simulationData.worldSize, this.scene.is3D));
         })
         this.dataStore.simulationData.points = newPoints;
 
         this.scene.setScene(
             this.dataStore.simulationData.physicsData,
-            this.dataStore.simulationData.points
+            this.dataStore.simulationData.points,
+            this.dataStore.simulationData.worldSize
         );
     }
 
@@ -133,13 +136,14 @@ export class MenuComponent implements OnInit {
         let newPoints: Point[] = [];
         const pointsPerType = Math.floor(this.pointNumber / numTypes);
         this.dataStore.simulationData.physicsData.types.forEach((type) => {
-            newPoints.push(...create(pointsPerType, type, 200, this.scene.is3D));
+            newPoints.push(...create(pointsPerType, type, this.dataStore.simulationData.worldSize, this.scene.is3D));
         });
         this.dataStore.simulationData.points = newPoints;
 
         this.scene.setScene(
             this.dataStore.simulationData.physicsData,
-            this.dataStore.simulationData.points
+            this.dataStore.simulationData.points,
+            this.dataStore.simulationData.worldSize
         );
     }
 
@@ -151,7 +155,7 @@ export class MenuComponent implements OnInit {
         });
 
         // update scene values
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     randomForces() {
@@ -162,7 +166,7 @@ export class MenuComponent implements OnInit {
         });
 
         // update scene values
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     randomParticleValues() {
@@ -178,7 +182,7 @@ export class MenuComponent implements OnInit {
         });
 
         // update scene values
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     multiplyForces(factor: number) {
@@ -197,7 +201,7 @@ export class MenuComponent implements OnInit {
         })
 
         // update scene values
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     async saveSimulation() {
@@ -215,12 +219,13 @@ export class MenuComponent implements OnInit {
         this.scene.is3D = is3D;
         this.scene.setScene(
             this.dataStore.simulationData.physicsData,
-            this.dataStore.simulationData.points
+            this.dataStore.simulationData.points,
+            this.dataStore.simulationData.worldSize
         )
     }
 
     updatePhysics() {
-        this.scene.updatePhysics(this.dataStore.simulationData.physicsData);
+        this.scene.updatePhysics(this.dataStore.simulationData.physicsData, this.dataStore.simulationData.worldSize);
     }
 
     addType() {
@@ -348,7 +353,8 @@ export class MenuComponent implements OnInit {
             this.scene.is3D = is3D;
             this.scene.setScene(
                 this.dataStore.simulationData.physicsData,
-                this.dataStore.simulationData.points
+                this.dataStore.simulationData.points,
+                this.dataStore.simulationData.worldSize
             );
             this.selectedPreset = null;
         });
@@ -372,6 +378,9 @@ export class MenuComponent implements OnInit {
         }
         if (!data.structures) {
             data.structures = [];
+        }
+        if (data.worldSize == null) {
+            data.worldSize = DEFAULT_WORLD_SIZE;
         }
     }
 }

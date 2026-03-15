@@ -12,12 +12,22 @@
                 <p-button severity="info" (click)="createRandomWorld()">recreate</p-button>
                 <p-button severity="warn" (click)="createRandomWorldWithRandomPhysics()">random</p-button>
                 <p-button severity="danger" (click)="resetWorld()">reset</p-button>
+
+            </div>
+            <div class="flex mt-4 align-items-center gap-3">
                 <div class="flex flex-column gap-1">
                     <div class="slider-input-row">
                         <label>Points:</label>
                         <p-inputnumber class="compact-input" [(ngModel)]="pointNumber" [min]="0" [max]="10000" [step]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
                     </div>
                     <p-slider class="compact-slider" [step]="1" [(ngModel)]="pointNumber" [min]="0" [max]="10000"/>
+                </div>
+                <div class="flex flex-column gap-1">
+                    <div class="slider-input-row">
+                        <label>Size:</label>
+                        <p-inputnumber class="compact-input" [(ngModel)]="dataStore.simulationData.worldSize" (ngModelChange)="updatePhysics()" [min]="10" [max]="LIMITS.MAX_WORLD_SIZE" [step]="10" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" size="small"/>
+                    </div>
+                    <p-slider class="compact-slider" [step]="10" [(ngModel)]="dataStore.simulationData.worldSize" (onChange)="updatePhysics()" [min]="10" [max]="LIMITS.MAX_WORLD_SIZE"/>
                 </div>
             </div>
 
@@ -96,6 +106,8 @@
                     <i class="pi pi-question-circle"></i>
                     randomize
                 </button>
+                <p-button severity="info" (click)="multiplyForces(2)">forces * 2</p-button>
+                <p-button severity="info" (click)="multiplyForces(0.5)">forces / 2</p-button>
             </div>
 
             <div class="flex gap-3 mt-3">

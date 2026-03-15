@@ -12,7 +12,7 @@ import {SQUARE} from "./gpu/shapes/square";
 import {ndcToWorld, projectToScenePlane} from "./scene.mousevent";
 import {BACKGROUND_COLOR} from "./gpu/gpu-render-constants";
 import {CameraMovementListeners} from "./mouse-listeners";
-import {POINT_REDUCTION_FACTOR} from "./scene-constants";
+import {POINT_REDUCTION_FACTOR, DEFAULT_WORLD_SIZE} from "./scene-constants";
 
 export class ParticleSimulation {
     private isPlaying = false;
@@ -20,6 +20,7 @@ export class ParticleSimulation {
     private physicsData!: PhysicsData;
     private points!: Point[];
     private camera!: Camera;
+    private worldSize: number = DEFAULT_WORLD_SIZE;
 
     private gpuContext!: GpuContext;
     private simulationCompute?: Compute;
@@ -27,7 +28,7 @@ export class ParticleSimulation {
     private sceneStorage: SceneStorage = new SceneStorage();
 
     private step = 0;
-    private _simulationInterval = 10;
+    private _simulationInterval = 20;
     private _renderInterval = 30;
     private simulateIntervalId: any = undefined;
     private renderAnimFrameId: any = undefined;
@@ -123,7 +124,6 @@ export class ParticleSimulation {
         this.simulationLoop(false);
 
         const currentPoints = await this.getCurrentPoints();
-        const SCENE_SIZE = 200; // matches bounding sphere in compute shader
 
         if (this.is3D) {
             // Switching to 2D: flatten all z positions to 0, zero z velocity
@@ -135,7 +135,7 @@ export class ParticleSimulation {
         } else {
             // Switching to 3D: give random z positions within scene bounds
             currentPoints.forEach(point => {
-                point.position[2] = (Math.random() * 2 - 1) * SCENE_SIZE * 0.5;
+                point.position[2] = (Math.random() * 2 - 1) * this.worldSize * 0.5;
                 point.velocity[2] = 0;
             });
             this.is3D = true;
@@ -151,28 +151,35 @@ export class ParticleSimulation {
         }
     }
 
-    public setScene(physicsData: PhysicsData, points: Point[]) {
+    public setScene(physicsData: PhysicsData, points: Point[], worldSize?: number) {
         this.step = 0;
 
         this.physicsData = physicsData;
         this.points = points;
+        if (worldSize !== undefined) {
+            this.worldSize = worldSize;
+        }
 
         this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
         this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
 
         this.sceneStorage.createReadStorage(this.gpuContext, this.points, this.physicsData);
         this.sceneStorage.createPointStorage(this.gpuContext, this.points, this.physicsData);
+        this.sceneStorage.updateComputeUniformsBuffer(this.gpuContext, this.physicsData, this.worldSize);
 
         this.updateBindGroups();
     }
 
-    public updatePhysics(physicsData: PhysicsData) {
+    public updatePhysics(physicsData: PhysicsData, worldSize?: number) {
         this.physicsData = physicsData;
+        if (worldSize !== undefined) {
+            this.worldSize = worldSize;
+        }
 
         // Recreate force and type storage buffers since their size may have changed
         this.sceneStorage.createForceStorage(this.gpuContext, this.physicsData);
         this.sceneStorage.createTypeStorage(this.gpuContext, this.physicsData);
-        this.sceneStorage.updateComputeUniformsBuffer(this.gpuContext, this.physicsData);
+        this.sceneStorage.updateComputeUniformsBuffer(this.gpuContext, this.physicsData, this.worldSize);
 
         // Rebind since buffers may have been recreated
         this.updateBindGroups();
