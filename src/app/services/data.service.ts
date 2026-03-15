@@ -5,18 +5,28 @@ import { Structure } from '../../scene/model/Structure';
 import { PhysicsData, SimulationData } from '../../scene/model/Simulation';
 import { DataStore } from '../store/data.store';
 import { Observable } from 'rxjs/internal/Observable';
-import { combineLatest} from 'rxjs';
+import { combineLatest, switchMap, map } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
 
     public physics: string[] = []
     public structures: string[] = []
-    public simulations = [
-        "assets/presets/simulation.json",
-    ]
 
     constructor(private http: HttpClient, private dataStore: DataStore) {
+    }
+
+    loadPresetList(): Observable<{ label: string; value: string }[]> {
+        return this.http.get<string[]>('assets/presets/presets.json').pipe(
+            map(files => files.map(file => ({
+                label: file.replace('.json', ''),
+                value: `assets/presets/${file}`
+            })))
+        );
+    }
+
+    loadPreset(presetPath: string): Observable<SimulationData> {
+        return this.http.get<SimulationData>(presetPath);
     }
 
     async saveSimulation(sim: SimulationData): Promise<Structure> {
@@ -31,13 +41,6 @@ export class DataService {
         return await this.saveAsJson(physicsData, "physics.json");
     }
 
-    listSimulationModels(): Observable<SimulationData[]> {
-        let requests: Observable<SimulationData>[] = [];
-        this.simulations.forEach(file => {
-            requests.push(this.http.get<SimulationData>(file))
-        })
-        return combineLatest(requests);
-    }
 
     listStructures(): Observable<Structure[]> {
         let requests: Observable<Structure>[] = [];

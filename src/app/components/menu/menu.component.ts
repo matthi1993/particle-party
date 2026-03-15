@@ -65,11 +65,8 @@ export class MenuComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.http.get<string[]>('assets/presets/presets.json').subscribe(files => {
-            this.presetOptions = files.map(file => ({
-                label: file.replace('.json', ''),
-                value: `assets/presets/${file}`
-            }));
+        this.dataService.loadPresetList().subscribe(presets => {
+            this.presetOptions = presets;
         });
     }
 

@@ -4,6 +4,7 @@ import {DataStore} from 'src/app/store/data.store';
 import {FormsModule} from '@angular/forms';
 import {ParticleSimulation} from 'src/scene/particle-simulation';
 import {DataService} from 'src/app/services/data.service';
+import {GRAVITY_CONSTANT, ATTRACTION_CONSTANT} from 'src/scene/scene-constants';
 import {getMouseNDC, getPointNDC, ndcToWorld, projectToScenePlane} from "../../../scene/scene.mousevent";
 import {Brush, BrushState} from "../../model/Brush";
 import {MenuComponent} from "../menu/menu.component";
@@ -11,6 +12,7 @@ import {BrushComponent} from "../brush/brush.component";
 import {Point} from 'src/scene/model/Point';
 import {vec4} from 'gl-matrix';
 import {ButtonModule} from 'primeng/button';
+import {switchMap} from 'rxjs';
 
 @Component({
     selector: 'app-simulation',
@@ -29,8 +31,14 @@ export class SimulationComponent implements OnInit {
     }
 
     async ngOnInit() {
-        this.dataService.listSimulationModels().subscribe(simulations => {
-            this.dataStore.simulationData = simulations[0];
+        this.dataService.loadPresetList().pipe(
+            switchMap(presets => {
+                const firstPreset = presets[0];
+                return this.dataService.loadPreset(firstPreset.value);
+            })
+        ).subscribe(simulationData => {
+            this.dataStore.simulationData = simulationData;
+            this.applyPhysicsDefaults(this.dataStore.simulationData);
             this.dataStore.physicsDataOptions = [this.dataStore.simulationData.physicsData];
 
             let canvas = document.querySelector("canvas")!!;
@@ -58,7 +66,19 @@ export class SimulationComponent implements OnInit {
                 this.scene.simulationLoop(true);
                 this.scene.renderLoop(true);
             });
-        })
+        });
+    }
+
+    private applyPhysicsDefaults(data: any) {
+        if (data.physicsData.gravityConstant == null) {
+            data.physicsData.gravityConstant = GRAVITY_CONSTANT;
+        }
+        if (data.physicsData.attractionConstant == null) {
+            data.physicsData.attractionConstant = ATTRACTION_CONSTANT;
+        }
+        if (!data.structures) {
+            data.structures = [];
+        }
     }
 
     public async brushClicked(x: number, y: number) {
