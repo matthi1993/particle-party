@@ -1,5 +1,19 @@
 export const WORKGROUP_SIZE = 32;
 
+// ── Tuning knobs ─────────────────────────────────────────────────────────────
+// Collision repulsion: strength of the short-range universal repulsion force
+export const REPULSION_STRENGTH = 1.0;
+
+// Type-force fade: fraction of interactionDist at which the type force starts fading out (0..1)
+export const TYPE_FORCE_FADE_START = 0.85;
+
+// Density spreading: how many multiples of myType.size the same-type repulsion radius extends
+export const DENSITY_RADIUS_FACTOR = 4.0;
+
+// Density spreading strength: magnitude of the per-pair same-type repulsion
+export const DENSITY_STRENGTH = 0.5;
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const sceneComputeShader = `
 
     struct Particle {
@@ -38,18 +52,16 @@ export const sceneComputeShader = `
 
     var<workgroup> sharedParticles: array<Particle, ${WORKGROUP_SIZE}>; // Shared memory for particles in workgroup
 
-    fn normalizeVector(v: vec4f) -> vec4f {
-        let len = length(v); // Calculate the magnitude (length) of the vector
-        if (len > 0.0) {
-            return v / len; // Divide the vector by its length
-        }
-        return vec4f(0,0,0,0); // Handle the zero-length vector case
+    fn safeNormalize(v: vec4f) -> vec4f {
+        let len = length(v);
+        if (len > 1e-6) { return v / len; }
+        return vec4f(0, 0, 0, 0);
     }
 
     @compute @workgroup_size(${WORKGROUP_SIZE})
     fn computeMain(
-        @builtin(global_invocation_id) global_id: vec3<u32>, 
-        @builtin(local_invocation_id) local_id: vec3<u32>, 
+        @builtin(global_invocation_id) global_id: vec3<u32>,
+        @builtin(local_invocation_id) local_id: vec3<u32>,
         @builtin(workgroup_id) workgroup_id: vec3<u32>
     ) {
         let index = global_id.x;
@@ -58,21 +70,25 @@ export const sceneComputeShader = `
         let myType = particleTypes[i32(me.particleAttributes.x)];
         let numParticles = arrayLength(&particles);
 
+        // Build force lookup: myForces[otherTypeId] = attraction/repulsion strength
+        // Positive = attract, negative = repel
         var myForces: array<f32, 16>; // TODO 16 is the max number of types currently
-        
-        
         var forceCounter = 0;
         for (var i: u32 = 0; i < arrayLength(&forces); i++) {
-            if(forces[i].idParticleA == me.particleAttributes.x) {
+            if (forces[i].idParticleA == me.particleAttributes.x) {
                 myForces[forceCounter] = forces[i].force;
                 forceCounter++;
             }
         }
 
-        // Initialize force accumulator
-        var force: vec4f = vec4f(0, 0,0,0);
+        var totalForce: vec4f = vec4f(0, 0, 0, 0);
 
-        // Loop over all particles in chunks
+        // Interaction radii
+        let collisionDist   = myType.size;                                // repulsion zone
+        let interactionDist = myType.radius;                              // type-force cutoff
+        let densityRadius   = myType.size * ${DENSITY_RADIUS_FACTOR};    // same-type spread radius
+
+        // Loop over all particles in workgroup-sized chunks
         for (var chunkStart = 0u; chunkStart < numParticles; chunkStart += ${WORKGROUP_SIZE}) {
 
             // Load the current chunk into shared memory
@@ -80,83 +96,54 @@ export const sceneComputeShader = `
             if (chunkIndex < numParticles) {
                 sharedParticles[local_id.x] = particles[chunkIndex];
             }
+            workgroupBarrier();
 
-            workgroupBarrier(); // Ensure all threads have loaded the data
-
-
-            // Calculate interactions with particles in shared memory
             for (var i = 0u; i < ${WORKGROUP_SIZE}; i++) {
-                
-                // stop loop if no more particles left
-                if (chunkStart + i >= numParticles) {
-                    break;
-                }
-                    
+                if (chunkStart + i >= numParticles) { break; }
+                if (chunkStart + i == index) { continue; } // skip self
+
                 let other = sharedParticles[i];
-                let otherType = particleTypes[i32(other.particleAttributes.x)];
 
-                let direction = me.position - other.position;
-                let distanceSquared = max(dot(direction, direction), 1e-6); // Avoid division by zero
-                let distance = sqrt(distanceSquared);
-                let dir = normalizeVector(direction);
+                let delta = me.position - other.position; // points from other → me
+                let dist  = length(delta);
+                let dir   = safeNormalize(delta);
 
-                // Smooth transition width (controls how gradual the blend is)
-                let transitionWidth = myType.size * 0.2;
+                let forceMag   = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
+                let isSameType = select(0.0, 1.0, other.particleAttributes.x == me.particleAttributes.x);
 
-                // ##### Blend weights using smoothstep for continuous transitions #####
+                // ── Repulsion weight ──
+                // Quadratic: 1 at contact, smoothly reaches 0 at collisionDist. No hard cutoff.
+                let repW = pow(1.0 - clamp(dist / collisionDist, 0.0, 1.0), 2.0);
 
-                // innerWeight: 1.0 when deep inside size, smoothly fades to 0 at size boundary
-                let innerWeight = 1.0 - smoothstep(myType.size - transitionWidth, myType.size + transitionWidth, distance);
+                // ── Type-force weight ──
+                // Smoothly fades IN past the collision zone, smoothly fades OUT near interactionDist.
+                // Product of two smoothsteps naturally forms a single continuous hill — no if/else needed.
+                let typeInW  = smoothstep(0.0, collisionDist, dist);
+                let typeOutW = 1.0 - smoothstep(interactionDist * ${TYPE_FORCE_FADE_START}, interactionDist, dist);
+                let typeW    = typeInW * typeOutW;
 
-                // outerWeight: 0.0 inside size, smoothly rises to 1 at size boundary
-                let outerWeight = smoothstep(myType.size - transitionWidth, myType.size + transitionWidth, distance);
+                // ── Density-spreading weight (same-type only) ──
+                // Quadratic per-pair repulsion that fades to zero at densityRadius.
+                let densW = pow(max(0.0, 1.0 - dist / densityRadius), 2.0);
 
-                // attractionWeight: 1.0 near size edge, smoothly fades to 0 at radius boundary
-                let radiusTransition = (myType.radius - myType.size) * 0.15;
-                let attractionWeight = outerWeight * (1.0 - smoothstep(myType.radius - radiusTransition, myType.radius + radiusTransition, distance));
-
-                // ##### inner atomic repulsion force (blended) #####
-                let smoothness = 0.15;
-                let diff = 1.0 / (pow(myType.size, smoothness)) * (pow(max(distance, 1e-6), smoothness)) - 1.0;
-                let repulsionForce = diff * dir;
-                force -= innerWeight * repulsionForce;
-
-                // ##### attraction force (blended) #####
-                let relativeDistance = distance - myType.size;
-                let relativeRadius = myType.radius - myType.size;
-                let t = clamp(relativeDistance / max(relativeRadius, 1e-6), 0.0, 1.0);
-                let decayRate = 5.0;
-                let electricAttraction = (exp(-decayRate * t) - exp(-decayRate)) / (1.0 - exp(-decayRate));
-                let forceMagnitude = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
-                force -= attractionWeight * electricAttraction * forceMagnitude * dir;
-
-                // ##### gravity force (blended, fades in outside size) #####
-                let gravityMagnitude = uniforms.G * otherType.mass / (distanceSquared + 1e-6);
-                force -= outerWeight * gravityMagnitude * dir;
+                totalForce += dir * repW  * ${REPULSION_STRENGTH};   // collision repulsion
+                totalForce -= dir * forceMag * typeW;                 // type attraction / repulsion
+                totalForce += dir * densW * ${DENSITY_STRENGTH};     // density spreading
             }
 
-            workgroupBarrier(); // Synchronize before loading the next chunk
+            workgroupBarrier();
         }
 
-
-
-
-
-
-
-        let size = uniforms.worldSize;
-
-        // ##### Update the velocity and position of the particle #####
-        me.velocity = (me.velocity + force) * 0.5;
+        // ── Integrate ──
+        me.velocity = (me.velocity + totalForce) * 0.5;
         me.position += me.velocity;
 
-
-        // ##### Bounding Sphere #####
-        if(length(me.position) >= size) {
+        // ── Bounding Sphere ──
+        let size = uniforms.worldSize;
+        if (length(me.position) >= size) {
             me.velocity = me.velocity * -1.0;
             me.position += me.velocity;
-            me.velocity = vec4f(0, 0,0,0);
-
+            me.velocity = vec4f(0, 0, 0, 0);
         }
 
         particlesOut[index] = me;
