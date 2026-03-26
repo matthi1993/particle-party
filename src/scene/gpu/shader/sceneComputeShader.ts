@@ -161,10 +161,11 @@ export const sceneComputeShader = `
                 if (chunkStart + i >= numParticles) { break; }
                 if (chunkStart + i == index) { continue; } // skip self
 
-                let other = sharedParticles[i];
-                let delta = me.position - other.position; // away from other
-                let dist  = length(delta);
-                let dir   = safeNormalize(delta);
+                let other     = sharedParticles[i];
+                let otherType = particleTypes[i32(other.particleAttributes.x)];
+                let delta     = me.position - other.position; // away from other
+                let dist      = length(delta);
+                let dir       = safeNormalize(delta);
 
                 // ── Particle Life force ──────────────────────────────────────
                 // f < 0 → repulsion: dir points away → subtracting a negative adds force away ✓
@@ -173,6 +174,13 @@ export const sceneComputeShader = `
                 let attraction = myForces[i32(other.particleAttributes.x)] * uniforms.attractionFactor;
                 let f          = particleLifeForce(r, beta, attraction) * ${FORCE_SCALE};
                 totalForce -= dir * f;
+
+                // ── Gravity (separate, additive) ─────────────────────────────
+                // a = G * m_other / (r² + ε)  — softened to avoid singularity at contact.
+                // Skipped entirely when either particle has zero mass.
+                let bothMassive = myType.mass > 0.0 && otherType.mass > 0.0;
+                let gravAccel   = select(0.0, uniforms.G * otherType.mass / (dist * dist + 1e-4), bothMassive);
+                totalForce     -= dir * gravAccel; // toward other
 
                 // ── SPH density + pressure gradient ──────────────────────────
                 // Accumulated for all neighbours regardless of type.
