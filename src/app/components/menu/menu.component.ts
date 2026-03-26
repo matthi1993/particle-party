@@ -51,9 +51,9 @@ export class MenuComponent implements OnInit {
     public selectedPreset: string | null = null;
 
     public LIMITS = {
-        MIN_FORCE: -3,
-        MAX_FORCE: 3,
-        MAX_RADIUS: 100,
+        MIN_FORCE: -1,
+        MAX_FORCE: 1,
+        MAX_RADIUS: 10,
         MAX_MASS: 0.25,
         MIN_SIZE: 0.25,
         MAX_SIZE: 1.0,
